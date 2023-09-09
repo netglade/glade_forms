@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:glade_forms/src/core/generic_input.dart';
 import 'package:glade_forms/src/validator/validator.dart';
 
 // /// Base input with value of type [TInput] and validation error of type [TError].
@@ -19,15 +20,16 @@ typedef ValueComparator<T> = bool Function(T? initial, T? value);
 typedef TranslateError<T> = String Function(
   GenericValidatorError<T> error,
   Object? key,
-  String defaultMessage,
-);
+  String defaultMessage, {
+  required InputDependencies dependencies,
+});
 
 @immutable
 abstract class GladeInputBase<T> {
   @protected
   final ValueComparator<T>? valueComparator;
 
-  final String? inputName;
+  final String? inputKey;
 
   final T value;
 
@@ -54,7 +56,7 @@ abstract class GladeInputBase<T> {
     this.isPure = true,
     this.initialValue,
     this.valueComparator,
-    this.inputName,
+    this.inputKey,
     this.translateError,
   });
 
@@ -98,10 +100,12 @@ abstract class GladeInputBase<T> {
 }
 
 class _GladeForms {
+  // ignore: avoid-dynamic, we allow mix of inputs.
   static bool validate(List<GladeInputBase<dynamic>> inputs) {
     return inputs.every((input) => input.isValid);
   }
 
+  // ignore: avoid-dynamic, we allow mix of inputs.
   static bool isPure(List<GladeInputBase<dynamic>> inputs) {
     return inputs.every((input) => input.isPure);
   }
@@ -116,15 +120,16 @@ mixin GladeFormMixin {
 
   bool get isDirty => !isPure;
 
+  // ignore: avoid-dynamic, we allow mix of inputs.
   List<GladeInputBase<dynamic>> get inputs;
 
   /// Formats errors from `inputs`.
   String get formattedValidationErrors => inputs.map((e) {
         if (e.error?.errors.isNotEmpty ?? false) {
-          return '${e.inputName ?? e.runtimeType} - ${e.errorFormatted()}';
+          return '${e.inputKey ?? e.runtimeType} - ${e.errorFormatted()}';
         }
 
-        return '${e.inputName ?? e.runtimeType} - VALID';
+        return '${e.inputKey ?? e.runtimeType} - VALID';
       }).join('\n');
 
   // ignore: avoid-dynamic, error from Formz is dynamic

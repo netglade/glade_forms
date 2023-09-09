@@ -1,4 +1,5 @@
 import 'package:glade_forms/src/core/generic_input.dart';
+import 'package:glade_forms/src/core/glade_input_base.dart';
 import 'package:glade_forms/src/forms/text_form_field_input_validator_mixin.dart';
 import 'package:glade_forms/src/validator/generic_validator_instance.dart';
 import 'package:glade_forms/src/validator/string_validator.dart';
@@ -9,7 +10,7 @@ class StringInput extends GenericInput<String> with TextFormFieldInputValidatorM
     String? defaultValue,
     bool pure = true,
     TranslateError<String>? translateError,
-    String? inputName,
+    String? inputKey,
   }) {
     final instance = validatorFactory(StringValidator());
 
@@ -18,13 +19,13 @@ class StringInput extends GenericInput<String> with TextFormFieldInputValidatorM
             validatorInstance: instance,
             value: defaultValue ?? '',
             translateError: translateError,
-            inputName: inputName,
+            inputKey: inputKey,
           )
         : StringInput.dirty(
             validatorInstance: instance,
             value: defaultValue ?? '',
             translateError: translateError,
-            inputName: inputName,
+            inputKey: inputKey,
           );
   }
 
@@ -33,7 +34,7 @@ class StringInput extends GenericInput<String> with TextFormFieldInputValidatorM
     super.validatorInstance,
     super.translateError,
     super.initialValue,
-    super.inputName,
+    super.inputKey,
     super.valueComparator,
   }) : super.dirty(value: value ?? '');
 
@@ -42,7 +43,7 @@ class StringInput extends GenericInput<String> with TextFormFieldInputValidatorM
     String? defaultValue,
     bool pure = true,
     TranslateError<String>? translateError,
-    String? inputName,
+    String? inputKey,
   }) {
     final instance = StringValidator().build();
 
@@ -51,13 +52,13 @@ class StringInput extends GenericInput<String> with TextFormFieldInputValidatorM
             validatorInstance: instance,
             value: defaultValue ?? '',
             translateError: translateError,
-            inputName: inputName,
+            inputKey: inputKey,
           )
         : StringInput.dirty(
             validatorInstance: instance,
             value: defaultValue ?? '',
             translateError: translateError,
-            inputName: inputName,
+            inputKey: inputKey,
           );
   }
 
@@ -65,7 +66,7 @@ class StringInput extends GenericInput<String> with TextFormFieldInputValidatorM
     String? value,
     super.validatorInstance,
     super.translateError,
-    super.inputName,
+    super.inputKey,
     super.valueComparator,
   }) : super.pure(value: value ?? '');
 
@@ -75,7 +76,7 @@ class StringInput extends GenericInput<String> with TextFormFieldInputValidatorM
     String? defaultValue,
     bool pure = true,
     TranslateError<String>? translateError,
-    String? inputName,
+    String? inputKey,
   }) {
     final instance = validatorFactory?.call(StringValidator()..notEmpty()) ?? (StringValidator()..notEmpty()).build();
 
@@ -84,13 +85,13 @@ class StringInput extends GenericInput<String> with TextFormFieldInputValidatorM
             validatorInstance: instance,
             value: defaultValue ?? '',
             translateError: translateError,
-            inputName: inputName,
+            inputKey: inputKey,
           )
         : StringInput.dirty(
             validatorInstance: instance,
             value: defaultValue ?? '',
             translateError: translateError,
-            inputName: inputName,
+            inputKey: inputKey,
           );
   }
 
@@ -100,7 +101,7 @@ class StringInput extends GenericInput<String> with TextFormFieldInputValidatorM
         value: value ?? '',
         translateError: translateError,
         initialValue: initialValue,
-        inputName: inputName,
+        inputKey: inputKey,
         valueComparator: valueComparator,
       );
 
@@ -109,7 +110,7 @@ class StringInput extends GenericInput<String> with TextFormFieldInputValidatorM
         validatorInstance: validatorInstance,
         value: value ?? '',
         translateError: translateError,
-        inputName: inputName,
+        inputKey: inputKey,
         valueComparator: valueComparator,
       );
 }

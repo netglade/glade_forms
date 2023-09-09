@@ -11,7 +11,7 @@ class OptionalInput<T> extends GenericInput<T?> {
     super.value,
     super.translateError,
     super.valueComparator,
-    super.inputName,
+    super.inputKey,
     super.initialValue,
   }) : super.dirty(validatorInstance: GenericValidator<T>().build());
 
@@ -19,14 +19,14 @@ class OptionalInput<T> extends GenericInput<T?> {
     super.value,
     super.translateError,
     super.valueComparator,
-    super.inputName,
+    super.inputKey,
   }) : super.pure(validatorInstance: GenericValidator<T>().build());
 
   @override
   OptionalInput<T> asDirty(T? value) => OptionalInput.dirty(
         value: value,
         translateError: translateError,
-        inputName: inputName,
+        inputKey: inputKey,
         valueComparator: valueComparator,
         initialValue: initialValue,
       );
@@ -35,7 +35,7 @@ class OptionalInput<T> extends GenericInput<T?> {
   OptionalInput<T> asPure(T? value) => OptionalInput.pure(
         value: value,
         translateError: translateError,
-        inputName: inputName,
+        inputKey: inputKey,
         valueComparator: valueComparator,
       );
 }

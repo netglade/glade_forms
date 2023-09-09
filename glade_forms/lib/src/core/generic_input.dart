@@ -1,20 +1,20 @@
+import 'package:collection/collection.dart';
 import 'package:glade_forms/src/core/glade_input_base.dart';
 import 'package:glade_forms/src/validator/validator.dart';
 import 'package:meta/meta.dart';
 
-typedef TranslateError<T> = String Function(
-  GenericValidatorError<T> error,
-  Object? key,
-  String defaultMessage,
-);
+typedef InputDependencies = List<GenericInput<dynamic>>;
 
-typedef Comparator<T> = bool Function(T? initial, T? value);
+extension InputDependenciesFunctions on InputDependencies {
+  GenericInput? byKey(String key) => firstWhereOrNull((x) => x.inputKey == key);
+}
 
 @immutable
 class GenericInput<T> extends GladeInputBase<T> {
-  @override
   @protected
   final GenericValidatorInstance<T> validatorInstance;
+
+  final InputDependencies dependencies;
 
   GenericInput._({
     required super.value,
@@ -23,7 +23,8 @@ class GenericInput<T> extends GladeInputBase<T> {
     super.initialValue,
     super.valueComparator,
     super.translateError,
-    super.inputName,
+    super.inputKey,
+    this.dependencies = const [],
   }) {
     validatorInstance.bindInput(this);
   }
@@ -31,34 +32,38 @@ class GenericInput<T> extends GladeInputBase<T> {
   GenericInput.dirty({
     required T value,
     T? initialValue,
-    String? inputName,
+    String? inputKey,
     TranslateError<T>? translateError,
-    Comparator<T>? valueComparator,
+    ValueComparator<T>? valueComparator,
     GenericValidatorInstance<T>? validatorInstance,
+    InputDependencies dependencies = const [],
   }) : this._(
           value: value,
           validatorInstance: validatorInstance ?? GenericValidator<T>().build(),
-          inputName: inputName,
+          inputKey: inputKey,
           initialValue: initialValue,
           translateError: translateError,
           valueComparator: valueComparator,
+          dependencies: dependencies,
           isPure: false,
         );
 
   GenericInput.pure({
     required T value,
     T? initialValue,
-    String? inputName,
+    String? inputKey,
     TranslateError<T>? translateError,
-    Comparator<T>? valueComparator,
+    ValueComparator<T>? valueComparator,
     GenericValidatorInstance<T>? validatorInstance,
+    InputDependencies dependencies = const [],
   }) : this._(
           value: value,
           validatorInstance: validatorInstance ?? GenericValidator<T>().build(),
-          inputName: inputName,
+          inputKey: inputKey,
           initialValue: initialValue ?? value,
           translateError: translateError,
           valueComparator: valueComparator,
+          dependencies: dependencies,
           isPure: true,
         );
 
@@ -73,8 +78,9 @@ class GenericInput<T> extends GladeInputBase<T> {
     T? initialValue,
     bool pure = true,
     TranslateError<T>? translateError,
-    Comparator<T>? comparator,
-    String? inputName,
+    ValueComparator<T>? comparator,
+    String? inputKey,
+    InputDependencies dependencies = const [],
   }) {
     final validator = validatorFactory(GenericValidator<T>());
 
@@ -84,7 +90,8 @@ class GenericInput<T> extends GladeInputBase<T> {
             value: value,
             translateError: translateError,
             valueComparator: comparator,
-            inputName: inputName,
+            inputKey: inputKey,
+            dependencies: dependencies,
           )
         : GenericInput.dirty(
             validatorInstance: validator,
@@ -92,7 +99,8 @@ class GenericInput<T> extends GladeInputBase<T> {
             initialValue: initialValue,
             translateError: translateError,
             valueComparator: comparator,
-            inputName: inputName,
+            inputKey: inputKey,
+            dependencies: dependencies,
           );
   }
 
@@ -102,8 +110,9 @@ class GenericInput<T> extends GladeInputBase<T> {
         value: value,
         translateError: translateError,
         initialValue: initialValue,
-        inputName: inputName,
+        inputKey: inputKey,
         valueComparator: valueComparator,
+        dependencies: dependencies,
       );
 
   @override
@@ -112,8 +121,9 @@ class GenericInput<T> extends GladeInputBase<T> {
         value: value,
         translateError: translateError,
         initialValue: initialValue,
-        inputName: inputName,
+        inputKey: inputKey,
         valueComparator: valueComparator,
+        dependencies: dependencies,
       );
 
   @override
@@ -145,7 +155,9 @@ class GenericInput<T> extends GladeInputBase<T> {
   String translateGenericErrors(ValidatorErrors<T> errors, String delimiter) {
     final translateErrorTmp = translateError;
     if (translateErrorTmp != null) {
-      return errors.errors.map((e) => translateErrorTmp(e, e.key, e.onErrorMessage)).join(delimiter);
+      return errors.errors
+          .map((e) => translateErrorTmp(e, e.key, e.onErrorMessage, dependencies: dependencies))
+          .join(delimiter);
     }
 
     return errors.errors.map((e) => e.toString()).join(delimiter);
@@ -154,7 +166,7 @@ class GenericInput<T> extends GladeInputBase<T> {
   ValidatorErrors<T>? validate() => validator(value);
 
   @override
-  ValidatorErrors<T>? validator(T? value) {
+  ValidatorErrors<T>? validator(T value) {
     final result = validatorInstance.validate(value);
 
     if (result.isValid) return null;
@@ -162,7 +174,7 @@ class GenericInput<T> extends GladeInputBase<T> {
     return result;
   }
 
-  String? formFieldValidator(T? value, {String delimiter = '.'}) {
+  String? formFieldValidator(T value, {String delimiter = '.'}) {
     final convertedError = validator(value);
 
     return convertedError != null ? translate(delimiter: delimiter, customError: convertedError) : null;

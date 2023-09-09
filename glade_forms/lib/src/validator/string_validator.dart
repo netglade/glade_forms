@@ -13,8 +13,8 @@ class StringValidator extends GenericValidator<String> {
     Object? key,
   }) =>
       satisfy(
-        (x, _) {
-          if (x == null || x.isEmpty) {
+        (x, _, __) {
+          if (x.isEmpty) {
             return allowEmpty;
           }
 
@@ -38,8 +38,8 @@ class StringValidator extends GenericValidator<String> {
     Object? key,
   }) =>
       satisfy(
-        (x, _) {
-          if (x == null || x.isEmpty) {
+        (x, _, __) {
+          if (x.isEmpty) {
             return allowEmpty;
           }
 
@@ -54,7 +54,7 @@ class StringValidator extends GenericValidator<String> {
 
   /// Given value can't be empty string (or null).
   void notEmpty({OnError<String>? devError, Object? extra, Object? key}) => satisfy(
-        (input, extra) => input?.isNotEmpty ?? false,
+        (input, extra, __) => input.isNotEmpty,
         devError: devError ?? (_, __) => "Value can't be empty",
         extra: extra,
         key: key,

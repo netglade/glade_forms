@@ -17,11 +17,11 @@ class GenericValidatorInstance<T> {
   void bindInput(GenericInput<T> input) => _input = input;
 
   /// Performs validation on given [value].
-  ValidatorErrors<T> validate(T? value, {Object? extra}) {
+  ValidatorErrors<T> validate(T value, {Object? extra}) {
     final errors = <GenericValidatorError<T>>[];
 
     for (final part in _parts) {
-      final error = part.validate(value, extra: extra);
+      final error = part.validate(value, extra: extra, dependencies: _input.dependencies);
 
       if (error != null) {
         errors.add(error);

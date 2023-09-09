@@ -1,4 +1,5 @@
 import 'package:glade_forms/src/core/generic_input.dart';
+import 'package:glade_forms/src/core/glade_input_base.dart';
 import 'package:glade_forms/src/core/string_to_type_converter.dart';
 import 'package:glade_forms/src/forms/text_form_field_input_validator_mixin.dart';
 import 'package:glade_forms/src/validator/generic_validator_instance.dart';
@@ -16,7 +17,7 @@ class TextFormFieldStringInput extends GenericInput<String?> with TextFormFieldI
     String? defaultValue,
     bool pure = true,
     TranslateError<String?>? translateError,
-    String? inputName,
+    String? inputKey,
   }) {
     final instance = validatorFactory(StringValidator());
 
@@ -25,13 +26,13 @@ class TextFormFieldStringInput extends GenericInput<String?> with TextFormFieldI
             validatorInstance: instance,
             value: defaultValue,
             translateError: translateError,
-            inputName: inputName,
+            inputKey: inputKey,
           )
         : TextFormFieldStringInput.dirty(
             validatorInstance: instance,
             value: defaultValue,
             translateError: translateError,
-            inputName: inputName,
+            inputKey: inputKey,
           );
   }
 
@@ -39,7 +40,7 @@ class TextFormFieldStringInput extends GenericInput<String?> with TextFormFieldI
     super.value,
     super.validatorInstance,
     super.translateError,
-    super.inputName,
+    super.inputKey,
     super.valueComparator,
   })  : _stringToTypeConverter = StringToTypeConverter(converter: (x, _) => x ?? ''),
         super.dirty();
@@ -48,7 +49,7 @@ class TextFormFieldStringInput extends GenericInput<String?> with TextFormFieldI
     super.value,
     super.validatorInstance,
     super.translateError,
-    super.inputName,
+    super.inputKey,
     super.valueComparator,
   })  : _stringToTypeConverter = StringToTypeConverter(converter: (x, _) => x ?? ''),
         super.pure();
@@ -58,7 +59,7 @@ class TextFormFieldStringInput extends GenericInput<String?> with TextFormFieldI
         value: value,
         validatorInstance: validatorInstance,
         translateError: translateError,
-        inputName: inputName,
+        inputKey: inputKey,
         valueComparator: valueComparator,
       );
 
@@ -67,7 +68,7 @@ class TextFormFieldStringInput extends GenericInput<String?> with TextFormFieldI
         value: value,
         validatorInstance: validatorInstance,
         translateError: translateError,
-        inputName: inputName,
+        inputKey: inputKey,
         valueComparator: valueComparator,
       );
 }

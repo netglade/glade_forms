@@ -1,4 +1,5 @@
 import 'package:glade_forms/src/core/generic_input.dart';
+import 'package:glade_forms/src/core/glade_input_base.dart';
 import 'package:glade_forms/src/core/string_to_type_converter.dart';
 import 'package:glade_forms/src/forms/text_form_field_input_validator_mixin.dart';
 import 'package:glade_forms/src/validator/validator.dart';
@@ -18,7 +19,7 @@ class TextFormFieldGenericInput<T> extends GenericInput<T?> with TextFormFieldIn
     bool pure = true,
     StringToTypeConverter<T>? converter,
     TranslateError<T?>? translateError,
-    String? inputName,
+    String? inputKey,
   }) {
     final instance = validatorFactory(GenericValidator<T>());
 
@@ -28,14 +29,14 @@ class TextFormFieldGenericInput<T> extends GenericInput<T?> with TextFormFieldIn
             value: defaultValue,
             stringToTypeConverter: converter,
             translateError: translateError,
-            inputName: inputName,
+            inputKey: inputKey,
           )
         : TextFormFieldGenericInput.dirty(
             validatorInstance: instance,
             value: defaultValue,
             stringToTypeConverter: converter,
             translateError: translateError,
-            inputName: inputName,
+            inputKey: inputKey,
           );
   }
 
@@ -44,7 +45,7 @@ class TextFormFieldGenericInput<T> extends GenericInput<T?> with TextFormFieldIn
     super.validatorInstance,
     StringToTypeConverter<T>? stringToTypeConverter,
     super.translateError,
-    super.inputName,
+    super.inputKey,
   })  : assert(
           _typesEqual<T, String>() || _typesEqual<T, String?>() || stringToTypeConverter != null,
           'For non-string values [converter] must be provided. TInput type: ${T.runtimeType}',
@@ -57,7 +58,7 @@ class TextFormFieldGenericInput<T> extends GenericInput<T?> with TextFormFieldIn
     super.validatorInstance,
     StringToTypeConverter<T>? stringToTypeConverter,
     super.translateError,
-    super.inputName,
+    super.inputKey,
   })  : assert(
           _typesEqual<T, String>() || _typesEqual<T, String?>() || stringToTypeConverter != null,
           'For non-string values [converter] must be provided. TInput type: ${T.runtimeType}',
@@ -71,7 +72,7 @@ class TextFormFieldGenericInput<T> extends GenericInput<T?> with TextFormFieldIn
         value: value,
         stringToTypeConverter: _stringToTypeConverter,
         translateError: translateError,
-        inputName: inputName,
+        inputKey: inputKey,
       );
 
   @override
@@ -80,6 +81,6 @@ class TextFormFieldGenericInput<T> extends GenericInput<T?> with TextFormFieldIn
         value: value,
         stringToTypeConverter: _stringToTypeConverter,
         translateError: translateError,
-        inputName: inputName,
+        inputKey: inputKey,
       );
 }

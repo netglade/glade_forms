@@ -9,7 +9,7 @@ class RequiredInput<T> extends GenericInput<T> {
     required super.value,
     super.translateError,
     super.valueComparator,
-    super.inputName,
+    super.inputKey,
     super.initialValue,
   }) : super.dirty(validatorInstance: (GenericValidator<T>()..notNull()).build());
 
@@ -17,14 +17,14 @@ class RequiredInput<T> extends GenericInput<T> {
     required super.value,
     super.translateError,
     super.valueComparator,
-    super.inputName,
+    super.inputKey,
   }) : super.pure(validatorInstance: (GenericValidator<T>()..notNull()).build());
 
   @override
   RequiredInput<T> asDirty(T value) => RequiredInput.dirty(
         value: value,
         translateError: translateError,
-        inputName: inputName,
+        inputKey: inputKey,
         valueComparator: valueComparator,
         initialValue: initialValue,
       );
@@ -33,7 +33,7 @@ class RequiredInput<T> extends GenericInput<T> {
   RequiredInput<T> asPure(T value) => RequiredInput.pure(
         value: value,
         translateError: translateError,
-        inputName: inputName,
+        inputKey: inputKey,
         valueComparator: valueComparator,
       );
 }
