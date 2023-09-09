@@ -1,0 +1,25 @@
+name: glade_forms_example
+description: Glade Forms - Interactive example
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ">=2.16.0 <3.0.0"
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_hooks: ^0.20.1
+  glade_forms:
+    path: ../../glade_forms
+  provider: ^6.0.2
+  storybook_flutter: ^0.14.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  netglade_analysis: ^4.2.0
+
+flutter:
+  uses-material-design: true

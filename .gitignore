@@ -1,7 +1,33 @@
-# https://dart.dev/guides/libraries/private-files
-# Created by `dart pub`
-.dart_tool/
+.DS_Store
+.atom/
+.idea/
+!.idea/runConfigurations
+.melos_tool/*
+melos_my_project.iml
+.vscode/*
+!.vscode/tasks.json
+!.vscode/settings.json
 
-# Avoid committing pubspec.lock for library packages; see
-# https://dart.dev/guides/libraries/private-files#pubspeclock.
+.packages
+.pub/
+.dart_tool/
 pubspec.lock
+pubspec_overrides.yaml
+
+GeneratedPluginRegistrant.h
+GeneratedPluginRegistrant.m
+GeneratedPluginRegistrant.java
+GeneratedPluginRegistrant.swift
+generated_plugin_registrant.dart
+
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+.project
+.classpath
+.settings
+.last_build_id
+*.iml
+
+.fvm/flutter_sdk

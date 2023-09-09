@@ -1,0 +1,32 @@
+name: glade_forms_workspace
+
+packages:
+  - glade_forms/**
+  - examples/**
+
+command:
+  bootstrap:
+    usePubspecOverrides: true
+
+scripts:
+  # ANALYZING
+
+  lint:all:
+    run: melos run lint:dart && melos run lint:dcm
+    description: Run all static analysis checks.
+
+  lint:dart:
+    run: melos exec -c 10 -- dart analyze --fatal-infos
+    description: Run Dart static analysis checks.
+
+  lint:dcm:
+    run: melos exec -c 10 -- dart run dart_code_metrics:metrics analyze . --fatal-style --fatal-performance --fatal-warnings
+    description: Run DCM static analysis checks.
+
+  # TESTING
+
+  test:
+    run: melos exec -- dart test
+    packageFilters:
+      dirExists: test
+    description: Run all Dart tests.

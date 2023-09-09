@@ -1,0 +1,10 @@
+include: package:netglade_analysis/lints.yaml
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+
+dart_code_metrics:
+  extends:
+    - package:netglade_analysis/dcm.yaml
