@@ -1,5 +1,5 @@
 import 'package:glade_forms/src/validator/generic_validator_instance.dart';
-import 'package:glade_forms/src/validator/part/custom_part.dart';
+import 'package:glade_forms/src/validator/part/custom_validation_part.dart';
 import 'package:glade_forms/src/validator/part/input_validator_part.dart';
 import 'package:glade_forms/src/validator/part/satisfy_predicate_part.dart';
 import 'package:glade_forms/src/validator/validator_error/validator_error.dart';
@@ -23,20 +23,20 @@ class GenericValidator<T> {
   void clear() => parts = [];
 
   /// Checks value with custom validation function.
-  void custom(ValidateFunction<T> onValidate, {Object? localeKey}) =>
-      parts.add(CustomPart(customValidator: onValidate, localeKey: localeKey));
+  void custom(ValidateFunction<T> onValidate, {Object? key}) =>
+      parts.add(CustomValidationPart(customValidator: onValidate, key: key));
 
   /// Checks value through custom validator [part].
   void customPart(InputValidatorPart<T> part) => parts.add(part);
 
   /// Checks that value is not null. Returns [ValueNullError] error.
-  void notNull({OnError<T>? devError, Object? localeKey}) => custom(
+  void notNull({OnError<T>? devError, Object? key}) => custom(
         (value, {extra}) => value == null
             ? ValueNullError<T>(
                 value: value,
                 devError: devError,
                 extra: extra,
-                localeKey: localeKey,
+                key: key,
               )
             : null,
       );
@@ -46,14 +46,14 @@ class GenericValidator<T> {
     SatisfyPredicate<T> predicate, {
     required OnError<T> devError,
     Object? extra,
-    Object? localeKey,
+    Object? key,
   }) =>
       parts.add(
         SatisfyPredicatePart(
           predicate: predicate,
           devError: devError,
           extra: extra,
-          localeKey: localeKey,
+          key: key,
         ),
       );
 }

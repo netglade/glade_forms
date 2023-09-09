@@ -5,6 +5,6 @@ class ValueNullError<T> extends GenericValidatorError<T> {
     required super.value,
     OnError<T>? devError,
     super.extra,
-    super.localeKey,
+    super.key,
   }) : super(devError: devError ?? (_, __) => "Value can't be null");
 }

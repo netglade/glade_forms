@@ -5,6 +5,6 @@ class ValueIncorrectFormatError<T> extends GenericValidatorError<T> {
     required super.value,
     OnError<T>? devError,
     super.extra,
-    super.localeKey,
-  }) : super(devError: devError ?? (value, __) => 'Given value "$value" does not have valid format');
+    super.key,
+  }) : super(devError: devError ?? (value, __) => 'Given value "${value ?? 'NULL'}" does not have valid format');
 }

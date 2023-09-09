@@ -1,4 +1,4 @@
-import 'package:glade_forms/src/generic_input.dart';
+import 'package:glade_forms/src/core/generic_input.dart';
 import 'package:glade_forms/src/validator/validator.dart';
 
 class GenericValidatorInstance<T> {

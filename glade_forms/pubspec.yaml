@@ -5,11 +5,13 @@ version: 1.0.0
 
 environment:
   sdk: ^3.0.6
+  flutter: ">=1.17.0"
 
 # Add regular dependencies here.
 dependencies:
   equatable: ^2.0.5
-  formz: ^0.6.0
+  flutter:
+    sdk: flutter
   meta: ^1.9.1
 
 dev_dependencies:

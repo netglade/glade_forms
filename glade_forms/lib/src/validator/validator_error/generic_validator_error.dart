@@ -12,7 +12,7 @@ abstract class GenericValidatorError<T> extends Equatable {
 
   /// Can be used to identify concrete error when translating.
   // ignore: no-object-declaration, locate key can be any object
-  final Object? localeKey;
+  final Object? key;
 
   /// Value which triggered validation and returned this error.
   final T? value;
@@ -20,17 +20,17 @@ abstract class GenericValidatorError<T> extends Equatable {
   String get onErrorMessage => devError(value, extra);
 
   @override
-  List<Object?> get props => [value, devError, extra, localeKey];
+  List<Object?> get props => [value, devError, extra, key];
 
   const GenericValidatorError({
     required this.value,
     required this.devError,
     this.extra,
-    this.localeKey,
+    this.key,
   });
 
-  factory GenericValidatorError.cantBeNull(T? value, {Object? extra, Object? localeKey}) =>
-      ValueNullError<T>(value: value, localeKey: localeKey, extra: extra);
+  factory GenericValidatorError.cantBeNull(T? value, {Object? extra, Object? key}) =>
+      ValueNullError<T>(value: value, key: key, extra: extra);
 
   @override
   String toString() {

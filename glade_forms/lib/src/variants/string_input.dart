@@ -1,9 +1,9 @@
-import 'package:glade_forms/src/generic_input.dart';
-import 'package:glade_forms/src/text_form_field_input_validator.dart';
+import 'package:glade_forms/src/core/generic_input.dart';
+import 'package:glade_forms/src/forms/text_form_field_input_validator_mixin.dart';
 import 'package:glade_forms/src/validator/generic_validator_instance.dart';
 import 'package:glade_forms/src/validator/string_validator.dart';
 
-class StringInput extends GenericInput<String> with TextFormFieldInputValidator {
+class StringInput extends GenericInput<String> with TextFormFieldInputValidatorMixin<String> {
   factory StringInput.create(
     GenericValidatorInstance<String> Function(StringValidator validator) validatorFactory, {
     String? defaultValue,
@@ -15,13 +15,13 @@ class StringInput extends GenericInput<String> with TextFormFieldInputValidator 
 
     return pure
         ? StringInput.pure(
-            validator: instance,
+            validatorInstance: instance,
             value: defaultValue ?? '',
             translateError: translateError,
             inputName: inputName,
           )
         : StringInput.dirty(
-            validator: instance,
+            validatorInstance: instance,
             value: defaultValue ?? '',
             translateError: translateError,
             inputName: inputName,
@@ -30,11 +30,11 @@ class StringInput extends GenericInput<String> with TextFormFieldInputValidator 
 
   StringInput.dirty({
     String? value,
-    super.validator,
+    super.validatorInstance,
     super.translateError,
     super.initialValue,
     super.inputName,
-    super.comparator,
+    super.valueComparator,
   }) : super.dirty(value: value ?? '');
 
   /// String input which allows empty (and null) values without any additional validations.
@@ -48,13 +48,13 @@ class StringInput extends GenericInput<String> with TextFormFieldInputValidator 
 
     return pure
         ? StringInput.pure(
-            validator: instance,
+            validatorInstance: instance,
             value: defaultValue ?? '',
             translateError: translateError,
             inputName: inputName,
           )
         : StringInput.dirty(
-            validator: instance,
+            validatorInstance: instance,
             value: defaultValue ?? '',
             translateError: translateError,
             inputName: inputName,
@@ -63,10 +63,10 @@ class StringInput extends GenericInput<String> with TextFormFieldInputValidator 
 
   StringInput.pure({
     String? value,
-    super.validator,
+    super.validatorInstance,
     super.translateError,
     super.inputName,
-    super.comparator,
+    super.valueComparator,
   }) : super.pure(value: value ?? '');
 
   /// String input with predefined `notEmpty` validation rule.
@@ -81,13 +81,13 @@ class StringInput extends GenericInput<String> with TextFormFieldInputValidator 
 
     return pure
         ? StringInput.pure(
-            validator: instance,
+            validatorInstance: instance,
             value: defaultValue ?? '',
             translateError: translateError,
             inputName: inputName,
           )
         : StringInput.dirty(
-            validator: instance,
+            validatorInstance: instance,
             value: defaultValue ?? '',
             translateError: translateError,
             inputName: inputName,
@@ -96,20 +96,20 @@ class StringInput extends GenericInput<String> with TextFormFieldInputValidator 
 
   @override
   StringInput asDirty(String? value) => StringInput.dirty(
-        validator: validatorInstance,
+        validatorInstance: validatorInstance,
         value: value ?? '',
         translateError: translateError,
-        initialValue: initial,
+        initialValue: initialValue,
         inputName: inputName,
-        comparator: comparator,
+        valueComparator: valueComparator,
       );
 
   @override
   StringInput asPure(String? value) => StringInput.pure(
-        validator: validatorInstance,
+        validatorInstance: validatorInstance,
         value: value ?? '',
         translateError: translateError,
         inputName: inputName,
-        comparator: comparator,
+        valueComparator: valueComparator,
       );
 }

@@ -1,4 +1,4 @@
-import 'package:glade_forms/src/generic_input.dart';
+import 'package:glade_forms/src/core/generic_input.dart';
 import 'package:glade_forms/src/validator/generic_validator.dart';
 
 /// Predefined GenericInput with predefined `notNull` validation.
@@ -6,34 +6,34 @@ import 'package:glade_forms/src/validator/generic_validator.dart';
 /// In case of need of any aditional validation use `GenericInput` directly.
 class RequiredInput<T> extends GenericInput<T> {
   RequiredInput.dirty({
-    super.value,
+    required super.value,
     super.translateError,
-    super.comparator,
+    super.valueComparator,
     super.inputName,
     super.initialValue,
-  }) : super.dirty(validator: (GenericValidator<T>()..notNull()).build());
+  }) : super.dirty(validatorInstance: (GenericValidator<T>()..notNull()).build());
 
   RequiredInput.pure({
-    super.value,
+    required super.value,
     super.translateError,
-    super.comparator,
+    super.valueComparator,
     super.inputName,
-  }) : super.pure(validator: (GenericValidator<T>()..notNull()).build());
+  }) : super.pure(validatorInstance: (GenericValidator<T>()..notNull()).build());
 
   @override
-  RequiredInput<T> asDirty(T? value) => RequiredInput.dirty(
+  RequiredInput<T> asDirty(T value) => RequiredInput.dirty(
         value: value,
         translateError: translateError,
         inputName: inputName,
-        comparator: comparator,
-        initialValue: initial,
+        valueComparator: valueComparator,
+        initialValue: initialValue,
       );
 
   @override
-  RequiredInput<T> asPure(T? value) => RequiredInput.pure(
+  RequiredInput<T> asPure(T value) => RequiredInput.pure(
         value: value,
         translateError: translateError,
         inputName: inputName,
-        comparator: comparator,
+        valueComparator: valueComparator,
       );
 }

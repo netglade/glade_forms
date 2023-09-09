@@ -15,7 +15,7 @@ class SatisfyPredicatePart<T> extends InputValidatorPart<T> {
     required this.predicate,
     required this.devError,
     this.extra,
-    super.localeKey,
+    super.key,
   });
 
   @override
@@ -26,7 +26,7 @@ class SatisfyPredicatePart<T> extends InputValidatorPart<T> {
             value: value,
             devError: devError,
             extra: extra,
-            localeKey: localeKey,
+            key: key,
           );
   }
 }

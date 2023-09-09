@@ -10,7 +10,7 @@ class StringValidator extends GenericValidator<String> {
     OnError<String>? devError,
     Object? extra,
     bool allowEmpty = false,
-    Object? localeKey,
+    Object? key,
   }) =>
       satisfy(
         (x, _) {
@@ -22,9 +22,9 @@ class StringValidator extends GenericValidator<String> {
 
           return regExp.hasMatch(x);
         },
-        devError: devError ?? (value, _) => 'Value "$value" is not in e-mail format',
+        devError: devError ?? (value, _) => 'Value "${value ?? 'NULL'}" is not in e-mail format',
         extra: extra,
-        localeKey: localeKey,
+        key: key,
       );
 
   /// Checks that value is valid URL address.
@@ -35,7 +35,7 @@ class StringValidator extends GenericValidator<String> {
     OnError<String>? devError,
     Object? extra,
     bool allowEmpty = false,
-    Object? localeKey,
+    Object? key,
   }) =>
       satisfy(
         (x, _) {
@@ -47,21 +47,16 @@ class StringValidator extends GenericValidator<String> {
 
           return regExp.hasMatch(x);
         },
-        devError: devError ?? (value, _) => 'Value "$value" is not valid URL address',
+        devError: devError ?? (value, _) => 'Value "${value ?? 'NULL'}" is not valid URL address',
         extra: extra,
-        localeKey: localeKey,
+        key: key,
       );
 
   /// Given value can't be empty string (or null).
-  void notEmpty({
-    OnError<String>? devError,
-    Object? extra,
-    Object? localeKey,
-  }) =>
-      satisfy(
+  void notEmpty({OnError<String>? devError, Object? extra, Object? key}) => satisfy(
         (input, extra) => input?.isNotEmpty ?? false,
         devError: devError ?? (_, __) => "Value can't be empty",
         extra: extra,
-        localeKey: localeKey,
+        key: key,
       );
 }

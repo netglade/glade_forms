@@ -1,4 +1,4 @@
-import 'package:glade_forms/src/convert_error.dart';
+import 'package:glade_forms/src/core/convert_error.dart';
 import 'package:glade_forms/src/validator/validator_error/validator_error.dart';
 
 // ignore: avoid-dynamic, ok for now

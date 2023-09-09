@@ -1,6 +1,6 @@
-import 'package:glade_forms/src/base_input.dart';
-import 'package:glade_forms/src/convert_error.dart';
-import 'package:glade_forms/src/string_to_type_converter.dart';
+import 'package:glade_forms/src/core/convert_error.dart';
+import 'package:glade_forms/src/core/glade_input_base.dart';
+import 'package:glade_forms/src/core/string_to_type_converter.dart';
 import 'package:meta/meta.dart';
 
 /// Provides short-hand validator function for TextFormField's [validator] function
@@ -9,7 +9,7 @@ import 'package:meta/meta.dart';
 ///
 /// This mixin could be mixed-in into GenericInput's with its validator for easy validation.
 /// If [T] is not a String instance given class should override [converter] to provide concrete type converter ino concrete type.
-mixin TextFormFieldInputValidator<T, E> on BaseInput<T, E> {
+mixin TextFormFieldInputValidatorMixin<T> on GladeInputBase<T> {
   @protected
   StringToTypeConverter<T> get converter => StringToTypeConverter<T>(converter: (x, _) => x as T);
 

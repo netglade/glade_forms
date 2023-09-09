@@ -1,9 +1,12 @@
+// ignore_for_file: prefer-match-file-name
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:storybook_flutter/storybook_flutter.dart';
 
-GlobalKey<NavigatorState> storyNavigatorKey = GlobalKey(debugLabel: 'storyNavigatorKey');
+// ignore: prefer-static-class, ok for now
+final GlobalKey<NavigatorState> storyNavigatorKey = GlobalKey(debugLabel: 'storyNavigatorKey');
 
 void main() {
   runApp(const App());

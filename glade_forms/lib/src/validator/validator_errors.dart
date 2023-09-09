@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:glade_forms/src/generic_input.dart';
+import 'package:glade_forms/src/core/generic_input.dart';
 import 'package:glade_forms/src/validator/validator_error/validator_error.dart';
 
 class ValidatorErrors<T> extends Equatable {

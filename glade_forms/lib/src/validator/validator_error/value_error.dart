@@ -5,6 +5,6 @@ class ValueError<T> extends GenericValidatorError<T> {
     required super.value,
     required super.devError,
     super.extra,
-    super.localeKey,
+    super.key,
   });
 }
