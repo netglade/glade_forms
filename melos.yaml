@@ -1,7 +1,7 @@
 name: glade_forms_workspace
 
 packages:
-  - glade_forms/**
+  - glade_forms
   - examples/**
 
 command:
@@ -9,6 +9,9 @@ command:
     usePubspecOverrides: true
 
 scripts:
+  setup:
+    run: melos exec -- fvm flutter pub get
+
   # ANALYZING
 
   lint:all:
@@ -30,3 +33,11 @@ scripts:
     packageFilters:
       dirExists: test
     description: Run all Dart tests.
+
+  # Gallery
+  gallery_setup:
+    run:
+      melos exec -- flutter pub run easy_localization:generate -S "assets/translations" -o locale_loader.g.dart |
+      melos exec -- fvm flutter pub run easy_localization:generate -S "assets/translations" --skip-unnecessary-keys -f keys -o locale_keys.g.dart
+    packageFilters:
+      dependsOn: easy_localization

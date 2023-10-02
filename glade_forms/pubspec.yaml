@@ -4,8 +4,8 @@ version: 1.0.0
 # repository: https://github.com/my_org/my_repo
 
 environment:
-  sdk: ^3.0.6
-  flutter: ">=1.17.0"
+  sdk: ^3.0.0
+  flutter: ">=3.0.0"
 
 # Add regular dependencies here.
 dependencies:
@@ -14,6 +14,7 @@ dependencies:
   flutter:
     sdk: flutter
   meta: ^1.9.1
+  provider: ^6.0.5
 
 dev_dependencies:
   netglade_analysis: ^4.1.0

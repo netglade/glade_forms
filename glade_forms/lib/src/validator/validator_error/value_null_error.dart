@@ -3,7 +3,7 @@ import 'package:glade_forms/src/validator/validator_error/generic_validator_erro
 class ValueNullError<T> extends GenericValidatorError<T> {
   ValueNullError({
     required super.value,
-    OnError<T>? devError,
+    OnValidateError<T>? devError,
     super.extra,
     super.key,
   }) : super(devError: devError ?? (_, __) => "Value can't be null");

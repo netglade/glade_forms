@@ -1,5 +1,1 @@
-/// Support for doing something awesome.
-///
-/// More dartdocs go here.
-/// TODO
-library;
+export 'src/src.dart';

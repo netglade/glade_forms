@@ -1,39 +1,80 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+<a href="https://github.com/netglade">
+    <img alt="netglade" height='120px' src="https://raw.githubusercontent.com/netglade/auto_mappr/main/packages/auto_mappr/doc/badge_dark.png">  
+</a>
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages). 
+Developed with 💚 by [netglade][netglade_link]
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages). 
--->
+[![ci][ci_badge]][ci_badge_link]
+[![glade_forms][glade_forms_pub_badge]][glade_forms_pub_badge_link]
+[![license: MIT][license_badge]][license_badge_link]
+[![style: netglade analysis][style_badge]][style_badge_link]
+[![Discord][discord_badge]][discord_badge_link]
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+---
 
-## Features
+A universal way to define form validators with support of translations.
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+- [👀 What is this?](#-what-is-this)
+  - [Why should I use it?](#why-should-i-use-it)
+- [🚀 Getting started](#-getting-started)
+  - [Mutable or immutable model](#mutable-or-immutable-model)
+  - [Quickstart example](#quickstart-example)
+  - [Existing validators](#existing-validators)
+  - [Creating own reusable ValidatorPart](#creating-own-reusable-validatorpart)
+  - [Adding translation support](#adding-translation-support)
+  - [Debugging validators](#debugging-validators)
+- [👏 Contributing](#-contributing)
 
-## Getting started
+## 👀 What is this?
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+Glade forms offer unified way to define reusable 
+and fluent API to define Form fields input's validators with support of translation on top of that.
 
-## Usage
+### Why should I use it?
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
+
+## 🚀 Getting started
+
+Quicstart example: 
 
 ```dart
-const like = 'sample';
+
+
 ```
 
-## Additional information
+### Mutable or immutable model
 
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+
+### Quickstart example
+
+TBD
+
+### Existing validators
+
+
+### Creating own reusable ValidatorPart
+
+### Adding translation support
+
+
+### Debugging validators
+
+
+
+
+
+## 👏 Contributing
+
+Your contributions are always welcome! Feel free to open pull request.
+
+[netglade_link]: https://netglade.com/en
+[ci_badge]: https://github.com/netglade/glade_forms/actions/workflows/ci.yaml/badge.svg
+[ci_badge_link]: https://github.com/netglade/glade_forms/actions
+[license_badge]: https://img.shields.io/badge/license-MIT-blue.svg
+[license_badge_link]: https://opensource.org/licenses/MIT
+[style_badge]: https://img.shields.io/badge/style-netglade_analysis-26D07C.svg
+[style_badge_link]: https://pub.dev/packages/netglade_analysis
+[glade_forms_pub_badge]: https://img.shields.io/pub/v/glade_forms.svg
+[glade_forms_pub_badge_link]: https://pub.dartlang.org/packages/glade_forms
+[discord_badge]: https://img.shields.io/discord/1091460081054400532.svg?logo=discord&color=blue
+[discord_badge_link]: https://discord.gg/sJfBBuDZy4

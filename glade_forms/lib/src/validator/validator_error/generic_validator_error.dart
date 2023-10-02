@@ -1,33 +1,43 @@
 import 'package:equatable/equatable.dart';
+import 'package:glade_forms/src/core/glade_input_error.dart';
 import 'package:glade_forms/src/validator/validator_error/value_null_error.dart';
 
-typedef OnError<T> = String Function(T? value, Object? extra);
+/// When validation failed but we already have propert [T] value.
+typedef OnValidateError<T> = String Function(T? value, Object? extra);
 
-abstract class GenericValidatorError<T> extends Equatable {
+// TODO(petr): Rename to Glade?.
+abstract class GenericValidatorError<T> extends GladeInputError<T> with EquatableMixin {
   /// Error message when translation is not used. Useful for development.
-  final OnError<T> devError;
+  final OnValidateError<T> devError;
 
   // ignore: no-object-declaration, extra can be any object
   final Object? extra;
 
-  /// Can be used to identify concrete error when translating.
-  // ignore: no-object-declaration, locate key can be any object
-  final Object? key;
+  // /// Can be used to identify concrete error when translating.
+  // @override
+  // // ignore: no-object-declaration, key can be any object
+  // final Object? key;
 
   /// Value which triggered validation and returned this error.
   final T? value;
 
-  String get onErrorMessage => devError(value, extra);
+  @override
+  // ignore: no-object-declaration, error can be anything (but typically it is string)
+  Object get error => devError(value, extra);
+
+  String get devErrorMessage => devError(value, extra);
 
   @override
-  List<Object?> get props => [value, devError, extra, key];
+  List<Object?> get props => [value, devError, extra, key, error, isConversionError];
 
-  const GenericValidatorError({
+  GenericValidatorError({
     required this.value,
-    required this.devError,
+    OnValidateError<T>? devError,
     this.extra,
-    this.key,
-  });
+    super.key,
+  }) : devError = devError ??
+            ((value, _) =>
+                'Value "${value ?? 'NULL'}" does not satisfy validation. [This is default validation meessage. Consider to set `devErro` to cutomize validation errors]');
 
   factory GenericValidatorError.cantBeNull(T? value, {Object? extra, Object? key}) =>
       ValueNullError<T>(value: value, key: key, extra: extra);
