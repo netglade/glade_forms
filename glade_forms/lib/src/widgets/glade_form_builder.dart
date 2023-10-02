@@ -3,9 +3,9 @@ import 'package:glade_forms/src/core/core.dart';
 import 'package:glade_forms/src/widgets/glade_form_provider.dart';
 import 'package:provider/provider.dart';
 
-typedef GladeFormWidgetBuilder<M extends MutableGenericModel> = Widget Function(BuildContext context, M model);
+typedef GladeFormWidgetBuilder<M extends GladeModel> = Widget Function(BuildContext context, M model);
 
-class GladeFormBuilder<M extends MutableGenericModel> extends StatelessWidget {
+class GladeFormBuilder<M extends GladeModel> extends StatelessWidget {
   final CreateModelFunction<M>? create;
   final M? value;
   final GladeFormWidgetBuilder<M> builder;

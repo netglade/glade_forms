@@ -3,4 +3,5 @@ class GladeErrorKeys {
   static const String stringNotUrl = 'string-not-url';
   static const String stringNotEmail = 'string-not-email';
   static const String valueIsNull = 'value-is-null';
+  static const String conversionError = 'value-cant-be-converted';
 }

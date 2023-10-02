@@ -1,7 +1,7 @@
+import 'package:glade_forms/src/core/glade_error_keys.dart';
 import 'package:glade_forms/src/validator/generic_validator.dart';
 import 'package:glade_forms/src/validator/regex_patterns.dart';
 import 'package:glade_forms/src/validator/validator_error/validator_error.dart';
-import 'package:glade_forms/src/validator/validator_error/validator_keys.dart';
 
 class StringValidator extends GenericValidator<String> {
   /// Checks that value is valid email address.

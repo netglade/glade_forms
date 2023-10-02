@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:glade_forms/src/core/core.dart';
 
-abstract class MutableGenericModel extends ChangeNotifier with GladeFormMixin {
+abstract class GladeModel extends ChangeNotifier with GladeFormMixin {
   // @protected
   // void updateInput<INPUT extends GladeInput<T>, T>(INPUT input, T value, void Function(INPUT v) assign) {
   //   if (input.value == value) return;
@@ -17,7 +17,7 @@ abstract class MutableGenericModel extends ChangeNotifier with GladeFormMixin {
     notifyListeners();
   }
 
-  void updateInput<INPUT extends GladeInput<T>, T>(INPUT input, T value) {
+  void updateInput<INPUT extends GladeInput<T?>, T>(INPUT input, T value) {
     if (input.value == value) return;
 
     input.value = value;

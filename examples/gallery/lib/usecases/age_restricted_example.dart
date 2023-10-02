@@ -1,3 +1,5 @@
+// ignore_for_file: prefer-match-file-name
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:glade_forms/glade_forms.dart';
@@ -9,7 +11,7 @@ class _ErrorKeys {
   static const String ageRestriction = 'age-restriction';
 }
 
-class _Model extends MutableGenericModel {
+class AgeRestrictedModel extends GladeModel {
   late StringInput nameInput;
   late GladeInput<int> ageInput;
   late GladeInput<bool> vipInput;
@@ -17,7 +19,7 @@ class _Model extends MutableGenericModel {
   @override
   List<GladeInput<Object?>> get inputs => [nameInput, ageInput, vipInput];
 
-  _Model() {
+  AgeRestrictedModel() {
     nameInput = StringInput.required(
       inputKey: 'name-input',
       defaultTranslations: DefaultTranslations(
@@ -42,13 +44,7 @@ class _Model extends MutableGenericModel {
             ))
           .build(),
       value: 0,
-      valueConverter: StringToTypeConverter(
-        converter: (rawInput, cantConvert) {
-          if (rawInput == null) return cantConvert(error: 'Input can not be null', rawValue: rawInput);
-
-          return int.tryParse(rawInput) ?? cantConvert(error: 'Can not convert', rawValue: rawInput);
-        },
-      ),
+      valueConverter: GladeTypeConverters.intConverter,
       inputKey: 'age-input',
       translateError: (error, key, devMessage, {required dependencies}) {
         if (key == _ErrorKeys.ageRestriction) return LocaleKeys.ageRestriction_under18.tr();
@@ -77,10 +73,11 @@ If *VIP content* is checked, **age** must be over 18.
  ''';
 
     return UsecaseContainer(
-      shortDescription: 'If *VIP content* is checked, **age** must be over 18.',
+      shortDescription: "Age input depends on checkbox's value",
       description: markdownData,
+      className: 'age_restricted_example.dart',
       child: GladeFormBuilder(
-        create: (context) => _Model(),
+        create: (context) => AgeRestrictedModel(),
         builder: (context, formModel) => Padding(
           padding: const EdgeInsets.all(8),
           child: Form(
@@ -89,11 +86,13 @@ If *VIP content* is checked, **age** must be over 18.
               children: [
                 TextFormField(
                   initialValue: formModel.nameInput.value,
+                  decoration: const InputDecoration(labelText: 'Name'),
                   onChanged: (value) => formModel.stringFieldUpdateInput(formModel.nameInput, value),
                   validator: formModel.nameInput.formFieldInputValidator,
                 ),
                 TextFormField(
                   initialValue: formModel.ageInput.stringValue,
+                  decoration: const InputDecoration(labelText: 'Age'),
                   onChanged: (value) => formModel.stringFieldUpdateInput(formModel.ageInput, value),
                   validator: (v) => formModel.ageInput.formFieldInputValidator(v),
                 ),
@@ -102,13 +101,15 @@ If *VIP content* is checked, **age** must be over 18.
                   title: const Text('VIP Content'),
                   onChanged: (value) => formModel.updateInput(formModel.vipInput, value),
                 ),
-                ElevatedButton(
-                  onPressed: formModel.isValid
-                      ? () {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved')));
-                        }
-                      : null,
-                  child: const Text('Save'),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: formModel.isValid
+                        ? () {
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved')));
+                          }
+                        : null,
+                    child: const Text('Save'),
+                  ),
                 ),
                 ModelDebugInfo(model: formModel),
               ],

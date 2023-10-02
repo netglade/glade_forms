@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:glade_forms/src/core/convert_error.dart';
 import 'package:glade_forms/src/core/error_translator.dart';
+import 'package:glade_forms/src/core/glade_model.dart';
 import 'package:glade_forms/src/core/input_dependencies.dart';
-import 'package:glade_forms/src/core/mutable_generic_model.dart';
 import 'package:glade_forms/src/core/string_to_type_converter.dart';
 import 'package:glade_forms/src/core/type_helper.dart';
 import 'package:glade_forms/src/validator/validator.dart';
@@ -10,7 +10,7 @@ import 'package:glade_forms/src/validator/validator.dart';
 typedef ValueComparator<T> = bool Function(T? initial, T? value);
 
 class GladeInput<T> extends ChangeNotifier {
-  final MutableGenericModel? bindContext;
+  final GladeModel? bindContext;
 
   @protected
   final ValueComparator<T>? valueComparator;
@@ -101,7 +101,7 @@ class GladeInput<T> extends ChangeNotifier {
     T? initialValue,
     String? inputKey,
     ValueComparator<T>? valueComparator,
-    MutableGenericModel? bindContext,
+    GladeModel? bindContext,
     StringToTypeConverter<T>? valueConverter,
     GenericValidatorInstance<T>? validatorInstance,
     InputDependenciesFactory? dependencies,
@@ -126,7 +126,7 @@ class GladeInput<T> extends ChangeNotifier {
     T? initialValue,
     String? inputKey,
     ValueComparator<T>? valueComparator,
-    MutableGenericModel? bindContext,
+    GladeModel? bindContext,
     StringToTypeConverter<T>? valueConverter,
     GenericValidatorInstance<T>? validatorInstance,
     InputDependenciesFactory? dependencies,
@@ -327,7 +327,7 @@ class GladeInput<T> extends ChangeNotifier {
 
   @protected
   GladeInput<T> copyWith({
-    MutableGenericModel? bindContext,
+    GladeModel? bindContext,
     ValueComparator<T>? valueComparator,
     GenericValidatorInstance<T>? validatorInstance,
     StringToTypeConverter<T>? stringTovalueConverter,

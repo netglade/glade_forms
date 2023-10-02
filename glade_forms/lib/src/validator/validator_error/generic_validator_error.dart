@@ -13,11 +13,6 @@ abstract class GenericValidatorError<T> extends GladeInputError<T> with Equatabl
   // ignore: no-object-declaration, extra can be any object
   final Object? extra;
 
-  // /// Can be used to identify concrete error when translating.
-  // @override
-  // // ignore: no-object-declaration, key can be any object
-  // final Object? key;
-
   /// Value which triggered validation and returned this error.
   final T? value;
 
@@ -28,7 +23,8 @@ abstract class GenericValidatorError<T> extends GladeInputError<T> with Equatabl
   String get devErrorMessage => devError(value, extra);
 
   @override
-  List<Object?> get props => [value, devError, extra, key, error, isConversionError];
+  List<Object?> get props =>
+      [value, devError, extra, key, error, isConversionError, isNullError, hasStringEmptyOrNullErrorKey];
 
   GenericValidatorError({
     required this.value,

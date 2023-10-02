@@ -10,7 +10,9 @@ command:
 
 scripts:
   setup:
-    run: melos exec -- fvm flutter pub get
+    description: Completely setups project
+    run: melos exec -- fvm flutter pub get |
+      melos run gallery_setup
 
   # ANALYZING
 

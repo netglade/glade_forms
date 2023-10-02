@@ -1,6 +1,6 @@
 import 'package:glade_forms/src/core/convert_error.dart';
+import 'package:glade_forms/src/core/glade_error_keys.dart';
 import 'package:glade_forms/src/validator/validator.dart';
-import 'package:glade_forms/src/validator/validator_error/validator_keys.dart';
 
 abstract class GladeInputError<T> {
   /// Can be used to identify concrete error when translating.

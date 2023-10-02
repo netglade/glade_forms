@@ -1,12 +1,14 @@
 import 'package:glade_forms/src/core/convert_error.dart';
+import 'package:glade_forms/src/core/glade_error_keys.dart';
 
 typedef OnErrorCallback<T> = ConvertError<T> Function(String? rawValue, Object error);
 
 typedef ConverterToType<T> = T Function(
   String? rawInput,
-  T Function({
-    required Object error,
+  T Function(
+    Object error, {
     required String? rawValue,
+    Object? key,
     OnConvertError? onError,
   }) cantConvert,
 );
@@ -45,10 +47,16 @@ class StringToTypeConverter<T> {
 
   String? convertBack(T input) => _converterBack(input);
 
-  T _cantConvert({
+  T _cantConvert(
+    Object error, {
     required String? rawValue,
-    required Object error,
+    Object? key,
     OnConvertError? onError,
   }) =>
-      throw ConvertError<T>(input: rawValue, formatError: onError, error: error);
+      throw ConvertError<T>(
+        input: rawValue,
+        formatError: onError,
+        error: error,
+        key: key ?? GladeErrorKeys.conversionError,
+      );
 }

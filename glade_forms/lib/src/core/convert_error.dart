@@ -9,16 +9,12 @@ class ConvertError<T> extends GladeInputError<T> with EquatableMixin implements 
 
   final String? input;
 
-  // /// Can be used to identify concrete error when translating.
-  // @override
-  // // ignore: no-object-declaration, key can be any object.
-  // final Object? key;
-
   // ignore: no-object-declaration, error can be anything (but typically it is string)
   final Object? _convertError;
 
   @override
-  List<Object?> get props => [input, devError, error, key, _convertError, isConversionError];
+  List<Object?> get props =>
+      [input, devError, error, key, _convertError, isConversionError, isNullError, hasStringEmptyOrNullErrorKey];
 
   String get targetType => T.runtimeType.toString();
 
@@ -34,8 +30,7 @@ class ConvertError<T> extends GladeInputError<T> with EquatableMixin implements 
     super.key,
     OnConvertError? formatError,
   })  : _convertError = error,
-        devError = formatError ??
-            ((rawValue, {extra, key}) => 'Value "${rawValue ?? 'NULL'}" does not have valid format. Error: $error');
+        devError = formatError ?? ((rawValue, {extra, key}) => 'Conversion error: $error');
 
   @override
   String toString() => devError(input, key: key);
