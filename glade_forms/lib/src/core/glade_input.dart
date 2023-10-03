@@ -1,18 +1,19 @@
 import 'package:flutter/foundation.dart';
+import 'package:glade_forms/src/converters/glade_type_converters.dart';
 import 'package:glade_forms/src/core/convert_error.dart';
 import 'package:glade_forms/src/core/error_translator.dart';
-import 'package:glade_forms/src/core/glade_model.dart';
 import 'package:glade_forms/src/core/input_dependencies.dart';
 import 'package:glade_forms/src/core/string_to_type_converter.dart';
 import 'package:glade_forms/src/core/type_helper.dart';
 import 'package:glade_forms/src/validator/validator.dart';
 
 typedef ValueComparator<T> = bool Function(T? initial, T? value);
+typedef ValidatorFactory<T> = GenericValidatorInstance<T> Function(GenericValidator<T> v);
 
 class GladeInput<T> extends ChangeNotifier {
-  final GladeModel? bindContext;
-
   @protected
+
+  /// Compares.
   final ValueComparator<T>? valueComparator;
 
   @protected
@@ -47,10 +48,8 @@ class GladeInput<T> extends ChangeNotifier {
 
   T get value => _value;
 
+  /// Input's value was not changed.
   bool get isPure => _isPure;
-
-  // @override
-  // int get hashCode => Object.hashAll([value, _isPure]);
 
   ValidatorErrors<T>? get error => _validator(value);
 
@@ -59,12 +58,14 @@ class GladeInput<T> extends ChangeNotifier {
   /// Can be dirty or pure.
   bool get isUnchanged => (valueComparator?.call(initialValue, value) ?? value) == initialValue;
 
+  /// Input does not have conversion error nor validation error.
   bool get isValid => !_conversionError && _validator(value) == null;
 
   bool get isNotValid => !isValid;
 
   bool get hasConversionError => _conversionError;
 
+  /// String representattion of [value].
   String get stringValue => stringTovalueConverter?.convertBack(value) ?? value.toString();
 
   // ignore: no_runtimetype_tostring, in this case it is ok - only for dev purposes
@@ -87,7 +88,6 @@ class GladeInput<T> extends ChangeNotifier {
     required this.valueComparator,
     required this.inputKey,
     required this.translateError,
-    required this.bindContext,
     required this.stringTovalueConverter,
     required this.dependencies,
     required this.defaultTranslations,
@@ -101,7 +101,6 @@ class GladeInput<T> extends ChangeNotifier {
     T? initialValue,
     String? inputKey,
     ValueComparator<T>? valueComparator,
-    GladeModel? bindContext,
     StringToTypeConverter<T>? valueConverter,
     GenericValidatorInstance<T>? validatorInstance,
     InputDependenciesFactory? dependencies,
@@ -113,7 +112,6 @@ class GladeInput<T> extends ChangeNotifier {
           inputKey: inputKey,
           initialValue: initialValue ?? value,
           valueComparator: valueComparator,
-          bindContext: bindContext,
           stringTovalueConverter: valueConverter,
           dependencies: dependencies ?? () => [],
           validatorInstance: validatorInstance ?? GenericValidator<T>().build(),
@@ -126,7 +124,6 @@ class GladeInput<T> extends ChangeNotifier {
     T? initialValue,
     String? inputKey,
     ValueComparator<T>? valueComparator,
-    GladeModel? bindContext,
     StringToTypeConverter<T>? valueConverter,
     GenericValidatorInstance<T>? validatorInstance,
     InputDependenciesFactory? dependencies,
@@ -139,17 +136,16 @@ class GladeInput<T> extends ChangeNotifier {
           initialValue: initialValue,
           valueComparator: valueComparator,
           stringTovalueConverter: valueConverter,
-          bindContext: bindContext,
           dependencies: dependencies ?? () => [],
           validatorInstance: validatorInstance ?? GenericValidator<T>().build(),
           translateError: translateError,
           defaultTranslations: defaultTranslations,
         );
 
-  factory GladeInput.create(
-    GenericValidatorInstance<T> Function(GenericValidator<T> v) validatorFactory, {
+  factory GladeInput.create({
     /// Sets current value of input.
     required T value,
+    ValidatorFactory<T>? validator,
 
     /// Initial value when GenericInput is created.
     ///
@@ -162,12 +158,12 @@ class GladeInput<T> extends ChangeNotifier {
     StringToTypeConverter<T>? valueConverter,
     InputDependenciesFactory? dependencies,
   }) {
-    final validator = validatorFactory(GenericValidator<T>());
+    final validatorInstance = validator?.call(GenericValidator<T>()) ?? GenericValidator<T>().build();
 
     return pure
         ? GladeInput.pure(
             value,
-            validatorInstance: validator,
+            validatorInstance: validatorInstance,
             initialValue: initialValue ?? value,
             translateError: translateError,
             valueComparator: comparator,
@@ -177,7 +173,7 @@ class GladeInput<T> extends ChangeNotifier {
           )
         : GladeInput.dirty(
             value,
-            validatorInstance: validator,
+            validatorInstance: validatorInstance,
             initialValue: initialValue,
             translateError: translateError,
             valueComparator: comparator,
@@ -203,7 +199,7 @@ class GladeInput<T> extends ChangeNotifier {
     InputDependenciesFactory? dependencies,
   }) =>
       GladeInput.create(
-        (v) => v.build(),
+        validator: (v) => v.build(),
         value: value,
         initialValue: initialValue,
         translateError: translateError,
@@ -228,7 +224,7 @@ class GladeInput<T> extends ChangeNotifier {
     InputDependenciesFactory? dependencies,
   }) =>
       GladeInput.create(
-        (v) => (v..notNull()).build(),
+        validator: (v) => (v..notNull()).build(),
         value: value,
         initialValue: initialValue,
         translateError: translateError,
@@ -239,14 +235,132 @@ class GladeInput<T> extends ChangeNotifier {
         dependencies: dependencies,
       );
 
+  static GladeInput<int> intInput({
+    required int value,
+    ValidatorFactory<int>? validator,
+    int? initialValue,
+    bool pure = true,
+    ErrorTranslator<int>? translateError,
+    ValueComparator<int>? comparator,
+    String? inputKey,
+    InputDependenciesFactory? dependencies,
+  }) =>
+      GladeInput.create(
+        value: value,
+        initialValue: initialValue,
+        validator: validator,
+        pure: pure,
+        translateError: translateError,
+        comparator: comparator,
+        inputKey: inputKey,
+        dependencies: dependencies,
+        valueConverter: GladeTypeConverters.intConverter,
+      );
+
+  static GladeInput<bool> boolInput({
+    required bool value,
+    ValidatorFactory<bool>? validator,
+    bool? initialValue,
+    bool pure = true,
+    ErrorTranslator<bool>? translateError,
+    ValueComparator<bool>? comparator,
+    String? inputKey,
+    InputDependenciesFactory? dependencies,
+  }) =>
+      GladeInput.create(
+        value: value,
+        initialValue: initialValue,
+        validator: validator,
+        pure: pure,
+        translateError: translateError,
+        comparator: comparator,
+        inputKey: inputKey,
+        dependencies: dependencies,
+        valueConverter: GladeTypeConverters.boolConverter,
+      );
+
   GladeInput<T> asDirty(T value) => copyWith(isPure: false, value: value);
 
   GladeInput<T> asPure(T value) => copyWith(isPure: true, value: value);
 
   ValidatorErrors<T>? validate() => _validator(value);
 
-  // TODO(petr): Consider to pass BuildContext. This would allow use context based translation.
-  String? translate({String delimiter = '.', Object? customError}) {
+  String? translate({String delimiter = '.'}) => _translate(delimiter: delimiter, customError: error);
+
+  String errorFormatted({String delimiter = '|'}) => error?.errors.map((e) => e.toString()).join(delimiter) ?? '';
+
+  /// Shorthand validator for TextFieldForm inputs.
+  ///
+  /// Returns translated validation message. Translated message is returned through [_translate].
+  /// If there are multiple errors they are concenated into one string with [delimiter].
+  String? formFieldInputValidatorCustom(String? value, {String delimiter = '.'}) {
+    assert(
+      TypeHelper.typesEqual<T, String>() || TypeHelper.typesEqual<T, String?>() || stringTovalueConverter != null,
+      'For non-string values [converter] must be provided. TInput type: $T',
+    );
+    final converter = stringTovalueConverter ?? _defaultConverter;
+
+    try {
+      final convertedValue = converter.convert(value);
+      final convertedError = _validator(convertedValue);
+
+      return convertedError != null ? _translate(delimiter: delimiter, customError: convertedError) : null;
+    } on ConvertError<T> catch (formatError) {
+      return formatError.error != null
+          ? _translate(delimiter: delimiter, customError: formatError)
+          : formatError.devError(value, extra: error);
+    }
+  }
+
+  /// Shorthand validator for TextFieldForm inputs.
+  ///
+  /// Returns translated validation message. Translated message is returned through [_translate].
+  String? formFieldInputValidator(String? value) => formFieldInputValidatorCustom(value);
+
+  void updateValueWithString(String? strValue) {
+    assert(
+      TypeHelper.typesEqual<T, String>() || TypeHelper.typesEqual<T, String?>() || stringTovalueConverter != null,
+      'For non-string values [converter] must be provided. TInput type: ${T.runtimeType}',
+    );
+
+    final converter = stringTovalueConverter ?? _defaultConverter;
+
+    try {
+      this.value = converter.convert(strValue);
+    } on ConvertError<T> {
+      _conversionError = true;
+    }
+  }
+
+  @protected
+  GladeInput<T> copyWith({
+    ValueComparator<T>? valueComparator,
+    GenericValidatorInstance<T>? validatorInstance,
+    StringToTypeConverter<T>? stringTovalueConverter,
+    InputDependenciesFactory? dependencies,
+    String? inputKey,
+    T? initialValue,
+    ErrorTranslator<T>? translateError,
+    T? value,
+    bool? isPure,
+    DefaultTranslations? defaultTranslations,
+  }) {
+    return GladeInput<T>(
+      value: value ?? this.value,
+      valueComparator: valueComparator ?? this.valueComparator,
+      validatorInstance: validatorInstance ?? this.validatorInstance,
+      stringTovalueConverter: stringTovalueConverter ?? this.stringTovalueConverter,
+      dependencies: dependencies ?? this.dependencies,
+      inputKey: inputKey ?? this.inputKey,
+      initialValue: initialValue ?? this.initialValue,
+      translateError: translateError ?? this.translateError,
+      isPure: isPure ?? this.isPure,
+      defaultTranslations: defaultTranslations ?? this.defaultTranslations,
+    );
+  }
+
+  /// Translates input's errors (validation or conversion).
+  String? _translate({String delimiter = '.', Object? customError}) {
     final err = customError ?? error;
 
     if (err == null) return null;
@@ -271,87 +385,6 @@ class GladeInput<T> extends ChangeNotifier {
     }
 
     return err.toString();
-  }
-
-  String errorFormatted({String delimiter = '|'}) => error?.errors.map((e) => e.toString()).join(delimiter) ?? '';
-
-  /// Shorthand validator for TextFieldForm inputs.
-  ///
-  /// Returns translated validation message. Translated message is returned through [translate].
-  /// If there are multiple errors they are concenated into one string with [delimiter].
-  String? formFieldInputValidatorCustom(String? value, {String delimiter = '.'}) {
-    assert(
-      TypeHelper.typesEqual<T, String>() || TypeHelper.typesEqual<T, String?>() || stringTovalueConverter != null,
-      'For non-string values [converter] must be provided. TInput type: ${T.runtimeType}',
-    );
-    final converter = stringTovalueConverter ?? _defaultConverter;
-
-    try {
-      final convertedValue = converter.convert(value);
-      final convertedError = _validator(convertedValue);
-
-      return convertedError != null ? translate(delimiter: delimiter, customError: convertedError) : null;
-    } on ConvertError<T> catch (formatError) {
-      return formatError.error != null
-          ? translate(delimiter: delimiter, customError: formatError)
-          : formatError.devError(value, extra: error);
-    }
-  }
-
-  /// Shorthand validator for TextFieldForm inputs.
-  ///
-  /// Returns translated validation message. Translated message is returned through [translate].
-  String? formFieldInputValidator(String? value) => formFieldInputValidatorCustom(value);
-
-  void updateValueWithString(String? strValue) {
-    assert(
-      TypeHelper.typesEqual<T, String>() || TypeHelper.typesEqual<T, String?>() || stringTovalueConverter != null,
-      'For non-string values [converter] must be provided. TInput type: ${T.runtimeType}',
-    );
-
-    final converter = stringTovalueConverter ?? _defaultConverter;
-
-    try {
-      this.value = converter.convert(strValue);
-    } on ConvertError<T> {
-      _conversionError = true;
-    }
-  }
-
-  // @override
-  // bool operator ==(Object other) {
-  //   if (other.runtimeType != runtimeType) return false;
-
-  //   return other is GladeInputBase<T> && other.value == value && other._isPure == _isPure;
-  // }
-
-  @protected
-  GladeInput<T> copyWith({
-    GladeModel? bindContext,
-    ValueComparator<T>? valueComparator,
-    GenericValidatorInstance<T>? validatorInstance,
-    StringToTypeConverter<T>? stringTovalueConverter,
-    InputDependenciesFactory? dependencies,
-    String? inputKey,
-    T? initialValue,
-    ErrorTranslator<T>? translateError,
-    T? value,
-    bool? isPure,
-    DefaultTranslations? defaultTranslations,
-  }) {
-    return GladeInput<T>(
-      value: value ?? this.value,
-      bindContext: bindContext ?? this.bindContext,
-      valueComparator: valueComparator ?? this.valueComparator,
-      validatorInstance: validatorInstance ?? this.validatorInstance,
-      stringTovalueConverter: stringTovalueConverter ?? this.stringTovalueConverter,
-      dependencies: dependencies ?? this.dependencies,
-      inputKey: inputKey ?? this.inputKey,
-      initialValue: initialValue ?? this.initialValue,
-      translateError: translateError ?? this.translateError,
-      isPure: isPure ?? this.isPure,
-      defaultTranslations: defaultTranslations ?? this.defaultTranslations,
-    );
   }
 
   ValidatorErrors<T>? _validator(T value) {

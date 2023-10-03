@@ -22,11 +22,11 @@ class _Model extends GladeModel {
   List<GladeInput<Object?>> get inputs => [selectedItem, availableStats];
   _Model() {
     selectedItem = GladeInput.create(
-      (v) => (v..notNull()).build(),
+      validator: (v) => (v..notNull()).build(),
       value: null,
     );
     availableStats = GladeInput.create(
-      (v) => v.build(),
+      validator: (v) => v.build(),
       value: [],
       valueConverter: StringToTypeConverter(
         converter: (rawInput, cantConvert) {
@@ -86,7 +86,9 @@ class ComplexMappingExample extends StatelessWidget {
                             .toList(),
                         value: model.selectedItem.value?.id,
                         onChanged: (v) => model.updateInput(
-                            model.selectedItem, model.availableItems.firstWhere((element) => element.id == v)),
+                          model.selectedItem,
+                          model.availableItems.firstWhere((element) => element.id == v),
+                        ),
                       ),
                     ],
                   ),

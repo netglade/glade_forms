@@ -4,7 +4,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:glade_forms/glade_forms.dart';
 import 'package:glade_forms_example/generated/locale_keys.g.dart';
-import 'package:glade_forms_example/shared/model_debug_info.dart';
 import 'package:glade_forms_example/shared/usecase_container.dart';
 
 class _ErrorKeys {
@@ -27,7 +26,7 @@ class AgeRestrictedModel extends GladeModel {
       ),
     );
     ageInput = GladeInput.create(
-      (v) => (v
+      validator: (v) => (v
             ..notNull()
             ..satisfy(
               (value, extra, dependencies) {
@@ -56,7 +55,7 @@ class AgeRestrictedModel extends GladeModel {
       dependencies: () => [vipInput],
     );
     vipInput = GladeInput.create(
-      (v) => (v..notNull()).build(),
+      validator: (v) => (v..notNull()).build(),
       value: false,
       inputKey: 'vip-input',
     );
@@ -111,7 +110,7 @@ If *VIP content* is checked, **age** must be over 18.
                     child: const Text('Save'),
                   ),
                 ),
-                ModelDebugInfo(model: formModel),
+                GladeModelDebugInfo(model: formModel),
               ],
             ),
           ),

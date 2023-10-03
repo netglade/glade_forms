@@ -45,41 +45,6 @@ class UsecaseContainer extends HookWidget {
         ),
       ),
     );
-
-    // return LayoutBuilder(
-    //   builder: (context, constraints) => Scaffold(
-    //     body: SizedBox(
-    //       height: constraints.maxHeight,
-    //       child: Stack(
-    //         children: [
-    //           child,
-    //           // SizedBox(
-    //           //   height: 180,
-    //           //   child: ExpansionTile(
-    //           //     initiallyExpanded: expanded.value,
-    //           //     title: Markdown(data: shortDescription),
-    //           //     onExpansionChanged: (v) => expanded.value = v,
-    //           //     children: [if (description case final x?) Markdown(data: x)],
-    //           //   ),
-    //           // ),
-    //           Align(
-    //             alignment: Alignment.bottomCenter,
-    //             child: ConstrainedBox(
-    //               constraints: const BoxConstraints(minHeight: 100, maxHeight: 200),
-    //               child: SizedBox(
-    //                 width: double.infinity,
-    //                 child: switch (description) {
-    //                   final x? => Markdown(data: x),
-    //                   _ => null,
-    //                 },
-    //               ),
-    //             ),
-    //           ),
-    //         ],
-    //       ),
-    //     ),
-    //   ),
-    // );
   }
 }
 
@@ -93,8 +58,8 @@ class _CodeSample extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final f = useMemoized(getFileContent);
-    final getFileFuture = useFuture(f);
+    final getFileContentFutureMemo = useMemoized(getFileContent);
+    final getFileFuture = useFuture(getFileContentFutureMemo);
 
     if (getFileFuture.connectionState == ConnectionState.waiting) {
       return const Center(child: CircularProgressIndicator());
@@ -130,7 +95,7 @@ class _CodeSample extends HookWidget {
                   child: ElevatedButton.icon(
                     onPressed: () {
                       Clipboard.setData(ClipboardData(text: getFileFuture.data!));
-                      ScaffoldMessenger.of(context)
+                      final _ = ScaffoldMessenger.of(context)
                           .showSnackBar(const SnackBar(content: Text('Code copied to clipboad')));
                     },
                     icon: const Icon(Icons.code),

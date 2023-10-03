@@ -7,6 +7,8 @@ mixin GladeFormMixin {
 
   bool get isPure => inputs.every((input) => input.isPure);
 
+  bool get isUnchaged => inputs.every((input) => input.isUnchanged);
+
   bool get isDirty => !isPure;
 
   List<GladeInput<Object?>> get inputs;
