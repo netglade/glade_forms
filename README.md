@@ -15,27 +15,24 @@ Developed with 💚 by [netglade][netglade_link]
 A universal way to define form validators with support of translations.
 
 - [👀 What is this?](#-what-is-this)
-  - [Why should I use it?](#why-should-i-use-it)
 - [🚀 Getting started](#-getting-started)
   - [GladeInput](#gladeinput)
     - [Defining input](#defining-input)
+    - [StringToValueConverter (valueConverter)](#stringtovalueconverter-valueconverter)
     - [StringInput](#stringinput)
-  - [Creating own reusable ValidatorPart](#creating-own-reusable-validatorpart)
-  - [:books: Adding translation support](#books-adding-translation-support)
+    - [Dependencies](#dependencies)
+  - [📚 Adding translation support](#-adding-translation-support)
+  - [GladeModel](#glademodel)
   - [GladeFormBuilder and GladeFormProvider](#gladeformbuilder-and-gladeformprovider)
-  - [:hammer: Debugging validators](#hammer-debugging-validators)
+  - [🔨 Debugging validators](#-debugging-validators)
 - [👏 Contributing](#-contributing)
 
 ## 👀 What is this?
-
-**TODO reword this.**
 
 Glade forms offer unified way to define reusable form input
 with support of fluent API to define input's validators and with support of translation on top of that.
 
 **TBA DEMO SITE**
-
-### Why should I use it?
 
 
 ## 🚀 Getting started
@@ -95,6 +92,8 @@ GladeFormBuilder(
 )
 ```
 
+See DEMO site for more, complex, examples.
+
 ### GladeInput
 Each form's input is represented by instance of `GladeInput<T>` where `T` is value held by input.
 For simplicity we will interchange `input` and `GladeInput<T>`.
@@ -139,24 +138,64 @@ This example defines validation that `int` value has to be greater or equal to 1
       valueConverter: GladeTypeConverters.intConverter,
  );
 ```
-> [!IMPORTANT]
-> Order of validation parts matter. By default first failing part stops validation. Pass `stopOnFirstError: false` on `.build()` to validate all parts. 
+
+Order of validation parts matter. By default first failing part stops validation. Pass `stopOnFirstError: false` on `.build()` to validate all parts at once.
+
+#### StringToValueConverter (valueConverter)
+As noted before, if `T` is not a String, a converter from String to `T` has to be provided. 
+
+GladeForms provides some predefined converters such as `IntConverter` and more. See `GladeTypeConverters` for more.
 
 
 #### StringInput
 StringInput is specialized variant of GladeInput<String> which has aditional, string focused, validations such as `isEmail` or `isUrl`.
 
+#### Dependencies
+Input can have dependencies on another inputs to allow dependendent validation. 
+`inputKey` should be assigned for each input to allow dependency work. 
 
-### Creating own reusable ValidatorPart
+In validation (or translation if needed) just call `dependencies.byKey()` to get dependendent input. 
 
-### :books: Adding translation support
 
+### 📚 Adding translation support
+
+Each validation error (and conversion error if any) can be translated. Provide `translateError` fucntion which accepts 
+
+- `error` - Error to translate
+- `key` - Error's identification if any
+- `devMessage` - Provided `devError` from validator
+- `dependencies` - Input's dependencies
+
+Age example translation
+```dart
+
+translateError: (error, key, devMessage, {required dependencies}) {
+  if (key == _ErrorKeys.ageRestriction) return LocaleKeys.ageRestriction_under18.tr();
+
+  if (error.isConversionError) return LocaleKeys.ageRestriction_ageFormat.tr();
+
+  return devMessage;
+},
+
+```
+
+### GladeModel
+GladeModel is base class for Form's model which holds all inputs together. 
+
+For updating concrete input, call `updateInput` or `stringFieldUpdateInput` methods to update its value. GladeModel is ChangeNotifier so all dependant widgets will be rebuilt.
 
 ### GladeFormBuilder and GladeFormProvider
+GladeFormProvider is predefined widget to provide GladeFormModel to widget's subtreee.
 
-### :hammer: Debugging validators
+Similarly GladeFormBuilder allows to listen to Model's changes and rebuilts its child. 
 
+### 🔨 Debugging validators
 
+There are some getter and methods on GladeInput / GladeModel which can be used for debugging. 
+
+Use `model.formattedValidationErrors` to get all input's error formatted for simple debugging. 
+
+There is also `GladeModelDebugInfo` widget which displays table of all model's inputs and their properties such as `isValid` or `validation error`.
 
 
 
