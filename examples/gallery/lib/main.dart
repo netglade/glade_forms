@@ -6,7 +6,7 @@ import 'package:glade_forms_example/generated/locale_loader.g.dart';
 import 'package:glade_forms_example/localization_addon_custom.dart';
 import 'package:glade_forms_example/usecases/age_restricted_example.dart';
 import 'package:glade_forms_example/usecases/complex_object_mapping_example.dart';
-import 'package:glade_forms_example/usecases/simple_form_example.dart';
+import 'package:glade_forms_example/usecases/quickstart_example.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 // ignore: prefer-static-class, ok for now
@@ -42,7 +42,7 @@ class App extends StatelessWidget {
         ),
       ],
       directories: [
-        WidgetbookUseCase(name: 'Simple form', builder: (context) => const SimpleFormExample()),
+        WidgetbookUseCase(name: 'Simple form', builder: (context) => const QuickStartExample()),
         WidgetbookCategory(
           name: 'Dependencies',
           children: [

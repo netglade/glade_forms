@@ -18,11 +18,12 @@ A universal way to define form validators with support of translations.
   - [Why should I use it?](#why-should-i-use-it)
 - [🚀 Getting started](#-getting-started)
   - [GladeInput](#gladeinput)
-  - [Existing validators](#existing-validators)
+    - [Defining input](#defining-input)
+    - [StringInput](#stringinput)
   - [Creating own reusable ValidatorPart](#creating-own-reusable-validatorpart)
-  - [📚 Adding translation support](#-adding-translation-support)
+  - [:books: Adding translation support](#books-adding-translation-support)
   - [GladeFormBuilder and GladeFormProvider](#gladeformbuilder-and-gladeformprovider)
-  - [🛠️ Debugging validators](#️-debugging-validators)
+  - [:hammer: Debugging validators](#hammer-debugging-validators)
 - [👏 Contributing](#-contributing)
 
 ## 👀 What is this?
@@ -52,7 +53,7 @@ class _Model extends GladeModel {
 
   _Model() {
     name = StringInput.required();
-    age = GladeInput.create(value: 0);
+    age = GladeInput.intInput(value: 0);
     email = StringInput.create((validator) => (validator..isEmail()).build());
   }
 }
@@ -62,7 +63,36 @@ class _Model extends GladeModel {
 and wire-it up with Form
 
 ```dart
-
+GladeFormBuilder(
+  create: (context) => _Model(),
+  builder: (context, model) => Form(
+    autovalidateMode: AutovalidateMode.onUserInteraction,
+    child: Column(
+      children: [
+        TextFormField(
+          initialValue: model.name.value,
+          validator: model.name.formFieldInputValidator,
+          onChanged: (v) => model.stringFieldUpdateInput(model.name, v),
+          decoration: const InputDecoration(labelText: 'Name'),
+        ),
+        TextFormField(
+          initialValue: model.age.stringValue,
+          validator: model.age.formFieldInputValidator,
+          onChanged: (v) => model.stringFieldUpdateInput(model.age, v),
+          decoration: const InputDecoration(labelText: 'Age'),
+        ),
+        TextFormField(
+          initialValue: model.email.value,
+          validator: model.email.formFieldInputValidator,
+          onChanged: (v) => model.stringFieldUpdateInput(model.email, v),
+          decoration: const InputDecoration(labelText: 'Email'),
+        ),
+        const SizedBox(height: 10),
+        ElevatedButton(onPressed: model.isValid ? () {} : null, child: const Text('Save')),
+      ],
+    ),
+  ),  
+)
 ```
 
 ### GladeInput
@@ -80,18 +110,51 @@ On each input we can defined
  - *valueComparator* - Sometimes it is handy to provied `initialValue` which will be never updated after input is mutated. `valueComparator` should be provided to compare `initialValue` and `value` if `T` is not comparable type by default. 
  - *defaultTranslation* - If error's translations are simple, the default translation settings can be set instead of custom `translateError` method.
 
+#### Defining input
+Most of the time, input is created with `.create()` factory with defined validation, translation and other properties. 
 
-### Existing validators
+Validation is defined through part methods on ValidatorFactory such as `notNull()`, `satisfy()` and other parts. 
+
+Each validation rule defines
+  - *value validation*, e.g `notNull()` defines that value  can not be null. `satisfy()` defines predicate which has to be true to be valid etc. 
+  - **devErrorMessage** - message which will be displayed if no translation is not provided. 
+  - **key** - Validation error's identification. Usable for translation. 
+
+  
+This example defines validation that `int` value has to be greater or equal to 18.
+
+```dart
+ ageInput = GladeInput.create(
+      validator: (v) => (v
+            ..notNull()
+            ..satisfy(
+              (value, extra, dependencies) {
+                return value >= 18;
+              },
+              devError: (_, __) => 'Value must be greater or equal to 18',
+              key: _ErrorKeys.ageRestriction,
+            ))
+          .build(),
+      value: 0,
+      valueConverter: GladeTypeConverters.intConverter,
+ );
+```
+> [!IMPORTANT]
+> Order of validation parts matter. By default first failing part stops validation. Pass `stopOnFirstError: false` on `.build()` to validate all parts. 
+
+
+#### StringInput
+StringInput is specialized variant of GladeInput<String> which has aditional, string focused, validations such as `isEmail` or `isUrl`.
 
 
 ### Creating own reusable ValidatorPart
 
-### 📚 Adding translation support
+### :books: Adding translation support
 
 
 ### GladeFormBuilder and GladeFormProvider
 
-### 🛠️ Debugging validators
+### :hammer: Debugging validators
 
 
 

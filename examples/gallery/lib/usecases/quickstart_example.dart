@@ -12,13 +12,13 @@ class _Model extends GladeModel {
 
   _Model() {
     name = StringInput.required();
-    age = GladeInput.create(value: 0, valueConverter: GladeTypeConverters.intConverter);
+    age = GladeInput.intInput(value: 0);
     email = StringInput.create((validator) => (validator..isEmail()).build());
   }
 }
 
-class SimpleFormExample extends StatelessWidget {
-  const SimpleFormExample({super.key});
+class QuickStartExample extends StatelessWidget {
+  const QuickStartExample({super.key});
 
   @override
   Widget build(BuildContext context) {
