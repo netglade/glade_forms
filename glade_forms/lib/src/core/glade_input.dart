@@ -8,7 +8,7 @@ import 'package:glade_forms/src/core/type_helper.dart';
 import 'package:glade_forms/src/validator/validator.dart';
 
 typedef ValueComparator<T> = bool Function(T? initial, T? value);
-typedef ValidatorFactory<T> = GenericValidatorInstance<T> Function(GenericValidator<T> v);
+typedef ValidatorFactory<T> = ValidatorInstance<T> Function(GenericValidator<T> v);
 
 class GladeInput<T> extends ChangeNotifier {
   @protected
@@ -17,12 +17,12 @@ class GladeInput<T> extends ChangeNotifier {
   final ValueComparator<T>? valueComparator;
 
   @protected
-  final GenericValidatorInstance<T> validatorInstance;
+  final ValidatorInstance<T> validatorInstance;
 
   @protected
   final StringToTypeConverter<T>? stringTovalueConverter;
 
-  final InputDependenciesFactory dependencies;
+  final InputDependenciesFactory dependenciesFactory;
 
   /// An input's identification.
   final String? inputKey;
@@ -89,7 +89,7 @@ class GladeInput<T> extends ChangeNotifier {
     required this.inputKey,
     required this.translateError,
     required this.stringTovalueConverter,
-    required this.dependencies,
+    required this.dependenciesFactory,
     required this.defaultTranslations,
   })  : _isPure = isPure,
         _value = value {
@@ -102,7 +102,7 @@ class GladeInput<T> extends ChangeNotifier {
     String? inputKey,
     ValueComparator<T>? valueComparator,
     StringToTypeConverter<T>? valueConverter,
-    GenericValidatorInstance<T>? validatorInstance,
+    ValidatorInstance<T>? validatorInstance,
     InputDependenciesFactory? dependencies,
     ErrorTranslator<T>? translateError,
     DefaultTranslations? defaultTranslations,
@@ -113,7 +113,7 @@ class GladeInput<T> extends ChangeNotifier {
           initialValue: initialValue ?? value,
           valueComparator: valueComparator,
           stringTovalueConverter: valueConverter,
-          dependencies: dependencies ?? () => [],
+          dependenciesFactory: dependencies ?? () => [],
           validatorInstance: validatorInstance ?? GenericValidator<T>().build(),
           translateError: translateError,
           defaultTranslations: defaultTranslations,
@@ -125,7 +125,7 @@ class GladeInput<T> extends ChangeNotifier {
     String? inputKey,
     ValueComparator<T>? valueComparator,
     StringToTypeConverter<T>? valueConverter,
-    GenericValidatorInstance<T>? validatorInstance,
+    ValidatorInstance<T>? validatorInstance,
     InputDependenciesFactory? dependencies,
     ErrorTranslator<T>? translateError,
     DefaultTranslations? defaultTranslations,
@@ -136,7 +136,7 @@ class GladeInput<T> extends ChangeNotifier {
           initialValue: initialValue,
           valueComparator: valueComparator,
           stringTovalueConverter: valueConverter,
-          dependencies: dependencies ?? () => [],
+          dependenciesFactory: dependencies ?? () => [],
           validatorInstance: validatorInstance ?? GenericValidator<T>().build(),
           translateError: translateError,
           defaultTranslations: defaultTranslations,
@@ -291,9 +291,9 @@ class GladeInput<T> extends ChangeNotifier {
 
   /// Shorthand validator for TextFieldForm inputs.
   ///
-  /// Returns translated validation message. Translated message is returned through [_translate].
+  /// Returns translated validation message.
   /// If there are multiple errors they are concenated into one string with [delimiter].
-  String? formFieldInputValidatorCustom(String? value, {String delimiter = '.'}) {
+  String? textFormFieldInputValidatorCustom(String? value, {String delimiter = '.'}) {
     assert(
       TypeHelper.typesEqual<T, String>() || TypeHelper.typesEqual<T, String?>() || stringTovalueConverter != null,
       'For non-string values [converter] must be provided. TInput type: $T',
@@ -314,8 +314,17 @@ class GladeInput<T> extends ChangeNotifier {
 
   /// Shorthand validator for TextFieldForm inputs.
   ///
-  /// Returns translated validation message. Translated message is returned through [_translate].
-  String? formFieldInputValidator(String? value) => formFieldInputValidatorCustom(value);
+  /// Returns translated validation message.
+  String? textFormFieldInputValidator(String? value) => textFormFieldInputValidatorCustom(value);
+
+  /// Shorthand validator for Form field input.
+  ///
+  /// Returns translated validation message.
+  String? formFieldValidator(T value) {
+    final convertedError = _validator(value);
+
+    return convertedError != null ? _translate(customError: convertedError) : null;
+  }
 
   void updateValueWithString(String? strValue) {
     assert(
@@ -335,9 +344,9 @@ class GladeInput<T> extends ChangeNotifier {
   @protected
   GladeInput<T> copyWith({
     ValueComparator<T>? valueComparator,
-    GenericValidatorInstance<T>? validatorInstance,
+    ValidatorInstance<T>? validatorInstance,
     StringToTypeConverter<T>? stringTovalueConverter,
-    InputDependenciesFactory? dependencies,
+    InputDependenciesFactory? dependenciesFactory,
     String? inputKey,
     T? initialValue,
     ErrorTranslator<T>? translateError,
@@ -350,7 +359,7 @@ class GladeInput<T> extends ChangeNotifier {
       valueComparator: valueComparator ?? this.valueComparator,
       validatorInstance: validatorInstance ?? this.validatorInstance,
       stringTovalueConverter: stringTovalueConverter ?? this.stringTovalueConverter,
-      dependencies: dependencies ?? this.dependencies,
+      dependenciesFactory: dependenciesFactory ?? this.dependenciesFactory,
       inputKey: inputKey ?? this.inputKey,
       initialValue: initialValue ?? this.initialValue,
       translateError: translateError ?? this.translateError,
@@ -373,7 +382,7 @@ class GladeInput<T> extends ChangeNotifier {
       final defaultTranslationsTmp = this.defaultTranslations;
       final translateErrorTmp = translateError;
       if (translateErrorTmp != null) {
-        return translateErrorTmp(err, err.key, err.devErrorMessage, dependencies: dependencies);
+        return translateErrorTmp(err, err.key, err.devErrorMessage, dependenciesFactory());
       } else if (defaultTranslationsTmp != null && defaultTranslationsTmp.defaultConversionMessage != null) {
         return defaultTranslationsTmp.defaultConversionMessage;
       }
@@ -401,7 +410,7 @@ class GladeInput<T> extends ChangeNotifier {
     final defaultTranslationsTmp = this.defaultTranslations;
     if (translateErrorTmp != null) {
       return inputErrors.errors
-          .map((e) => translateErrorTmp(e, e.key, e.devErrorMessage, dependencies: dependencies))
+          .map((e) => translateErrorTmp(e, e.key, e.devErrorMessage, dependenciesFactory()))
           .join(delimiter);
     }
 

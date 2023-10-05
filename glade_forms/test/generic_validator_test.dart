@@ -260,7 +260,7 @@ void main() {
             .build(),
         value: 0,
         //translateError: (err, key, defMessage, {depedencies}) => key == 'e1' ? 'Hodnota není větší jak 10!' : defMessage,
-        translateError: (error, key, devMessage, {required dependencies}) =>
+        translateError: (error, key, devMessage, dependencies) =>
             key == 'e1' ? 'Hodnota není větší jak 10!' : devMessage,
       );
 
@@ -281,7 +281,7 @@ void main() {
               ))
             .build(),
         value: 0,
-        translateError: (error, key, devMessage, {required dependencies}) =>
+        translateError: (error, key, devMessage, dependencies) =>
             key == 'e2' ? 'Hodnota není větší jak 10!' : devMessage,
       );
 

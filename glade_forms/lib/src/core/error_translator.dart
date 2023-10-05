@@ -11,10 +11,11 @@ typedef ErrorTranslator<T> = String Function(
   Object? key,
 
   /// Default dev message.
-  String devMessage, {
-  ///Input's dependencies
-  required InputDependenciesFactory dependencies,
-});
+  String devMessage,
+
+  /// Input's dependencies.
+  InputDependencies dependencies,
+);
 
 class DefaultTranslations {
   final String? defaultValueIsNullOrEmptyMessage;

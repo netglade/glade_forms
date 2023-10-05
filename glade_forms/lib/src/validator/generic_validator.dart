@@ -1,10 +1,10 @@
 import 'package:glade_forms/src/core/core.dart';
 import 'package:glade_forms/src/core/glade_error_keys.dart';
-import 'package:glade_forms/src/validator/generic_validator_instance.dart';
 import 'package:glade_forms/src/validator/part/custom_validation_part.dart';
 import 'package:glade_forms/src/validator/part/input_validator_part.dart';
 import 'package:glade_forms/src/validator/part/satisfy_predicate_part.dart';
 import 'package:glade_forms/src/validator/validator_error/validator_error.dart';
+import 'package:glade_forms/src/validator/validator_instance.dart';
 
 typedef ValidateFunction<T> = GenericValidatorError<T>? Function(
   T value, {
@@ -15,16 +15,13 @@ typedef ValidateFunction<T> = GenericValidatorError<T>? Function(
 class GenericValidator<T> {
   List<InputValidatorPart<T>> parts = [];
 
-  GenericValidatorInstance<T> build({
+  ValidatorInstance<T> build({
     /// Returns validation result on first error or continues validation.
     ///
     /// Beware that some validators assume non-null value.
     bool stopOnFirstError = true,
   }) =>
-      GenericValidatorInstance<T>(
-        parts: parts,
-        stopOnFirstError: stopOnFirstError,
-      );
+      ValidatorInstance<T>(parts: parts, stopOnFirstError: stopOnFirstError);
 
   void clear() => parts = [];
 

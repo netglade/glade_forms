@@ -45,7 +45,7 @@ class AgeRestrictedModel extends GladeModel {
       value: 0,
       valueConverter: GladeTypeConverters.intConverter,
       inputKey: 'age-input',
-      translateError: (error, key, devMessage, {required dependencies}) {
+      translateError: (error, key, devMessage, dependencies) {
         if (key == _ErrorKeys.ageRestriction) return LocaleKeys.ageRestriction_under18.tr();
 
         if (error.isConversionError) return LocaleKeys.ageRestriction_ageFormat.tr();
@@ -77,7 +77,7 @@ If *VIP content* is checked, **age** must be over 18.
       className: 'age_restricted_example.dart',
       child: GladeFormBuilder(
         create: (context) => AgeRestrictedModel(),
-        builder: (context, formModel) => Padding(
+        builder: (context, formModel, _) => Padding(
           padding: const EdgeInsets.all(8),
           child: Form(
             autovalidateMode: AutovalidateMode.always,
@@ -87,13 +87,13 @@ If *VIP content* is checked, **age** must be over 18.
                   initialValue: formModel.nameInput.value,
                   decoration: const InputDecoration(labelText: 'Name'),
                   onChanged: (value) => formModel.stringFieldUpdateInput(formModel.nameInput, value),
-                  validator: formModel.nameInput.formFieldInputValidator,
+                  validator: formModel.nameInput.textFormFieldInputValidator,
                 ),
                 TextFormField(
                   initialValue: formModel.ageInput.stringValue,
                   decoration: const InputDecoration(labelText: 'Age'),
                   onChanged: (value) => formModel.stringFieldUpdateInput(formModel.ageInput, value),
-                  validator: (v) => formModel.ageInput.formFieldInputValidator(v),
+                  validator: (v) => formModel.ageInput.textFormFieldInputValidator(v),
                 ),
                 CheckboxListTile(
                   value: formModel.vipInput.value,

@@ -61,7 +61,7 @@ class ComplexMappingExample extends StatelessWidget {
       className: 'complex_object_mapping_example.dart',
       child: GladeFormBuilder(
         create: (context) => _Model(),
-        builder: (context, model) {
+        builder: (context, model, _) {
           return Form(
             autovalidateMode: AutovalidateMode.always,
             child: Row(
@@ -72,7 +72,7 @@ class ComplexMappingExample extends StatelessWidget {
                       TextFormField(
                         decoration: const InputDecoration(labelText: 'Characters stats'),
                         initialValue: model.availableStats.stringValue,
-                        validator: model.availableStats.formFieldInputValidator,
+                        validator: model.availableStats.textFormFieldInputValidator,
                         onChanged: (value) => model.stringFieldUpdateInput(model.availableStats, value),
                       ),
                       DropdownButton(

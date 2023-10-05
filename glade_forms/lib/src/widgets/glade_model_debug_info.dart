@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:glade_forms/src/core/glade_model.dart';
+import 'package:glade_forms/src/model/glade_model.dart';
 
 /// Provides debug table displaying model's inputs and validation errors.
 class GladeModelDebugInfo extends StatelessWidget {
@@ -16,7 +16,7 @@ class GladeModelDebugInfo extends StatelessWidget {
         children: [
           const _DangerStrips(color1: Colors.black, color2: Colors.red, gap: 5),
           Text('Model isValid: ${model.isValid}'),
-          Text('Model isUnchanged: ${model.isUnchaged}'),
+          Text('Model isUnchanged: ${model.isUnchanged}'),
           const SizedBox(height: 20),
           Table(
             border: TableBorder.symmetric(outside: const BorderSide()),
@@ -37,7 +37,7 @@ class GladeModelDebugInfo extends StatelessWidget {
                   Center(
                     child: Padding(
                       padding: const EdgeInsets.all(8),
-                      child: Text('IsUnchanged: ${model.isUnchaged}'),
+                      child: Text('IsUnchanged: ${model.isUnchanged}'),
                     ),
                   ),
                   const SizedBox(),

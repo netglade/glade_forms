@@ -13,7 +13,7 @@ class _Model extends GladeModel {
   _Model() {
     name = StringInput.required();
     age = GladeInput.intInput(value: 0);
-    email = StringInput.create((validator) => (validator..isEmail()).build());
+    email = StringInput.create(validator: (validator) => (validator..isEmail()).build());
   }
 }
 
@@ -26,7 +26,7 @@ class QuickStartExample extends StatelessWidget {
       shortDescription: 'Quick start example',
       child: GladeFormBuilder(
         create: (context) => _Model(),
-        builder: (context, model) => Padding(
+        builder: (context, model, _) => Padding(
           padding: const EdgeInsets.all(32),
           child: Form(
             autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -34,19 +34,19 @@ class QuickStartExample extends StatelessWidget {
               children: [
                 TextFormField(
                   initialValue: model.name.value,
-                  validator: model.name.formFieldInputValidator,
+                  validator: model.name.textFormFieldInputValidator,
                   onChanged: (v) => model.stringFieldUpdateInput(model.name, v),
                   decoration: const InputDecoration(labelText: 'Name'),
                 ),
                 TextFormField(
                   initialValue: model.age.stringValue,
-                  validator: model.age.formFieldInputValidator,
+                  validator: model.age.textFormFieldInputValidator,
                   onChanged: (v) => model.stringFieldUpdateInput(model.age, v),
                   decoration: const InputDecoration(labelText: 'Age'),
                 ),
                 TextFormField(
                   initialValue: model.email.value,
-                  validator: model.email.formFieldInputValidator,
+                  validator: model.email.textFormFieldInputValidator,
                   onChanged: (v) => model.stringFieldUpdateInput(model.email, v),
                   decoration: const InputDecoration(labelText: 'Email'),
                 ),
