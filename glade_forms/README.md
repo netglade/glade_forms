@@ -1,7 +1,10 @@
 <a href="https://github.com/netglade">
-    <img alt="netglade" height='120px' src="https://raw.githubusercontent.com/netglade/auto_mappr/main/packages/auto_mappr/doc/badge_dark.png">  
+  <picture >
+    <source media="(prefers-color-scheme: dark)" height='120px' srcset="https://raw.githubusercontent.com/netglade/glade_forms/main/packages/glade_forms/doc/badge_light.png">
+    <source media="(prefers-color-scheme: light)" height='120px' srcset="https://raw.githubusercontent.com/netglade/glade_forms/main/packages/glade_forms/doc/badge_dark.png">
+    <img alt="netglade" height='120px' src="https://raw.githubusercontent.com/netglade/glade_forms/main/packages/glade_forms/doc/badge_dark.png">
+  </picture>
 </a>
-
 Developed with 💚 by [netglade][netglade_link]
 
 [![ci][ci_badge]][ci_badge_link]
@@ -25,6 +28,7 @@ A universal way to define form validators with support of translations.
   - [GladeModel](#glademodel)
   - [GladeFormBuilder and GladeFormProvider](#gladeformbuilder-and-gladeformprovider)
   - [🔨 Debugging validators](#-debugging-validators)
+  - [Using validators without GladeInput](#using-validators-without-gladeinput)
 - [👏 Contributing](#-contributing)
 
 ## 👀 What is this?

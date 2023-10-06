@@ -1,0 +1,38 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  auto_mappr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+      - uses: bluefireteam/melos-action@v2
+
+      - name: Analyze
+        run: melos run lint:all
+
+      - name: Install DCM
+        uses: CQLabs/setup-dcm@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run DCM
+        uses: CQLabs/dcm-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          ci_key: ${{ secrets.DCM_KEY }}
+          email: ${{ secrets.DCM_EMAIL }}
+          folders: .
+          fatal_style: true
+          fatal_performance: true
+          fatal_warnings: true
+
+      - name: Test
+        run: melos run test
