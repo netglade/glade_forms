@@ -1,10 +1,13 @@
-import 'package:glade_forms/glade_forms.dart';
+import 'package:glade_forms/src/core/core.dart';
+import 'package:glade_forms/src/validator/part/input_validator_part.dart';
+import 'package:glade_forms/src/validator/validator_error/glade_validator_error.dart';
+import 'package:glade_forms/src/validator/validator_result.dart';
 
 class ValidatorInstance<T> {
   /// Stops validation on first error.
   final bool stopOnFirstError;
 
-  late GladeInput<T> _input;
+  GladeInput<T>? _input;
   final List<InputValidatorPart<T>> _parts;
 
   ValidatorInstance({
@@ -16,19 +19,19 @@ class ValidatorInstance<T> {
   void bindInput(GladeInput<T> input) => _input = input;
 
   /// Performs validation on given [value].
-  ValidatorErrors<T> validate(T value, {Object? extra}) {
-    final errors = <GenericValidatorError<T>>[];
+  ValidatorResult<T> validate(T value, {Object? extra}) {
+    final errors = <GladeValidatorError<T>>[];
 
     for (final part in _parts) {
-      final error = part.validate(value, extra: extra, dependencies: _input.dependenciesFactory());
+      final error = part.validate(value, extra: extra, dependencies: _input?.dependenciesFactory() ?? []);
 
       if (error != null) {
         errors.add(error);
 
-        if (stopOnFirstError) return ValidatorErrors<T>(errors: errors, associatedInput: _input);
+        if (stopOnFirstError) return ValidatorResult<T>(errors: errors, associatedInput: _input);
       }
     }
 
-    return ValidatorErrors<T>(errors: errors, associatedInput: _input);
+    return ValidatorResult<T>(errors: errors, associatedInput: _input);
   }
 }

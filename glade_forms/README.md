@@ -148,7 +148,7 @@ GladeForms provides some predefined converters such as `IntConverter` and more. 
 
 
 #### StringInput
-StringInput is specialized variant of GladeInput<String> which has aditional, string focused, validations such as `isEmail` or `isUrl`.
+StringInput is specialized variant of GladeInput<String> which has additional, string related, validations such as `isEmail`, `isUrl`, `maxLength` and more.
 
 #### Dependencies
 Input can have dependencies on another inputs to allow dependendent validation. 
@@ -197,7 +197,13 @@ Use `model.formattedValidationErrors` to get all input's error formatted for sim
 
 There is also `GladeModelDebugInfo` widget which displays table of all model's inputs and their properties such as `isValid` or `validation error`.
 
+### Using validators without GladeInput
+Is is possible to use GladeValidator without associated GladeInputs. 
+Just create instance of ``
 
+```dart
+
+```
 
 ## 👏 Contributing
 

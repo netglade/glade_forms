@@ -1,18 +1,17 @@
 import 'package:glade_forms/src/core/core.dart';
-import 'package:glade_forms/src/core/glade_error_keys.dart';
 import 'package:glade_forms/src/validator/part/custom_validation_part.dart';
 import 'package:glade_forms/src/validator/part/input_validator_part.dart';
 import 'package:glade_forms/src/validator/part/satisfy_predicate_part.dart';
 import 'package:glade_forms/src/validator/validator_error/validator_error.dart';
 import 'package:glade_forms/src/validator/validator_instance.dart';
 
-typedef ValidateFunction<T> = GenericValidatorError<T>? Function(
+typedef ValidateFunction<T> = GladeValidatorError<T>? Function(
   T value, {
   required InputDependencies dependencies,
   Object? extra,
 });
 
-class GenericValidator<T> {
+class GladeValidator<T> {
   List<InputValidatorPart<T>> parts = [];
 
   ValidatorInstance<T> build({

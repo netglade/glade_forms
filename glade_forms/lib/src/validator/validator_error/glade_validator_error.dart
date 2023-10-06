@@ -5,8 +5,7 @@ import 'package:glade_forms/src/validator/validator_error/value_null_error.dart'
 /// When validation failed but we already have propert [T] value.
 typedef OnValidateError<T> = String Function(T? value, Object? extra);
 
-// TODO(petr): Rename to Glade?.
-abstract class GenericValidatorError<T> extends GladeInputError<T> with EquatableMixin {
+abstract class GladeValidatorError<T> extends GladeInputError<T> with EquatableMixin {
   /// Error message when translation is not used. Useful for development.
   final OnValidateError<T> devError;
 
@@ -26,7 +25,7 @@ abstract class GenericValidatorError<T> extends GladeInputError<T> with Equatabl
   List<Object?> get props =>
       [value, devError, extra, key, error, isConversionError, isNullError, hasStringEmptyOrNullErrorKey];
 
-  GenericValidatorError({
+  GladeValidatorError({
     required this.value,
     OnValidateError<T>? devError,
     this.extra,
@@ -35,7 +34,7 @@ abstract class GenericValidatorError<T> extends GladeInputError<T> with Equatabl
             ((value, _) =>
                 'Value "${value ?? 'NULL'}" does not satisfy validation. [This is default validation meessage. Consider to set `devErro` to cutomize validation errors]');
 
-  factory GenericValidatorError.cantBeNull(T? value, {Object? extra, Object? key}) =>
+  factory GladeValidatorError.cantBeNull(T? value, {Object? extra, Object? key}) =>
       ValueNullError<T>(value: value, key: key, extra: extra);
 
   @override

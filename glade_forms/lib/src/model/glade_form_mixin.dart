@@ -17,12 +17,12 @@ mixin GladeFormMixin {
   String get formattedValidationErrors => inputs.map((e) {
         if (e.hasConversionError) return '${e.inputKey ?? e.runtimeType} - CONVERSION ERROR';
 
-        if (e.error?.errors.isNotEmpty ?? false) {
+        if (e.validatorError?.errors.isNotEmpty ?? false) {
           return '${e.inputKey ?? e.runtimeType} - ${e.errorFormatted()}';
         }
 
         return '${e.inputKey ?? e.runtimeType} - VALID';
       }).join('\n');
 
-  List<Object?> get errors => inputs.map((e) => e.error).toList();
+  List<Object?> get errors => inputs.map((e) => e.validatorError).toList();
 }

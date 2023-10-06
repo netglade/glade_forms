@@ -2,6 +2,7 @@ name: glade_forms_workspace
 
 packages:
   - glade_forms
+  - glade_forms/**
   - examples/**
 
 command:
@@ -11,7 +12,8 @@ command:
 scripts:
   setup:
     description: Completely setups project
-    run: melos exec -- fvm flutter pub get |
+    run: |
+      melos exec -- fvm flutter pub get 
       melos run gallery_setup
 
   # ANALYZING
@@ -38,8 +40,8 @@ scripts:
 
   # Gallery
   gallery_setup:
-    run:
-      melos exec -- flutter pub run easy_localization:generate -S "assets/translations" -o locale_loader.g.dart |
+    run: |
+      melos exec -- flutter pub run easy_localization:generate -S "assets/translations" -o locale_loader.g.dart
       melos exec -- fvm flutter pub run easy_localization:generate -S "assets/translations" --skip-unnecessary-keys -f keys -o locale_keys.g.dart
     packageFilters:
       dependsOn: easy_localization

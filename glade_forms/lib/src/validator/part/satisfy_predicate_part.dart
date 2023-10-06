@@ -1,5 +1,6 @@
 import 'package:glade_forms/src/core/core.dart';
 import 'package:glade_forms/src/validator/part/input_validator_part.dart';
+import 'package:glade_forms/src/validator/validator_error/glade_validator_error.dart';
 import 'package:glade_forms/src/validator/validator_error/validator_error.dart';
 
 typedef SatisfyPredicate<T> = bool Function(T value, Object? extra, InputDependencies dependencies);
@@ -21,7 +22,7 @@ class SatisfyPredicatePart<T> extends InputValidatorPart<T> {
   });
 
   @override
-  GenericValidatorError<T>? validate(
+  GladeValidatorError<T>? validate(
     T value, {
     required Object? extra,
     InputDependencies dependencies = const [],

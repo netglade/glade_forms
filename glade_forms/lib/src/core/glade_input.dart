@@ -6,14 +6,14 @@ import 'package:glade_forms/src/core/input_dependencies.dart';
 import 'package:glade_forms/src/core/string_to_type_converter.dart';
 import 'package:glade_forms/src/core/type_helper.dart';
 import 'package:glade_forms/src/validator/validator.dart';
+import 'package:glade_forms/src/validator/validator_result.dart';
 
 typedef ValueComparator<T> = bool Function(T? initial, T? value);
-typedef ValidatorFactory<T> = ValidatorInstance<T> Function(GenericValidator<T> v);
+typedef ValidatorFactory<T> = ValidatorInstance<T> Function(GladeValidator<T> v);
 
 class GladeInput<T> extends ChangeNotifier {
+  /// Compares initial and current value.
   @protected
-
-  /// Compares.
   final ValueComparator<T>? valueComparator;
 
   @protected
@@ -51,7 +51,7 @@ class GladeInput<T> extends ChangeNotifier {
   /// Input's value was not changed.
   bool get isPure => _isPure;
 
-  ValidatorErrors<T>? get error => _validator(value);
+  ValidatorResult<T>? get validatorError => _validator(value);
 
   /// [value] is equal to [initialValue].
   ///
@@ -114,7 +114,7 @@ class GladeInput<T> extends ChangeNotifier {
           valueComparator: valueComparator,
           stringTovalueConverter: valueConverter,
           dependenciesFactory: dependencies ?? () => [],
-          validatorInstance: validatorInstance ?? GenericValidator<T>().build(),
+          validatorInstance: validatorInstance ?? GladeValidator<T>().build(),
           translateError: translateError,
           defaultTranslations: defaultTranslations,
         );
@@ -137,7 +137,7 @@ class GladeInput<T> extends ChangeNotifier {
           valueComparator: valueComparator,
           stringTovalueConverter: valueConverter,
           dependenciesFactory: dependencies ?? () => [],
-          validatorInstance: validatorInstance ?? GenericValidator<T>().build(),
+          validatorInstance: validatorInstance ?? GladeValidator<T>().build(),
           translateError: translateError,
           defaultTranslations: defaultTranslations,
         );
@@ -158,7 +158,7 @@ class GladeInput<T> extends ChangeNotifier {
     StringToTypeConverter<T>? valueConverter,
     InputDependenciesFactory? dependencies,
   }) {
-    final validatorInstance = validator?.call(GenericValidator<T>()) ?? GenericValidator<T>().build();
+    final validatorInstance = validator?.call(GladeValidator<T>()) ?? GladeValidator<T>().build();
 
     return pure
         ? GladeInput.pure(
@@ -210,7 +210,7 @@ class GladeInput<T> extends ChangeNotifier {
         dependencies: dependencies,
       );
 
-  // Predefined GenericInput with predefined `notNull` validation.
+  /// Predefined GenericInput with predefined `notNull` validation.
   ///
   /// In case of need of any aditional validation use [GladeInput.create] directly.
   factory GladeInput.required({
@@ -283,11 +283,12 @@ class GladeInput<T> extends ChangeNotifier {
 
   GladeInput<T> asPure(T value) => copyWith(isPure: true, value: value);
 
-  ValidatorErrors<T>? validate() => _validator(value);
+  ValidatorResult<T>? validate() => _validator(value);
 
-  String? translate({String delimiter = '.'}) => _translate(delimiter: delimiter, customError: error);
+  String? translate({String delimiter = '.'}) => _translate(delimiter: delimiter, customError: validatorError);
 
-  String errorFormatted({String delimiter = '|'}) => error?.errors.map((e) => e.toString()).join(delimiter) ?? '';
+  String errorFormatted({String delimiter = '|'}) =>
+      validatorError?.errors.map((e) => e.toString()).join(delimiter) ?? '';
 
   /// Shorthand validator for TextFieldForm inputs.
   ///
@@ -308,7 +309,7 @@ class GladeInput<T> extends ChangeNotifier {
     } on ConvertError<T> catch (formatError) {
       return formatError.error != null
           ? _translate(delimiter: delimiter, customError: formatError)
-          : formatError.devError(value, extra: error);
+          : formatError.devError(value, extra: validatorError);
     }
   }
 
@@ -370,11 +371,11 @@ class GladeInput<T> extends ChangeNotifier {
 
   /// Translates input's errors (validation or conversion).
   String? _translate({String delimiter = '.', Object? customError}) {
-    final err = customError ?? error;
+    final err = customError ?? validatorError;
 
     if (err == null) return null;
 
-    if (err is ValidatorErrors<T>) {
+    if (err is ValidatorResult<T>) {
       return _translateGenericErrors(err, delimiter);
     }
 
@@ -396,7 +397,7 @@ class GladeInput<T> extends ChangeNotifier {
     return err.toString();
   }
 
-  ValidatorErrors<T>? _validator(T value) {
+  ValidatorResult<T>? _validator(T value) {
     final result = validatorInstance.validate(value);
 
     if (result.isValid) return null;
@@ -404,7 +405,7 @@ class GladeInput<T> extends ChangeNotifier {
     return result;
   }
 
-  String _translateGenericErrors(ValidatorErrors<T> inputErrors, String delimiter) {
+  String _translateGenericErrors(ValidatorResult<T> inputErrors, String delimiter) {
     final translateErrorTmp = translateError;
 
     final defaultTranslationsTmp = this.defaultTranslations;

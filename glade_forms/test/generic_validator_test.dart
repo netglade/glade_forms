@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 void main() {
   test('Empty validator', () {
-    final validator = GenericValidator<String>().build()..bindInput(GladeInput.pure(''));
+    final validator = GladeValidator<String>().build();
 
     expect(validator.validate('').isValid, isTrue);
     expect(validator.validate('abc').isValid, isTrue);
@@ -14,7 +14,7 @@ void main() {
   });
 
   test('Validator returns isValid for valid value', () {
-    final validator = (GenericValidator<String?>()..notNull()).build()..bindInput(GladeInput.pure(''));
+    final validator = (GladeValidator<String?>()..notNull()).build();
 
     const input = 'hello';
 
@@ -24,7 +24,7 @@ void main() {
   });
 
   test("Value can't be null", () {
-    final validator = (GenericValidator<String?>()..notNull()).build()..bindInput(GladeInput.pure(''));
+    final validator = (GladeValidator<String?>()..notNull()).build();
     final result = validator.validate(null);
 
     expect(result.isValid, isFalse);
@@ -34,22 +34,20 @@ void main() {
 
   group('Satisfy predicate', () {
     test('Should succeed', () {
-      final validator = (GenericValidator<int>()
+      final validator = (GladeValidator<int>()
             ..satisfy(
               (x, _, __) => x > 10,
               devError: (_, __) => 'Value must be greater than 10',
             ))
-          .build()
-        ..bindInput(GladeInput.pure(0));
+          .build();
 
       expect(validator.validate(20).isValid, isTrue);
     });
 
     test('Value not valid', () {
       const onErrorMessage = 'Value must be greater than 10';
-      final validator = (GenericValidator<int>()..satisfy((x, _, __) => x > 10, devError: (_, __) => onErrorMessage))
-          .build()
-        ..bindInput(GladeInput.pure(0));
+      final validator =
+          (GladeValidator<int>()..satisfy((x, _, __) => x > 10, devError: (_, __) => onErrorMessage)).build();
 
       final result = validator.validate(5);
       expect(result.isValid, isFalse);
@@ -67,27 +65,25 @@ void main() {
 
   group('Combined', () {
     test('notNull() and satisfy() - succeeds', () {
-      final validator = (GenericValidator<String>()
+      final validator = (GladeValidator<String>()
             ..notNull()
             ..satisfy(
               (x, _, __) => x.length >= 5,
               devError: (_, __) => 'Length must be at least 5',
             ))
-          .build()
-        ..bindInput(GladeInput.pure(''));
+          .build();
 
       expect(validator.validate('Length input').isValid, isTrue);
     });
 
     test('notNull() and satisfy() - value is null', () {
-      final validator = (GenericValidator<String?>()
+      final validator = (GladeValidator<String?>()
             ..notNull()
             ..satisfy(
               (x, _, __) => x!.length >= 5,
               devError: (_, __) => 'Length must be at least 5',
             ))
-          .build()
-        ..bindInput(GladeInput.pure(''));
+          .build();
 
       final result = validator.validate(null);
 
@@ -98,14 +94,13 @@ void main() {
 
     test('notNull() and satisfy() - value does not meet predicate', () {
       const onErrorMessage = 'Length must be at least 5';
-      final validator = (GenericValidator<String?>()
+      final validator = (GladeValidator<String?>()
             ..notNull()
             ..satisfy(
               (x, _, __) => x!.length >= 5,
               devError: (_, __) => onErrorMessage,
             ))
-          .build()
-        ..bindInput(GladeInput.pure(''));
+          .build();
 
       final result = validator.validate('a');
 
@@ -124,7 +119,7 @@ void main() {
 
     test('Run all parts: notNull() and satisfy() - value is null', () {
       const onErrorMessage = 'Length must be at least 5';
-      final validator = (GenericValidator<String?>()
+      final validator = (GladeValidator<String?>()
             ..notNull()
             ..satisfy(
               (x, _, __) => (x?.length ?? 0) >= 5,
@@ -152,7 +147,7 @@ void main() {
 
   group('IsEmail', () {
     test('Succeeds', () {
-      final validator = (StringValidator()..isEmail()).build()..bindInput(GladeInput.pure(''));
+      final validator = (StringValidator()..isEmail()).build();
 
       final inputs = [
         'abc@gmail.com',
@@ -168,7 +163,7 @@ void main() {
     });
 
     test('Value not valid', () {
-      final validator = (StringValidator()..isEmail()).build()..bindInput(GladeInput.pure(''));
+      final validator = (StringValidator()..isEmail()).build();
 
       final inputs = [
         'abc-gmail.com',
@@ -188,7 +183,7 @@ void main() {
 
   group('Is URL', () {
     test('Succeeds - http(s) optional', () {
-      final validator = (StringValidator()..isUrl()).build()..bindInput(GladeInput.pure(''));
+      final validator = (StringValidator()..isUri()).build();
 
       // Expected Url - Check with HTTP(S).
       final inputs = [
@@ -208,7 +203,7 @@ void main() {
     });
 
     test('Succeeds - http(s) mandatory', () {
-      final validator = (StringValidator()..isUrl(requireHttpScheme: true)).build()..bindInput(GladeInput.pure(''));
+      final validator = (StringValidator()..isUri(requiresScheme: true)).build();
 
       // Expected Url - Check with HTTP(S).
       final inputs = [
@@ -225,7 +220,7 @@ void main() {
     });
 
     test('Value is not url', () {
-      final validator = (StringValidator()..isUrl(requireHttpScheme: true)).build()..bindInput(GladeInput.pure(''));
+      final validator = (StringValidator()..isUri(requiresScheme: true)).build();
 
       // Expected Url - Check with HTTP(S).
       final inputs = [
@@ -259,7 +254,6 @@ void main() {
               ))
             .build(),
         value: 0,
-        //translateError: (err, key, defMessage, {depedencies}) => key == 'e1' ? 'Hodnota není větší jak 10!' : defMessage,
         translateError: (error, key, devMessage, dependencies) =>
             key == 'e1' ? 'Hodnota není větší jak 10!' : devMessage,
       );

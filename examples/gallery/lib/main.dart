@@ -2,11 +2,11 @@
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:glade_forms_example/generated/locale_loader.g.dart';
-import 'package:glade_forms_example/localization_addon_custom.dart';
-import 'package:glade_forms_example/usecases/age_restricted_example.dart';
-import 'package:glade_forms_example/usecases/complex_object_mapping_example.dart';
-import 'package:glade_forms_example/usecases/quickstart_example.dart';
+import 'package:glade_forms_gallery/generated/locale_loader.g.dart';
+import 'package:glade_forms_gallery/localization_addon_custom.dart';
+import 'package:glade_forms_gallery/usecases/age_restricted_example.dart';
+import 'package:glade_forms_gallery/usecases/complex_object_mapping_example.dart';
+import 'package:glade_forms_gallery/usecases/quickstart_example.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 // ignore: prefer-static-class, ok for now
