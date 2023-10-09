@@ -1,3 +1,5 @@
+// ignore_for_file: avoid-passing-self-as-argument
+
 import 'package:flutter/material.dart';
 import 'package:glade_forms/glade_forms.dart';
 import 'package:glade_forms_storybook/shared/usecase_container.dart';

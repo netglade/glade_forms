@@ -1,4 +1,4 @@
-// ignore_for_file: prefer-match-file-name
+// ignore_for_file: prefer-match-file-name, avoid-passing-self-as-argument
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -103,9 +103,7 @@ If *VIP content* is checked, **age** must be over 18.
                 Center(
                   child: ElevatedButton(
                     onPressed: formModel.isValid
-                        ? () {
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved')));
-                          }
+                        ? () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved')))
                         : null,
                     child: const Text('Save'),
                   ),

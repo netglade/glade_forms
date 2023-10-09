@@ -1,3 +1,5 @@
+// ignore_for_file: avoid-passing-self-as-argument
+
 import 'package:flutter/material.dart';
 import 'package:glade_forms/glade_forms.dart';
 import 'package:glade_forms_storybook/shared/usecase_container.dart';
@@ -51,8 +53,8 @@ class _Model extends GladeModel {
   }
 }
 
-class ComplexMappingExample extends StatelessWidget {
-  const ComplexMappingExample({super.key});
+class ComplexObjectMappingExample extends StatelessWidget {
+  const ComplexObjectMappingExample({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -87,6 +89,7 @@ class ComplexMappingExample extends StatelessWidget {
                         value: model.selectedItem.value?.id,
                         onChanged: (v) => model.updateInput(
                           model.selectedItem,
+                          // ignore: avoid-unsafe-collection-methods, ok here.
                           model.availableItems.firstWhere((element) => element.id == v),
                         ),
                       ),

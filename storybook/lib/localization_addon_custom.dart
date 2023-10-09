@@ -1,4 +1,4 @@
-// ignore_for_file: prefer-match-file-name
+// ignore_for_file: prefer-match-file-name, avoid-non-null-assertion
 
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
@@ -6,6 +6,7 @@ import 'package:widgetbook/widgetbook.dart';
 /// A [WidgetbookAddon] for changing the active [Locale] via [Localizations].
 class LocalizationAddonCustom extends WidgetbookAddon<Locale> {
   final List<Locale> locales;
+  // ignore: avoid-dynamic, ok here
   final List<LocalizationsDelegate<dynamic>> localizationsDelegates;
   final ValueChanged<Locale> onChange;
 
@@ -37,6 +38,7 @@ class LocalizationAddonCustom extends WidgetbookAddon<Locale> {
         ),
         super(
           name: 'Locale',
+          // ignore: avoid-unsafe-collection-methods, ok here
           initialSetting: initialLocale ?? locales.first,
         );
 

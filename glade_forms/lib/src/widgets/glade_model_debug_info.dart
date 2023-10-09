@@ -135,12 +135,12 @@ class _DangerStrips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ignore: avoid-returning-widgets, it is ok here
     return SizedBox(
       height: 5,
       width: double.infinity,
       child: LayoutBuilder(
         builder: (context, constraints) {
+          // ignore: avoid-returning-widgets, ok here
           return Stack(children: getListOfStripes((constraints.maxWidth / 2).ceil()));
         },
       ),

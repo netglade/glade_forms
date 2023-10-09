@@ -38,7 +38,8 @@ class App extends StatelessWidget {
           locales: context.supportedLocales,
           localizationsDelegates: context.localizationDelegates,
           initialLocale: context.locale,
-          onChange: (locale) => locale == null ? {} : context.setLocale(locale),
+          // ignore: avoid-async-call-in-sync-function, ok here.
+          onChange: (locale) => context.setLocale(locale),
         ),
       ],
       directories: [
@@ -54,7 +55,7 @@ class App extends StatelessWidget {
           children: [
             WidgetbookUseCase(
               name: 'Complex objects & converters',
-              builder: (context) => const ComplexMappingExample(),
+              builder: (context) => const ComplexObjectMappingExample(),
             ),
           ],
         ),

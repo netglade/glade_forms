@@ -58,6 +58,7 @@ class _CodeSample extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ignore: avoid-async-call-in-sync-function, memoize future
     final getFileContentFutureMemo = useMemoized(getFileContent);
     final getFileFuture = useFuture(getFileContentFutureMemo);
 
@@ -77,6 +78,7 @@ class _CodeSample extends HookWidget {
               child: SingleChildScrollView(
                 child: SelectionArea(
                   child: HighlightView(
+                    // ignore: avoid-non-null-assertion, ok here
                     getFileFuture.data!,
                     padding: const EdgeInsets.all(10),
                     language: 'dart',
@@ -93,7 +95,9 @@ class _CodeSample extends HookWidget {
                   width: 100,
                   height: 40,
                   child: ElevatedButton.icon(
+                    // ignore: prefer-extracting-callbacks, ok here.
                     onPressed: () {
+                      // ignore: avoid-async-call-in-sync-function, avoid-non-null-assertion , ok here
                       Clipboard.setData(ClipboardData(text: getFileFuture.data!));
                       final _ = ScaffoldMessenger.of(context)
                           .showSnackBar(const SnackBar(content: Text('Code copied to clipboad')));
