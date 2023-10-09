@@ -39,7 +39,7 @@ scripts:
   # TESTING
 
   test:
-    run: melos exec -- dart test
+    run: melos exec -- fvm flutter test
     packageFilters:
       dirExists: test
     description: Run all Dart tests.
