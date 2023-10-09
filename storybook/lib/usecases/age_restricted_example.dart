@@ -3,8 +3,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:glade_forms/glade_forms.dart';
-import 'package:glade_forms_gallery/generated/locale_keys.g.dart';
-import 'package:glade_forms_gallery/shared/usecase_container.dart';
+import 'package:glade_forms_storybook/generated/locale_keys.g.dart';
+import 'package:glade_forms_storybook/shared/usecase_container.dart';
 
 class _ErrorKeys {
   static const String ageRestriction = 'age-restriction';

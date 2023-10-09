@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:glade_forms/glade_forms.dart';
-import 'package:glade_forms_gallery/shared/usecase_container.dart';
+import 'package:glade_forms_storybook/shared/usecase_container.dart';
 
 class _Model extends GladeModel {
   late StringInput name;

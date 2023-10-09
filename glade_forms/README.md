@@ -5,6 +5,7 @@
     <img alt="netglade" height='120px' src="https://raw.githubusercontent.com/netglade/glade_forms/main/packages/glade_forms/doc/badge_dark.png">
   </picture>
 </a>
+
 Developed with 💚 by [netglade][netglade_link]
 
 [![ci][ci_badge]][ci_badge_link]
@@ -36,7 +37,7 @@ A universal way to define form validators with support of translations.
 Glade forms offer unified way to define reusable form input
 with support of fluent API to define input's validators and with support of translation on top of that.
 
-**TBA DEMO SITE**
+[📖 Glade Forms Widgetbook][storybook_demo_link] 
 
 
 ## 🚀 Getting started
@@ -96,15 +97,16 @@ GladeFormBuilder(
 )
 ```
 
-See DEMO site for more, complex, examples.
+See [📖 Glade Forms Widgetbook][storybook_demo_link] , complex, examples.
 
 ### GladeInput
+
 Each form's input is represented by instance of `GladeInput<T>` where `T` is value held by input.
 For simplicity we will interchange `input` and `GladeInput<T>`.
 
 Every input is *dirty* or *pure* based on if value was updated (or not, yet). 
 
-On each input we can defined
+On each input we define
  - *validator* - Input's value must satistfy validation to be *valid* input.
  - *translateError* - If there are validation errors, function for error translations can be provided.
  - *inputKey* - For debug purposes and dependencies, each input can have unique name for simple identification.
@@ -114,6 +116,7 @@ On each input we can defined
  - *defaultTranslation* - If error's translations are simple, the default translation settings can be set instead of custom `translateError` method.
 
 #### Defining input
+
 Most of the time, input is created with `.create()` factory with defined validation, translation and other properties. 
 
 Validation is defined through part methods on ValidatorFactory such as `notNull()`, `satisfy()` and other parts. 
@@ -143,7 +146,9 @@ This example defines validation that `int` value has to be greater or equal to 1
  );
 ```
 
-Order of validation parts matter. By default first failing part stops validation. Pass `stopOnFirstError: false` on `.build()` to validate all parts at once.
+Order of validation parts matter. By default first failing part stops validation. 
+
+Pass `stopOnFirstError: false` on `.build()` to validate all parts at once.
 
 #### StringToValueConverter (valueConverter)
 As noted before, if `T` is not a String, a converter from String to `T` has to be provided. 
@@ -163,49 +168,55 @@ In validation (or translation if needed) just call `dependencies.byKey()` to get
 
 ### 📚 Adding translation support
 
-Each validation error (and conversion error if any) can be translated. Provide `translateError` fucntion which accepts 
+Each validation error (and conversion error if any) can be translated. Provide `translateError` function which accepts 
 
 - `error` - Error to translate
 - `key` - Error's identification if any
 - `devMessage` - Provided `devError` from validator
 - `dependencies` - Input's dependencies
 
-Age example translation
-```dart
+Age example translation (LocaleKeys are generated translations from [easy_localization](https://pub.dev/packages/easy_localization) package)
 
+```dart
 translateError: (error, key, devMessage, {required dependencies}) {
   if (key == _ErrorKeys.ageRestriction) return LocaleKeys.ageRestriction_under18.tr();
 
   if (error.isConversionError) return LocaleKeys.ageRestriction_ageFormat.tr();
 
   return devMessage;
-},
-
+}
 ```
 
 ### GladeModel
-GladeModel is base class for Form's model which holds all inputs together. 
+GladeModel is base class for Form's model which holds all inputs together. GladeModel has properties such as `isValid` or `isUnchanged` for all input's states sum up together. 
 
-For updating concrete input, call `updateInput` or `stringFieldUpdateInput` methods to update its value. GladeModel is ChangeNotifier so all dependant widgets will be rebuilt.
+For updating concrete input, call `updateInput` or `stringFieldUpdateInput` methods to update its value. 
+
+GladeModel is *ChangeNotifier* so all dependant widgets will be rebuilt.
 
 ### GladeFormBuilder and GladeFormProvider
-GladeFormProvider is predefined widget to provide GladeFormModel to widget's subtreee.
+`GladeModelProvider` is predefined widget to provide `GladeModel` to widget's subtreee.
 
-Similarly GladeFormBuilder allows to listen to Model's changes and rebuilts its child. 
+Similarly `GladeFormBuilder` allows to listen to model's changes and rebuilts its child. 
 
 ### 🔨 Debugging validators
 
-There are some getter and methods on GladeInput / GladeModel which can be used for debugging. 
+There are some getters and methods on GladeInput / GladeModel which can be used for debugging. 
 
 Use `model.formattedValidationErrors` to get all input's error formatted for simple debugging. 
 
-There is also `GladeModelDebugInfo` widget which displays table of all model's inputs and their properties such as `isValid` or `validation error`.
+There is also `GladeModelDebugInfo` widget which displays table of all model's inputs 
+and their properties such as `isValid` or `validation error`.
 
 ### Using validators without GladeInput
-Is is possible to use GladeValidator without associated GladeInputs. 
-Just create instance of ``
+
+It is possible to use GladeValidator without associated GladeInputs. 
+
+Just create instance of `GladeValidator` (or `StringValidator`) and use it.
 
 ```dart
+final validator = (StringValidator()..notEmpty()).build();
+final result = validator.validate(null);
 
 ```
 
@@ -224,3 +235,4 @@ Your contributions are always welcome! Feel free to open pull request.
 [glade_forms_pub_badge_link]: https://pub.dartlang.org/packages/glade_forms
 [discord_badge]: https://img.shields.io/discord/1091460081054400532.svg?logo=discord&color=blue
 [discord_badge_link]: https://discord.gg/sJfBBuDZy4
+[storybook_demo_link]: https://netglade.github.io/glade_forms
