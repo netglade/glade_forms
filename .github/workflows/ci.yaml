@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  auto_mappr:
+  glade_forms:
     runs-on: ubuntu-latest
 
     steps:
