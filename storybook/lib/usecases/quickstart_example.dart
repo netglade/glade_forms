@@ -53,7 +53,12 @@ class QuickStartExample extends StatelessWidget {
                   decoration: const InputDecoration(labelText: 'Email'),
                 ),
                 const SizedBox(height: 10),
-                ElevatedButton(onPressed: model.isValid ? () {} : null, child: const Text('Save')),
+                ElevatedButton(
+                  onPressed: model.isValid
+                      ? () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved')))
+                      : null,
+                  child: const Text('Save'),
+                ),
               ],
             ),
           ),
