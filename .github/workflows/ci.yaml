@@ -15,14 +15,15 @@ jobs:
 
       - name: Configure FVM
         uses: kuhnroyal/flutter-fvm-config-action@v1
+        id: fvm-config-action
         with:
           path: ".fvm/fvm_config.json"
 
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: ${{ env.FLUTTER_CHANNEL }}
+          flutter-version: ${{ steps.fvm-config-action.outputs.FLUTTER_VERSION }}
+          channel: ${{ steps.fvm-config-action.outputs.FLUTTER_CHANNEL }}
 
       - name: Install DCM
         uses: CQLabs/setup-dcm@v1
