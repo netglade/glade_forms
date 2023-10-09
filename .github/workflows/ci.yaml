@@ -24,11 +24,6 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: ${{ env.FLUTTER_CHANNEL }}
 
-      - uses: bluefireteam/melos-action@v2
-
-      - name: Analyze
-        run: melos run lint:all
-
       - name: Install DCM
         uses: CQLabs/setup-dcm@v1
         with:
@@ -44,6 +39,11 @@ jobs:
           fatal_style: true
           fatal_performance: true
           fatal_warnings: true
+
+      - uses: bluefireteam/melos-action@v2
+
+      - name: Analyze
+        run: melos run lint:all
 
       - name: Test
         run: melos run test
