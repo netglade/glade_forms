@@ -35,19 +35,19 @@ class Example extends StatelessWidget {
               TextFormField(
                 initialValue: model.name.value,
                 validator: model.name.textFormFieldInputValidator,
-                onChanged: (v) => model.stringFieldUpdateInput(model.name, v),
+                onChanged: model.name.updateValueWithString,
                 decoration: const InputDecoration(labelText: 'Name'),
               ),
               TextFormField(
                 initialValue: model.age.stringValue,
                 validator: model.age.textFormFieldInputValidator,
-                onChanged: (v) => model.stringFieldUpdateInput(model.age, v),
+                onChanged: model.age.updateValueWithString,
                 decoration: const InputDecoration(labelText: 'Age'),
               ),
               TextFormField(
                 initialValue: model.email.value,
                 validator: model.email.textFormFieldInputValidator,
-                onChanged: (v) => model.stringFieldUpdateInput(model.email, v),
+                onChanged: model.email.updateValueWithString,
                 decoration: const InputDecoration(labelText: 'Email'),
               ),
               const SizedBox(height: 10),
