@@ -1,0 +1,7 @@
+{
+    "ageRestriction": {
+        "under18": "Musí vám být alespoň 18 let pro vstup",
+        "ageFormat": "Věk musí být číslo"
+    },
+    "empty": "Povinná hodnota"
+}

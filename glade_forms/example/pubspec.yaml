@@ -1,0 +1,10 @@
+name: glade_forms_example
+description: Example project how to use GladeForms
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ">=2.18.7 <4.0.0"
+
+dependencies:
+  glade_forms: ^1.0.0

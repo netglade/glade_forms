@@ -1,11 +1,14 @@
 name: glade_forms
-description: A starting point for Dart libraries or applications.
+description: A universal way to define form validators with support of translations.
 version: 1.0.0
-# repository: https://github.com/my_org/my_repo
+repository: https://github.com/netglade/glade_forms
+issue_tracker: https://github.com/netglade/glade_forms/issues
+screenshots:
+  - description: The auto_mappr package logo.
+    path: doc/icon.png
 
 environment:
-  sdk: ^3.0.6
-  flutter: ">=1.17.0"
+  sdk: ^3.0.0
 
 # Add regular dependencies here.
 dependencies:
@@ -14,6 +17,7 @@ dependencies:
   flutter:
     sdk: flutter
   meta: ^1.9.1
+  provider: ^6.0.5
 
 dev_dependencies:
   netglade_analysis: ^4.1.0

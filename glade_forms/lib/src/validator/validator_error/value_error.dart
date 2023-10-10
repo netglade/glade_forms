@@ -1,7 +1,7 @@
-import 'package:glade_forms/src/validator/validator_error/generic_validator_error.dart';
+import 'package:glade_forms/src/validator/validator_error/glade_validator_error.dart';
 
-class ValueError<T> extends GenericValidatorError<T> {
-  const ValueError({
+class ValueError<T> extends GladeValidatorError<T> {
+  ValueError({
     required super.value,
     required super.devError,
     super.extra,

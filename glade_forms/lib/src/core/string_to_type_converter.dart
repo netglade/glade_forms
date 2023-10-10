@@ -1,27 +1,36 @@
 import 'package:glade_forms/src/core/convert_error.dart';
-import 'package:glade_forms/src/validator/validator_error/validator_error.dart';
+import 'package:glade_forms/src/core/glade_error_keys.dart';
 
-// ignore: avoid-dynamic, ok for now
-typedef OnErrorCallback<T> = ConvertError<T> Function(String? rawValue, dynamic error);
+typedef OnErrorCallback<T> = ConvertError<T> Function(String? rawValue, Object error);
 
-typedef Converter<T> = T Function(
+typedef ConverterToType<T> = T Function(
   String? rawInput,
-  T Function({
-    // ignore: avoid-dynamic, ok for now
-    required dynamic error,
+  T Function(
+    Object error, {
     required String? rawValue,
-    OnError<String>? onError,
-  }) convert,
+    Object? key,
+    OnConvertError? onError,
+  }) cantConvert,
 );
 
+typedef TypeConverterToString<T> = String? Function(T rawInput);
+
+/// Used to convert string input into `T` value.
 class StringToTypeConverter<T> {
-  final Converter<T> converter;
+  final ConverterToType<T> converter;
   final OnErrorCallback<T> onError;
 
+  final TypeConverterToString<T> _converterBack;
+
   StringToTypeConverter({
+    /// Converts string value to [T] type.
     required this.converter,
-    OnErrorCallback<T>? onError,
-  }) : onError = onError ?? ((rawValue, error) => ConvertError<T>(rawValue: rawValue, error: error));
+
+    /// Converts [T] back to string.
+    TypeConverterToString<T>? converterBack,
+    //OnErrorCallback<T>? onError,
+  })  : _converterBack = converterBack ?? ((rawInput) => rawInput.toString()),
+        onError = ((rawValue, error) => ConvertError<T>(input: rawValue, error: error));
 
   T convert(String? input) {
     try {
@@ -29,18 +38,26 @@ class StringToTypeConverter<T> {
     } on ConvertError<T> {
       // If _cantConvert were used -> we already thrown an Error.
       rethrow;
-      // ignore: avoid_catches_without_on_clauses, has to be generic to it catches everything
-    } catch (e) {
+    }
+    // ignore: avoid_catches_without_on_clauses, has to be generic to catch everything
+    catch (e) {
       // ignore: avoid-throw-in-catch-block, this method should throw custom exception
       throw onError(input, e);
     }
   }
 
-  T _cantConvert({
+  String? convertBack(T input) => _converterBack(input);
+
+  T _cantConvert(
+    Object error, {
     required String? rawValue,
-    // ignore: avoid-dynamic, ok for now
-    required dynamic error,
-    OnError<String>? onError,
+    Object? key,
+    OnConvertError? onError,
   }) =>
-      throw ConvertError<T>(rawValue: rawValue, onError: onError, error: error);
+      throw ConvertError<T>(
+        input: rawValue,
+        formatError: onError,
+        error: error,
+        key: key ?? GladeErrorKeys.conversionError,
+      );
 }
