@@ -49,7 +49,9 @@ jobs:
       - uses: bluefireteam/melos-action@v2
 
       - name: Setup
-        run: melos run setup
+        run: |
+          flutter pub run easy_localization:generate -S "assets/translations" -o locale_loader.g.dart
+          flutter pub run easy_localization:generate -S "assets/translations" --skip-unnecessary-keys -f keys -o locale_keys.g.dart
 
       - name: Build Storybook for Web
         run: flutter build web --base-href "/glade_forms/"
