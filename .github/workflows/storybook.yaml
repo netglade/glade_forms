@@ -1,5 +1,4 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+name: Deploy storybook to pages
 
 on:
   # Runs on pushes targeting the default branch
@@ -35,7 +34,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: bluefireteam/melos-action@v2
 
       - name: Configure FVM
         uses: kuhnroyal/flutter-fvm-config-action@v1
@@ -47,6 +45,8 @@ jobs:
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: ${{ env.FLUTTER_CHANNEL }}
+
+      - uses: bluefireteam/melos-action@v2
 
       - name: Setup
         run: melos run setup
