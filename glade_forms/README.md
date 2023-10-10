@@ -20,16 +20,16 @@ A universal way to define form validators with support of translations.
 
 - [👀 What is this?](#-what-is-this)
 - [🚀 Getting started](#-getting-started)
-  - [GladeInput](#gladeinput)
-    - [Defining input](#defining-input)
-    - [StringToValueConverter (valueConverter)](#stringtovalueconverter-valueconverter)
-    - [StringInput](#stringinput)
-    - [Dependencies](#dependencies)
-  - [📚 Adding translation support](#-adding-translation-support)
-  - [GladeModel](#glademodel)
-  - [GladeFormBuilder and GladeFormProvider](#gladeformbuilder-and-gladeformprovider)
-  - [🔨 Debugging validators](#-debugging-validators)
-  - [Using validators without GladeInput](#using-validators-without-gladeinput)
+- [GladeInput](#gladeinput)
+  - [Defining input](#defining-input)
+  - [StringToValueConverter (valueConverter)](#stringtovalueconverter-valueconverter)
+  - [StringInput](#stringinput)
+  - [Dependencies](#dependencies)
+- [📚 Adding translation support](#-adding-translation-support)
+- [GladeModel](#glademodel)
+- [GladeFormBuilder and GladeFormProvider](#gladeformbuilder-and-gladeformprovider)
+- [🔨 Debugging validators](#-debugging-validators)
+- [Using validators without GladeInput](#using-validators-without-gladeinput)
 - [👏 Contributing](#-contributing)
 
 ## 👀 What is this?
@@ -53,10 +53,13 @@ class _Model extends GladeModel {
   @override
   List<GladeInput<Object?>> get inputs => [name, age, email];
 
-  _Model() {
+  @override
+  void initialize() {
     name = StringInput.required();
     age = GladeInput.intInput(value: 0);
-    email = StringInput.create((validator) => (validator..isEmail()).build());
+    email = StringInput.create(validator: (validator) => (validator..isEmail()).build());
+
+    super.initialize();
   }
 }
 
@@ -73,20 +76,20 @@ GladeFormBuilder(
       children: [
         TextFormField(
           initialValue: model.name.value,
-          validator: model.name.formFieldInputValidator,
-          onChanged: (v) => model.stringFieldUpdateInput(model.name, v),
+          validator: model.name.textFormFieldInputValidator,
+          onChanged: model.name.updateValueWithString,
           decoration: const InputDecoration(labelText: 'Name'),
         ),
         TextFormField(
           initialValue: model.age.stringValue,
-          validator: model.age.formFieldInputValidator,
-          onChanged: (v) => model.stringFieldUpdateInput(model.age, v),
+          validator: model.age.textFormFieldInputValidator,
+          onChanged: model.age.updateValueWithString,
           decoration: const InputDecoration(labelText: 'Age'),
         ),
         TextFormField(
           initialValue: model.email.value,
-          validator: model.email.formFieldInputValidator,
-          onChanged: (v) => model.stringFieldUpdateInput(model.email, v),
+          validator: model.email.textFormFieldInputValidator,
+          onChanged: model.email.updateValueWithString,
           decoration: const InputDecoration(labelText: 'Email'),
         ),
         const SizedBox(height: 10),
@@ -99,7 +102,7 @@ GladeFormBuilder(
 
 See [📖 Glade Forms Widgetbook][storybook_demo_link] , complex, examples.
 
-### GladeInput
+## GladeInput
 
 Each form's input is represented by instance of `GladeInput<T>` where `T` is value held by input.
 For simplicity we will interchange `input` and `GladeInput<T>`.
@@ -115,7 +118,7 @@ On each input we define
  - *valueComparator* - Sometimes it is handy to provied `initialValue` which will be never updated after input is mutated. `valueComparator` should be provided to compare `initialValue` and `value` if `T` is not comparable type by default. 
  - *defaultTranslation* - If error's translations are simple, the default translation settings can be set instead of custom `translateError` method.
 
-#### Defining input
+### Defining input
 
 Most of the time, input is created with `.create()` factory with defined validation, translation and other properties. 
 
@@ -150,23 +153,23 @@ Order of validation parts matter. By default first failing part stops validation
 
 Pass `stopOnFirstError: false` on `.build()` to validate all parts at once.
 
-#### StringToValueConverter (valueConverter)
+### StringToValueConverter (valueConverter)
 As noted before, if `T` is not a String, a converter from String to `T` has to be provided. 
 
 GladeForms provides some predefined converters such as `IntConverter` and more. See `GladeTypeConverters` for more.
 
 
-#### StringInput
+### StringInput
 StringInput is specialized variant of GladeInput<String> which has additional, string related, validations such as `isEmail`, `isUrl`, `maxLength` and more.
 
-#### Dependencies
+### Dependencies
 Input can have dependencies on another inputs to allow dependendent validation. 
 `inputKey` should be assigned for each input to allow dependency work. 
 
 In validation (or translation if needed) just call `dependencies.byKey()` to get dependendent input. 
 
 
-### 📚 Adding translation support
+## 📚 Adding translation support
 
 Each validation error (and conversion error if any) can be translated. Provide `translateError` function which accepts 
 
@@ -187,19 +190,31 @@ translateError: (error, key, devMessage, {required dependencies}) {
 }
 ```
 
-### GladeModel
-GladeModel is base class for Form's model which holds all inputs together. GladeModel has properties such as `isValid` or `isUnchanged` for all input's states sum up together. 
+## GladeModel
+GladeModel is base class for Form's model which holds all inputs together. 
+It is useful for cases where you want to sum up validations at once, 
+like disabling save button until all inputs are valid. 
 
-For updating concrete input, call `updateInput` or `stringFieldUpdateInput` methods to update its value. 
+GladeModel is `ChangeNotifier` so all dependant widgets will be rebuilt.
 
-GladeModel is *ChangeNotifier* so all dependant widgets will be rebuilt.
+There are **several rules** how to define models
 
-### GladeFormBuilder and GladeFormProvider
+- Each input has to be **mutable** and `late` field
+- Model has to override `initialize` method where each input field is created
+- In the end of `initialize` method, `super.initialize()` must be called to wire-up inputs with model.
+
+
+⚠️ Without wiring-up model, model will not be updated appropiately 
+and properties such as `isValid` or `formattedErrors` will not work. 
+ 
+For updating input call either `updateValueWithString(String?)` to update `T` value with string (will be converted if needed) or set `value` directly (via setter).
+
+## GladeFormBuilder and GladeFormProvider
 `GladeModelProvider` is predefined widget to provide `GladeModel` to widget's subtreee.
 
 Similarly `GladeFormBuilder` allows to listen to model's changes and rebuilts its child. 
 
-### 🔨 Debugging validators
+## 🔨 Debugging validators
 
 There are some getters and methods on GladeInput / GladeModel which can be used for debugging. 
 
@@ -208,7 +223,7 @@ Use `model.formattedValidationErrors` to get all input's error formatted for sim
 There is also `GladeModelDebugInfo` widget which displays table of all model's inputs 
 and their properties such as `isValid` or `validation error`.
 
-### Using validators without GladeInput
+## Using validators without GladeInput
 
 It is possible to use GladeValidator without associated GladeInputs. 
 
@@ -217,7 +232,6 @@ Just create instance of `GladeValidator` (or `StringValidator`) and use it.
 ```dart
 final validator = (StringValidator()..notEmpty()).build();
 final result = validator.validate(null);
-
 ```
 
 ## 👏 Contributing

@@ -18,7 +18,12 @@ class AgeRestrictedModel extends GladeModel {
   @override
   List<GladeInput<Object?>> get inputs => [nameInput, ageInput, vipInput];
 
-  AgeRestrictedModel() {
+  // AgeRestrictedModel() {
+  //   bindInputs();
+  // }
+
+  @override
+  void initialize() {
     nameInput = StringInput.required(
       inputKey: 'name-input',
       defaultTranslations: DefaultTranslations(
@@ -59,6 +64,8 @@ class AgeRestrictedModel extends GladeModel {
       value: false,
       inputKey: 'vip-input',
     );
+
+    super.initialize();
   }
 }
 
@@ -86,19 +93,19 @@ If *VIP content* is checked, **age** must be over 18.
                 TextFormField(
                   initialValue: formModel.nameInput.value,
                   decoration: const InputDecoration(labelText: 'Name'),
-                  onChanged: (value) => formModel.stringFieldUpdateInput(formModel.nameInput, value),
+                  onChanged: formModel.nameInput.updateValueWithString,
                   validator: formModel.nameInput.textFormFieldInputValidator,
                 ),
                 TextFormField(
                   initialValue: formModel.ageInput.stringValue,
                   decoration: const InputDecoration(labelText: 'Age'),
-                  onChanged: (value) => formModel.stringFieldUpdateInput(formModel.ageInput, value),
+                  onChanged: formModel.ageInput.updateValueWithString,
                   validator: (v) => formModel.ageInput.textFormFieldInputValidator(v),
                 ),
                 CheckboxListTile(
                   value: formModel.vipInput.value,
                   title: const Text('VIP Content'),
-                  onChanged: (value) => formModel.updateInput(formModel.vipInput, value),
+                  onChanged: (v) => formModel.vipInput.value = v ?? false,
                 ),
                 Center(
                   child: ElevatedButton(

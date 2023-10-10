@@ -1,5 +1,3 @@
-// ignore_for_file: avoid-passing-self-as-argument
-
 import 'package:flutter/material.dart';
 import 'package:glade_forms/glade_forms.dart';
 import 'package:glade_forms_storybook/shared/usecase_container.dart';
@@ -12,10 +10,15 @@ class _Model extends GladeModel {
   @override
   List<GladeInput<Object?>> get inputs => [name, age, email];
 
-  _Model() {
+  _Model();
+
+  @override
+  void initialize() {
     name = StringInput.required();
     age = GladeInput.intInput(value: 0);
     email = StringInput.create(validator: (validator) => (validator..isEmail()).build());
+
+    super.initialize();
   }
 }
 
@@ -37,19 +40,19 @@ class QuickStartExample extends StatelessWidget {
                 TextFormField(
                   initialValue: model.name.value,
                   validator: model.name.textFormFieldInputValidator,
-                  onChanged: (v) => model.stringFieldUpdateInput(model.name, v),
+                  onChanged: model.name.updateValueWithString,
                   decoration: const InputDecoration(labelText: 'Name'),
                 ),
                 TextFormField(
                   initialValue: model.age.stringValue,
                   validator: model.age.textFormFieldInputValidator,
-                  onChanged: (v) => model.stringFieldUpdateInput(model.age, v),
+                  onChanged: model.age.updateValueWithString,
                   decoration: const InputDecoration(labelText: 'Age'),
                 ),
                 TextFormField(
                   initialValue: model.email.value,
                   validator: model.email.textFormFieldInputValidator,
-                  onChanged: (v) => model.stringFieldUpdateInput(model.email, v),
+                  onChanged: model.email.updateValueWithString,
                   decoration: const InputDecoration(labelText: 'Email'),
                 ),
                 const SizedBox(height: 10),
