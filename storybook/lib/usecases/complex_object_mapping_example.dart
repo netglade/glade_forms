@@ -22,7 +22,9 @@ class _Model extends GladeModel {
 
   @override
   List<GladeInput<Object?>> get inputs => [selectedItem, availableStats];
-  _Model() {
+
+  @override
+  void initialize() {
     selectedItem = GladeInput.create(
       validator: (v) => (v..notNull()).build(),
       value: null,
@@ -50,6 +52,8 @@ class _Model extends GladeModel {
         converterBack: (input) => input.join(','),
       ),
     );
+
+    super.initialize();
   }
 }
 
