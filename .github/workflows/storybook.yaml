@@ -35,6 +35,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - uses: bluefireteam/melos-action@v2
 
       - name: Configure FVM
         uses: kuhnroyal/flutter-fvm-config-action@v1
@@ -46,6 +47,9 @@ jobs:
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: ${{ env.FLUTTER_CHANNEL }}
+
+      - name: Setup
+        run: melos run setup
 
       - name: Build Storybook for Web
         run: flutter build web --base-href "/glade_forms/"
