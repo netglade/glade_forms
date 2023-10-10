@@ -1,6 +1,6 @@
 name: glade_forms_example
 description: Example project how to use GladeForms
-version: 1.0.0
+version: 1.0.1
 publish_to: none
 
 environment:
