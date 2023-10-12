@@ -18,10 +18,6 @@ class AgeRestrictedModel extends GladeModel {
   @override
   List<GladeInput<Object?>> get inputs => [nameInput, ageInput, vipInput];
 
-  // AgeRestrictedModel() {
-  //   bindInputs();
-  // }
-
   @override
   void initialize() {
     nameInput = GladeInput.stringInput(
@@ -80,19 +76,21 @@ class AgeRestrictedModel extends GladeModel {
   }
 }
 
-class AgeRestrictedExample extends StatelessWidget {
-  const AgeRestrictedExample({super.key});
+class TwoWayCheckboxExample extends StatelessWidget {
+  const TwoWayCheckboxExample({super.key});
 
   @override
   Widget build(BuildContext context) {
     const markdownData = '''
-If *VIP content* is checked, **age** must be over 18.
+If *VIP content* is checked, **age** must be over 18 or it is changed to 18.
+
+If *age* is changed to value under 18, *vip content* is unchecked and vice-versa.
  ''';
 
     return UsecaseContainer(
-      shortDescription: "Age input depends on checkbox's value",
+      shortDescription: "Age input depends on checkbox's value automatically",
       description: markdownData,
-      className: 'age_restricted_example.dart',
+      className: 'two_way_checkbox_change.dart',
       child: GladeFormBuilder(
         create: (context) => AgeRestrictedModel(),
         builder: (context, formModel, _) => Padding(
@@ -102,14 +100,12 @@ If *VIP content* is checked, **age** must be over 18.
             child: ListView(
               children: [
                 TextFormField(
-                  //initialValue: formModel.nameInput.initialValue,
                   controller: formModel.nameInput.controller,
                   decoration: const InputDecoration(labelText: 'Name'),
                   onChanged: formModel.nameInput.updateValueWithString,
                   validator: formModel.nameInput.textFormFieldInputValidator,
                 ),
                 TextFormField(
-                  //initialValue: formModel.ageInput.stringValue,
                   controller: formModel.ageInput.controller,
                   decoration: const InputDecoration(labelText: 'Age'),
                   onChanged: formModel.ageInput.updateValueWithString,

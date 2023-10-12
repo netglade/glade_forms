@@ -38,19 +38,19 @@ class QuickStartExample extends StatelessWidget {
             child: Column(
               children: [
                 TextFormField(
-                  initialValue: model.name.value,
+                  controller: model.name.controller,
                   validator: model.name.textFormFieldInputValidator,
                   onChanged: model.name.updateValueWithString,
                   decoration: const InputDecoration(labelText: 'Name'),
                 ),
                 TextFormField(
-                  initialValue: model.age.stringValue,
+                  controller: model.age.controller,
                   validator: model.age.textFormFieldInputValidator,
                   onChanged: model.age.updateValueWithString,
                   decoration: const InputDecoration(labelText: 'Age'),
                 ),
                 TextFormField(
-                  initialValue: model.email.value,
+                  controller: model.email.controller,
                   validator: model.email.textFormFieldInputValidator,
                   onChanged: model.email.updateValueWithString,
                   decoration: const InputDecoration(labelText: 'Email'),
