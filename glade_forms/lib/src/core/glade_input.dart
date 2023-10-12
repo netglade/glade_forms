@@ -137,7 +137,11 @@ class GladeInput<T> extends ChangeNotifier {
         _textEditingController = textEditingController ??
             (createTextController
                 ? TextEditingController(
-                    text: TypeHelper.typeIsStringOrNullabeString<T>() ? initialValue as String? : '',
+                    text: switch (initialValue) {
+                      final String? x => x,
+                      != null => stringTovalueConverter?.convertBack(initialValue),
+                      _ => null,
+                    },
                   )
                 : null) {
     validatorInstance.bindInput(this);
