@@ -171,7 +171,7 @@ In validation, translation or in `onChange()`, just call `dependencies.byKey()` 
 Note that `byKey()` will throw if no input is found. This is by design to provide immediate indication of error.
 
 ## Control other inputs
-SSometimes, it can be handy to update some input *B* value based on the changed value of input *A*.
+Sometimes, it can be handy to update some input *B* value based on the changed value of input *A*.
 
 Each input has `onChange()` callback where these reactions can be created. For example, automatically update "Age" value based on checked `VIP Content` input (checkbox).
 
