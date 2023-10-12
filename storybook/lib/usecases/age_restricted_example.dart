@@ -24,7 +24,7 @@ class AgeRestrictedModel extends GladeModel {
 
   @override
   void initialize() {
-    nameInput = StringInput.required(
+    nameInput = GladeInput.stringInput(
       inputKey: 'name-input',
       defaultTranslations: DefaultTranslations(
         defaultValueIsNullOrEmptyMessage: LocaleKeys.empty.tr(),
@@ -37,7 +37,7 @@ class AgeRestrictedModel extends GladeModel {
               (value, extra, dependencies) {
                 final vipContentInput = dependencies.byKey<bool>('vip-input');
 
-                if (vipContentInput == null || !vipContentInput.value) {
+                if (!vipContentInput.value) {
                   return true;
                 }
 
@@ -48,6 +48,7 @@ class AgeRestrictedModel extends GladeModel {
             ))
           .build(),
       value: 0,
+      dependencies: () => [vipInput],
       valueConverter: GladeTypeConverters.intConverter,
       inputKey: 'age-input',
       translateError: (error, key, devMessage, dependencies) {
@@ -57,12 +58,22 @@ class AgeRestrictedModel extends GladeModel {
 
         return devMessage;
       },
-      dependencies: () => [vipInput],
+      onChange: (info, dependencies) {
+        dependencies.byKey<bool>('vip-input').value = info.value >= 18;
+      },
     );
     vipInput = GladeInput.create(
       validator: (v) => (v..notNull()).build(),
       value: false,
       inputKey: 'vip-input',
+      dependencies: () => [ageInput],
+      onChange: (info, dependencies) {
+        final age = dependencies.byKey<int>('age-input');
+
+        if (info.value && age.value < 18) {
+          age.value = 18;
+        }
+      },
     );
 
     super.initialize();
@@ -91,13 +102,15 @@ If *VIP content* is checked, **age** must be over 18.
             child: ListView(
               children: [
                 TextFormField(
-                  initialValue: formModel.nameInput.value,
+                  //initialValue: formModel.nameInput.initialValue,
+                  controller: formModel.nameInput.controller,
                   decoration: const InputDecoration(labelText: 'Name'),
                   onChanged: formModel.nameInput.updateValueWithString,
                   validator: formModel.nameInput.textFormFieldInputValidator,
                 ),
                 TextFormField(
-                  initialValue: formModel.ageInput.stringValue,
+                  //initialValue: formModel.ageInput.stringValue,
+                  controller: formModel.ageInput.controller,
                   decoration: const InputDecoration(labelText: 'Age'),
                   onChanged: formModel.ageInput.updateValueWithString,
                   validator: (v) => formModel.ageInput.textFormFieldInputValidator(v),

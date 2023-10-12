@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:glade_forms/glade_forms.dart';
 
+// ! When updating dont forget to update README.md quickstart as well
 class _Model extends GladeModel {
   late StringInput name;
   late GladeInput<int> age;
@@ -11,9 +12,9 @@ class _Model extends GladeModel {
 
   @override
   void initialize() {
-    name = StringInput.required();
+    name = GladeInput.stringInput();
     age = GladeInput.intInput(value: 0);
-    email = StringInput.create(validator: (validator) => (validator..isEmail()).build());
+    email = GladeInput.stringInput(validator: (validator) => (validator..isEmail()).build());
 
     super.initialize();
   }
@@ -33,19 +34,19 @@ class Example extends StatelessWidget {
           child: Column(
             children: [
               TextFormField(
-                initialValue: model.name.value,
+                controller: model.name.controller,
                 validator: model.name.textFormFieldInputValidator,
                 onChanged: model.name.updateValueWithString,
                 decoration: const InputDecoration(labelText: 'Name'),
               ),
               TextFormField(
-                initialValue: model.age.stringValue,
+                controller: model.age.controller,
                 validator: model.age.textFormFieldInputValidator,
                 onChanged: model.age.updateValueWithString,
                 decoration: const InputDecoration(labelText: 'Age'),
               ),
               TextFormField(
-                initialValue: model.email.value,
+                controller: model.email.controller,
                 validator: model.email.textFormFieldInputValidator,
                 onChanged: model.email.updateValueWithString,
                 decoration: const InputDecoration(labelText: 'Email'),

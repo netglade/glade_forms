@@ -14,9 +14,9 @@ class _Model extends GladeModel {
 
   @override
   void initialize() {
-    name = StringInput.required();
+    name = GladeInput.stringInput();
     age = GladeInput.intInput(value: 0);
-    email = StringInput.create(validator: (validator) => (validator..isEmail()).build());
+    email = GladeInput.stringInput(validator: (validator) => (validator..isEmail()).build());
 
     super.initialize();
   }
