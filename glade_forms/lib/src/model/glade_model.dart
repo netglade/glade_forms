@@ -19,14 +19,14 @@ abstract class GladeModel extends ChangeNotifier {
   String get formattedValidationErrors => inputs.map((e) {
         if (e.hasConversionError) return '${e.inputKey ?? e.runtimeType} - CONVERSION ERROR';
 
-        if (e.validatorError?.errors.isNotEmpty ?? false) {
+        if (e.validatorResult.isInvalid) {
           return '${e.inputKey ?? e.runtimeType} - ${e.errorFormatted()}';
         }
 
         return '${e.inputKey ?? e.runtimeType} - VALID';
       }).join('\n');
 
-  List<Object?> get errors => inputs.map((e) => e.validatorError).toList();
+  List<Object?> get errors => inputs.map((e) => e.validatorResult).toList();
 
   GladeModel() {
     initialize();

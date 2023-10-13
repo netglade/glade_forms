@@ -7,6 +7,7 @@ class ValidatorResult<T> extends Equatable {
   final List<GladeValidatorError<T>> errors;
 
   bool get isValid => errors.isEmpty;
+  bool get isInvalid => errors.isNotEmpty;
 
   @override
   List<Object?> get props => [associatedInput, errors];

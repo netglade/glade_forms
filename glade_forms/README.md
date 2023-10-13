@@ -25,6 +25,7 @@ A universal way to define form validators with support of translations.
   - [StringToValueConverter (valueConverter)](#stringtovalueconverter-valueconverter)
   - [StringInput](#stringinput)
   - [Dependencies](#dependencies)
+- [Control other inputs](#control-other-inputs)
 - [📚 Adding translation support](#-adding-translation-support)
 - [GladeModel](#glademodel)
 - [GladeFormBuilder and GladeFormProvider](#gladeformbuilder-and-gladeformprovider)
@@ -55,14 +56,13 @@ class _Model extends GladeModel {
 
   @override
   void initialize() {
-    name = StringInput.required();
+    name = GladeInput.stringInput();
     age = GladeInput.intInput(value: 0);
-    email = StringInput.create(validator: (validator) => (validator..isEmail()).build());
+    email = GladeInput.stringInput(validator: (validator) => (validator..isEmail()).build());
 
     super.initialize();
   }
 }
-
 ```
 
 and wire-it up with Form
@@ -75,19 +75,19 @@ GladeFormBuilder(
     child: Column(
       children: [
         TextFormField(
-          initialValue: model.name.value,
+          controller: model.name.controller,
           validator: model.name.textFormFieldInputValidator,
           onChanged: model.name.updateValueWithString,
           decoration: const InputDecoration(labelText: 'Name'),
         ),
         TextFormField(
-          initialValue: model.age.stringValue,
+          controller: model.age.controller,
           validator: model.age.textFormFieldInputValidator,
           onChanged: model.age.updateValueWithString,
           decoration: const InputDecoration(labelText: 'Age'),
         ),
         TextFormField(
-          initialValue: model.email.value,
+          controller: model.email.controller,
           validator: model.email.textFormFieldInputValidator,
           onChanged: model.email.updateValueWithString,
           decoration: const InputDecoration(labelText: 'Email'),
@@ -110,13 +110,14 @@ For simplicity we will interchange `input` and `GladeInput<T>`.
 Every input is *dirty* or *pure* based on if value was updated (or not, yet). 
 
 On each input we define
- - *validator* - Input's value must satistfy validation to be *valid* input.
- - *translateError* - If there are validation errors, function for error translations can be provided.
- - *inputKey* - For debug purposes and dependencies, each input can have unique name for simple identification.
- - *dependencies* - Each input can depend on another inputs for validation.
- - *valueConverter* - If input is used by TextField and `T` is not a `String`, value converter should be provided.
- - *valueComparator* - Sometimes it is handy to provied `initialValue` which will be never updated after input is mutated. `valueComparator` should be provided to compare `initialValue` and `value` if `T` is not comparable type by default. 
- - *defaultTranslation* - If error's translations are simple, the default translation settings can be set instead of custom `translateError` method.
+ - **validator** - Input's value must satistfy validation to be *valid* input.
+ - **translateError** - If there are validation errors, function for error translations can be provided.
+ - **inputKey** - For debug purposes and dependencies, each input can have unique name for simple identification.
+ - **dependencies** - Each input can depend on another inputs for validation.
+ - **valueConverter** - If input is used by TextField and `T` is not a `String`, value converter should be provided.
+ - **valueComparator** - Sometimes it is handy to provied `initialValue` which will be never updated after input is mutated. `valueComparator` should be provided to compare `initialValue` and `value` if `T` is not comparable type by default. 
+ - **defaultTranslation** - If error's translations are simple, the default translation settings can be set instead of custom `translateError` method.
+ - **textEditingController** - It is possible to provide custom instance of controller instead of default one.
 
 ### Defining input
 
@@ -125,8 +126,8 @@ Most of the time, input is created with `.create()` factory with defined validat
 Validation is defined through part methods on ValidatorFactory such as `notNull()`, `satisfy()` and other parts. 
 
 Each validation rule defines
-  - *value validation*, e.g `notNull()` defines that value  can not be null. `satisfy()` defines predicate which has to be true to be valid etc. 
-  - **devErrorMessage** - message which will be displayed if no translation is not provided. 
+  - **value validation**, e.g `notNull()` defines that value can not be null. `satisfy()` defines a predicate which has to be true to be valid etc. 
+  - **devErrorMessage** - a message which will be displayed if no translation is not provided. 
   - **key** - Validation error's identification. Usable for translation. 
 
   
@@ -149,29 +150,46 @@ This example defines validation that `int` value has to be greater or equal to 1
  );
 ```
 
-Order of validation parts matter. By default first failing part stops validation. 
+The order of each validation part matters. By default, the first failing part stops validation. 
 
-Pass `stopOnFirstError: false` on `.build()` to validate all parts at once.
+Pass `stopOnFirstError: false` on `.build()` to validate all parts simultaneously.
 
 ### StringToValueConverter (valueConverter)
 As noted before, if `T` is not a String, a converter from String to `T` has to be provided. 
 
 GladeForms provides some predefined converters such as `IntConverter` and more. See `GladeTypeConverters` for more.
 
-
 ### StringInput
 StringInput is specialized variant of GladeInput<String> which has additional, string related, validations such as `isEmail`, `isUrl`, `maxLength` and more.
 
 ### Dependencies
-Input can have dependencies on another inputs to allow dependendent validation. 
+Input can have dependencies on other inputs to allow dependent validation. 
 `inputKey` should be assigned for each input to allow dependency work. 
 
-In validation (or translation if needed) just call `dependencies.byKey()` to get dependendent input. 
+In validation, translation or in `onChange()`, just call `dependencies.byKey()` to get dependent input. 
 
+Note that `byKey()` will throw if no input is found. This is by design to provide immediate indication of error.
+
+## Control other inputs
+Sometimes, it can be handy to update some input *B* value based on the changed value of input *A*.
+
+Each input has `onChange()` callback where these reactions can be created. For example, automatically update `Age` value based on checked `VIP Content` input (checkbox).
+
+```dart
+// definition of vipContent input
+onChange: (info, dependencies) {
+  final age = dependencies.byKey<int>('age-input');
+
+  if (info.value && age.value < 18) {
+    age.value = 18;
+  }
+}
+
+```
 
 ## 📚 Adding translation support
 
-Each validation error (and conversion error if any) can be translated. Provide `translateError` function which accepts 
+Each validation error (and conversion error if any) can be translated. Provide `translateError` function which accepts:
 
 - `error` - Error to translate
 - `key` - Error's identification if any
