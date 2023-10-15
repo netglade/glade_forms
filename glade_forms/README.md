@@ -28,7 +28,7 @@ A universal way to define form validators with support of translations.
   - [Validation](#validation)
   - [Translation](#translation)
   - [Converters](#converters)
-  - [Debugging][#debugging]
+  - [Debugging](#debugging)
 - [👏 Contributing](#-contributing)
 
 ## 👀 What is this?
