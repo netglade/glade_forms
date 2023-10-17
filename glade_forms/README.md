@@ -198,8 +198,8 @@ For updating input call either `updateValueWithString(String?)` to update `T` va
 Similarly `GladeFormBuilder` allows to listen to model's changes and rebuilts its child. 
 
 ### Dependencies
+Input can have dependencies on other inputs to allow dependent validation. Define input's dependencies with `dependencies`.
 
-Input can have dependencies on other inputs to allow dependent validation. 
 `inputKey` should be assigned for each input to allow dependency work. 
 
 In validation, translation or in `onChange()`, just call `dependencies.byKey()` to get dependent input. 
@@ -254,7 +254,7 @@ Sometimes, it can be handy to update some input's value based on the changed val
 
 Each input has `onChange()` callback where these reactions can be created. 
 
-For example, automatically update `Age` value based on checked `VIP Content` input (checkbox).
+An example could be automatically update `Age` value based on checked `VIP Content` input (checkbox).
 
 ```dart
 // In vipContent input
