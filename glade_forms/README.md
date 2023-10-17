@@ -111,7 +111,7 @@ GladeFormBuilder(
 )
 ```
 
-![quick_start_example](doc/quickstart.gif)
+![quick_start_example](https://raw.githubusercontent.com/netglade/glade_forms/feat/readme-proposal/glade_forms/doc/quickstart.gif)
 
 See [📖 Glade Forms Widgetbook][storybook_demo_link], complex, examples.
 
@@ -246,7 +246,7 @@ vipInput = GladeInput.create(
 );
 ```
 
-![dependent-validation](doc/depend-validation.gif)
+![dependent-validation](https://raw.githubusercontent.com/netglade/glade_forms/feat/readme-proposal/glade_forms/doc/depend-validation.gif)
 
 ### Controlling other inputs
 
@@ -267,7 +267,7 @@ onChange: (info, dependencies) {
 }
 ```
 
-![two-way-inputs-example](doc/two-way-dependencies.gif)
+![two-way-inputs-example](https://raw.githubusercontent.com/netglade/glade_forms/feat/readme-proposal/glade_forms/doc/two-way-dependencies.gif)
 
 
 
@@ -303,7 +303,7 @@ translateError: (error, key, devMessage, {required dependencies}) {
 }
 ```
 
-![translation-example](doc/translation.gif)
+![translation-example](https://raw.githubusercontent.com/netglade/glade_forms/feat/readme-proposal/glade_forms/doc/translation.gif)
 
 ### Converters
 
