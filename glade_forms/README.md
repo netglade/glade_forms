@@ -320,7 +320,7 @@ Use `model.formattedValidationErrors` to get all input's error formatted for sim
 There is also `GladeModelDebugInfo` widget which displays table of all model's inputs 
 and their properties such as `isValid` or `validation error`.
 
-![GladeModelDebugInfo](doc/glade-model-debug.png)
+![GladeModelDebugInfo](https://raw.githubusercontent.com/netglade/glade_forms/feat/readme-proposal/glade_forms/doc/glade-model-debug.png)
 
 ## 👏 Contributing
 
