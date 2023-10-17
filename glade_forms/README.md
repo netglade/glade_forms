@@ -22,10 +22,13 @@ A universal way to define form validators with support of translations.
 - [🚀 Getting started](#-getting-started)
 - [✨ Features](#-features)
   - [GladeInput](#gladeinput)
-  - [GladeModel](#glademodel)
-  - [Dependencies](#dependencies)
-  - [Controlling other inputs](#controling-other-inputs)
+    - [StringInput](#stringinput)
   - [Validation](#validation)
+  - [GladeModel](#glademodel)
+    - [`GladeFormBuilder` and `GladeFormProvider`](#gladeformbuilder-and-gladeformprovider)
+  - [Dependencies](#dependencies)
+  - [Controlling other inputs](#controlling-other-inputs)
+    - [Using validators without GladeInput](#using-validators-without-gladeinput)
   - [Translation](#translation)
   - [Converters](#converters)
   - [Debugging](#debugging)
@@ -108,6 +111,8 @@ GladeFormBuilder(
 )
 ```
 
+![quick_start_example](doc/quickstart.gif)
+
 See [📖 Glade Forms Widgetbook][storybook_demo_link], complex, examples.
 
 ## ✨ Features
@@ -134,6 +139,39 @@ Most of the time, input is created with `.create()` factory with defined validat
 #### StringInput
 
 StringInput is specialized variant of GladeInput<String> which has additional, string related, validations such as `isEmail`, `isUrl`, `maxLength` and more.
+
+### Validation
+
+Validation is defined through part methods on ValidatorFactory such as `notNull()`, `satisfy()` and other parts. 
+
+Each validation rule defines
+  - **value validation**, e.g `notNull()` defines that value can not be null. `satisfy()` defines a predicate which has to be true to be valid etc. 
+  - **devErrorMessage** - a message which will be displayed if no translation is not provided. 
+  - **key** - Validation error's identification. Usable for translation. 
+
+This example defines validation that `int` value has to be greater or equal to 18.
+
+```dart
+ageInput = GladeInput.create(
+  validator: (v) => (v
+        ..notNull()
+        ..satisfy(
+          (value, extra, dependencies) {
+            return value >= 18;
+          },
+          devError: (_, __) => 'Value must be greater or equal to 18',
+          key: _ErrorKeys.ageRestriction,
+        ))
+      .build(),
+  value: 0,
+  valueConverter: GladeTypeConverters.intConverter,
+);
+```
+
+The order of each validation part matters. By default, the first failing part stops validation. Pass `stopOnFirstError: false` on `.build()` to validate all parts simultaneously.
+
+Fields connected with `textFormFieldInputValidator` will automatically call validator and validation error (if any) is passed down to fields. By default devError is used unless translation is specified. See below. 
+
 
 ### GladeModel
 
@@ -168,11 +206,55 @@ In validation, translation or in `onChange()`, just call `dependencies.byKey()` 
 
 Note that `byKey()` will throw if no input is found. This is by design to provide immediate indication of error.
 
+For example, we want to restrict "Age input" to be at least 18 when "VIP Content" is checked.
+
+```dart
+ageInput = GladeInput.create(
+  validator: (v) => (v
+        ..notNull()
+        ..satisfy(
+          (value, extra, dependencies) {
+            final vipContentInput = dependencies.byKey<bool>('vip-input');
+
+            if (!vipContentInput.value) {
+              return true;
+            }
+
+            return value >= 18;
+          },
+          devError: (_, __) => 'When VIP enabled you must be at least 18 years old.',
+          key: _ErrorKeys.ageRestriction,
+        ))
+      .build(),
+  value: 0,
+  dependencies: () => [vipInput], // <--- Dependency
+  valueConverter: GladeTypeConverters.intConverter,
+  inputKey: 'age-input',
+  translateError: (error, key, devMessage, dependencies) {
+    if (key == _ErrorKeys.ageRestriction) return LocaleKeys.ageRestriction_under18.tr();
+
+    if (error.isConversionError) return LocaleKeys.ageRestriction_ageFormat.tr();
+
+    return devMessage;
+  },
+);
+
+vipInput = GladeInput.create(
+  validator: (v) => (v..notNull()).build(),
+  value: false,
+  inputKey: 'vip-input',
+);
+```
+
+![dependent-validation](doc/depend-validation.gif)
+
 ### Controlling other inputs
 
-Sometimes, it can be handy to update some input *B* value based on the changed value of input *A*.
+Sometimes, it can be handy to update some input's value based on the changed value of another input.
 
-Each input has `onChange()` callback where these reactions can be created. For example, automatically update `Age` value based on checked `VIP Content` input (checkbox).
+Each input has `onChange()` callback where these reactions can be created. 
+
+For example, automatically update `Age` value based on checked `VIP Content` input (checkbox).
 
 ```dart
 // In vipContent input
@@ -185,35 +267,9 @@ onChange: (info, dependencies) {
 }
 ```
 
-### Validation
+![two-way-inputs-example](doc/two-way-dependencies.gif)
 
-Validation is defined through part methods on ValidatorFactory such as `notNull()`, `satisfy()` and other parts. 
 
-Each validation rule defines
-  - **value validation**, e.g `notNull()` defines that value can not be null. `satisfy()` defines a predicate which has to be true to be valid etc. 
-  - **devErrorMessage** - a message which will be displayed if no translation is not provided. 
-  - **key** - Validation error's identification. Usable for translation. 
-
-This example defines validation that `int` value has to be greater or equal to 18.
-
-```dart
-ageInput = GladeInput.create(
-      validator: (v) => (v
-            ..notNull()
-            ..satisfy(
-              (value, extra, dependencies) {
-                return value >= 18;
-              },
-              devError: (_, __) => 'Value must be greater or equal to 18',
-              key: _ErrorKeys.ageRestriction,
-            ))
-          .build(),
-      value: 0,
-      valueConverter: GladeTypeConverters.intConverter,
-);
-```
-
-The order of each validation part matters. By default, the first failing part stops validation. Pass `stopOnFirstError: false` on `.build()` to validate all parts simultaneously.
 
 #### Using validators without GladeInput
 
@@ -247,6 +303,8 @@ translateError: (error, key, devMessage, {required dependencies}) {
 }
 ```
 
+![translation-example](doc/translation.gif)
+
 ### Converters
 
 As noted before, if `T` is not a String, a converter from String to `T` has to be provided. 
@@ -261,6 +319,8 @@ Use `model.formattedValidationErrors` to get all input's error formatted for sim
 
 There is also `GladeModelDebugInfo` widget which displays table of all model's inputs 
 and their properties such as `isValid` or `validation error`.
+
+![GladeModelDebugInfo](doc/glade-model-debug.png)
 
 ## 👏 Contributing
 
