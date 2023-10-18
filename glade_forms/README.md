@@ -200,7 +200,7 @@ Similarly `GladeFormBuilder` allows to listen to model's changes and rebuilts it
 ### Dependencies
 Input can have dependencies on other inputs to allow dependent validation. Define input's dependencies with `dependencies`.
 
-`inputKey` should be assigned for each input to allow dependency work. 
+`inputKey` must be specified on inputs to be used as dependencies. 
 
 In validation, translation or in `onChange()`, just call `dependencies.byKey()` to get dependent input. 
 
