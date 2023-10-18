@@ -24,11 +24,11 @@ A universal way to define form validators with support of translations.
   - [GladeInput](#gladeinput)
     - [StringInput](#stringinput)
   - [Validation](#validation)
+    - [Using validators without GladeInput](#using-validators-without-gladeinput)
   - [GladeModel](#glademodel)
     - [`GladeFormBuilder` and `GladeFormProvider`](#gladeformbuilder-and-gladeformprovider)
   - [Dependencies](#dependencies)
   - [Controlling other inputs](#controlling-other-inputs)
-    - [Using validators without GladeInput](#using-validators-without-gladeinput)
   - [Translation](#translation)
   - [Converters](#converters)
   - [Debugging](#debugging)
@@ -172,6 +172,16 @@ The order of each validation part matters. By default, the first failing part st
 
 Fields connected with `textFormFieldInputValidator` will automatically call validator and validation error (if any) is passed down to fields. By default devError is used unless translation is specified. See below. 
 
+#### Using validators without GladeInput
+
+It is possible to use GladeValidator without associated GladeInput. 
+
+Just create instance of `GladeValidator` (or `StringValidator`) and use it.
+
+```dart
+final validator = (StringValidator()..notEmpty()).build();
+final result = validator.validate(null);
+```
 
 ### GladeModel
 
@@ -268,19 +278,6 @@ onChange: (info, dependencies) {
 ```
 
 ![two-way-inputs-example](https://raw.githubusercontent.com/netglade/glade_forms/feat/readme-proposal/glade_forms/doc/two-way-dependencies.gif)
-
-
-
-#### Using validators without GladeInput
-
-It is possible to use GladeValidator without associated GladeInputs. 
-
-Just create instance of `GladeValidator` (or `StringValidator`) and use it.
-
-```dart
-final validator = (StringValidator()..notEmpty()).build();
-final result = validator.validate(null);
-```
 
 ### Translation
 
