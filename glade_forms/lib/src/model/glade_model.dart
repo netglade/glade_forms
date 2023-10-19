@@ -32,13 +32,12 @@ abstract class GladeModel extends ChangeNotifier {
     initialize();
   }
 
-  @mustCallSuper
-  @mustBeOverridden
-  @protected
-
   /// Initialize model's inputs.
   ///
   /// `super.initialize()` must be called in the end.
+  @mustCallSuper
+  @mustBeOverridden
+  @protected
   void initialize() {
     for (final input in inputs) {
       input.bindToModel(this);

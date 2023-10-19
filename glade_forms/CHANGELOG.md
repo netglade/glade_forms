@@ -1,3 +1,6 @@
+## 1.1.1
+- Improve Readme
+
 ## 1.1.0
 - **[Feat]**: Add `onChange` 
   - support for listening changes and potentially update other inputs based on change
