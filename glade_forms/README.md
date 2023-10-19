@@ -1,9 +1,5 @@
 <a href="https://github.com/netglade">
-  <picture >
-    <source media="(prefers-color-scheme: dark)" height='120px' srcset="https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/doc/badge_light.png">
-    <source media="(prefers-color-scheme: light)" height='120px' srcset="https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/doc/badge_dark.png">
-    <img alt="netglade" height='120px' src="https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/doc/badge_dark.png">
-  </picture>
+    <img alt="netglade" height='120px' src="https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/doc/badge_dark.png">  
 </a>
 
 Developed with 💚 by [netglade][netglade_link]
@@ -111,7 +107,7 @@ GladeFormBuilder(
 )
 ```
 
-![quick_start_example](https://raw.githubusercontent.com/netglade/glade_forms/feat/readme-proposal/glade_forms/doc/quickstart.gif)
+![quick_start_example](https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/doc/quickstart.gif)
 
 See [📖 Glade Forms Widgetbook][storybook_demo_link], complex, examples.
 
@@ -256,7 +252,7 @@ vipInput = GladeInput.create(
 );
 ```
 
-![dependent-validation](https://raw.githubusercontent.com/netglade/glade_forms/feat/readme-proposal/glade_forms/doc/depend-validation.gif)
+![dependent-validation](https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/doc/depend-validation.gif)
 
 ### Controlling other inputs
 
@@ -277,7 +273,7 @@ onChange: (info, dependencies) {
 }
 ```
 
-![two-way-inputs-example](https://raw.githubusercontent.com/netglade/glade_forms/feat/readme-proposal/glade_forms/doc/two-way-dependencies.gif)
+![two-way-inputs-example](https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/doc/two-way-dependencies.gif)
 
 ### Translation
 
@@ -300,7 +296,7 @@ translateError: (error, key, devMessage, {required dependencies}) {
 }
 ```
 
-![translation-example](https://raw.githubusercontent.com/netglade/glade_forms/feat/readme-proposal/glade_forms/doc/translation.gif)
+![translation-example](https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/doc/translation.gif)
 
 ### Converters
 
@@ -317,7 +313,7 @@ Use `model.formattedValidationErrors` to get all input's error formatted for sim
 There is also `GladeModelDebugInfo` widget which displays table of all model's inputs 
 and their properties such as `isValid` or `validation error`.
 
-![GladeModelDebugInfo](https://raw.githubusercontent.com/netglade/glade_forms/feat/readme-proposal/glade_forms/doc/glade-model-debug.png)
+![GladeModelDebugInfo](https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/doc/glade-model-debug.png)
 
 ## 👏 Contributing
 
