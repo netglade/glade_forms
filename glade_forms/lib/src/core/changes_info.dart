@@ -3,7 +3,7 @@ import 'package:glade_forms/src/validator/validator_result.dart';
 
 class ChangesInfo<T> extends Equatable {
   final T? initialValue;
-  final T previousValue;
+  final T? previousValue;
   final T value;
   final ValidatorResult<T>? validatorResult;
 

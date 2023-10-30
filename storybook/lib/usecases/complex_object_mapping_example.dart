@@ -28,10 +28,12 @@ class _Model extends GladeModel {
     selectedItem = GladeInput.create(
       validator: (v) => (v..notNull()).build(),
       value: null,
+      inputKey: 'selectedItem',
     );
     availableStats = GladeInput.create(
       validator: (v) => v.build(),
       value: [],
+      inputKey: 'stats',
       valueConverter: StringToTypeConverter(
         converter: (rawInput, cantConvert) {
           final r = RegExp(r'^\d+(,\s*\d+\s*)*$');
@@ -65,7 +67,7 @@ class ComplexObjectMappingExample extends StatelessWidget {
     return UsecaseContainer(
       shortDescription: 'Converters and complex objects',
       className: 'complex_object_mapping_example.dart',
-      child: GladeFormBuilder(
+      child: GladeFormBuilder.create(
         create: (context) => _Model(),
         builder: (context, model, _) {
           return Form(

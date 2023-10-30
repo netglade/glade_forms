@@ -67,7 +67,9 @@ class AgeRestrictedModel extends GladeModel {
         final age = dependencies.byKey<int>('age-input');
 
         if (info.value && age.value < 18) {
-          age.value = 18;
+          groupEdit(() {
+            age.value = 18;
+          });
         }
       },
     );
@@ -91,7 +93,7 @@ If *age* is changed to value under 18, *vip content* is unchecked and vice-versa
       shortDescription: "Age input depends on checkbox's value automatically",
       description: markdownData,
       className: 'two_way_checkbox_change.dart',
-      child: GladeFormBuilder(
+      child: GladeFormBuilder.create(
         create: (context) => AgeRestrictedModel(),
         builder: (context, formModel, _) => Padding(
           padding: const EdgeInsets.all(8),

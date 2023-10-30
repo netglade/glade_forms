@@ -78,7 +78,7 @@ If *VIP content* is checked, **age** must be over 18.
       shortDescription: "Age input validation depends on checkbox's value",
       description: markdownData,
       className: 'one_checkbox_deps_validation.dart',
-      child: GladeFormBuilder(
+      child: GladeFormBuilder.create(
         create: (context) => AgeRestrictedModel(),
         builder: (context, formModel, _) => Padding(
           padding: const EdgeInsets.all(8),
