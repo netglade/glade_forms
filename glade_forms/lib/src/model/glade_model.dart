@@ -18,18 +18,17 @@ abstract class GladeModel extends ChangeNotifier {
 
   List<GladeInput<Object?>> get inputs;
 
-  List<String> get lastUpdatedInputKeys =>
-      _lastUpdates.map((e) => e.inputKey).where((element) => element != null).cast<String>().toList();
+  List<String> get lastUpdatedInputKeys => _lastUpdates.map((e) => e.inputKey).toList();
 
   /// Formats errors from `inputs`.
   String get formattedValidationErrors => inputs.map((e) {
-        if (e.hasConversionError) return '${e.inputKey ?? e.runtimeType} - CONVERSION ERROR';
+        if (e.hasConversionError) return '${e.inputKey} - CONVERSION ERROR';
 
         if (e.validatorResult.isInvalid) {
-          return '${e.inputKey ?? e.runtimeType} - ${e.errorFormatted()}';
+          return '${e.inputKey} - ${e.errorFormatted()}';
         }
 
-        return '${e.inputKey ?? e.runtimeType} - VALID';
+        return '${e.inputKey} - VALID';
       }).join('\n');
 
   List<Object?> get errors => inputs.map((e) => e.validatorResult).toList();

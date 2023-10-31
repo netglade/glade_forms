@@ -82,7 +82,7 @@ class GladeInput<T> extends ChangeNotifier {
   /// [value] is equal to [initialValue].
   ///
   /// Can be dirty or pure.
-  bool get isUnchanged => (valueComparator?.call(initialValue, value) ?? value) == initialValue;
+  bool get isUnchanged => valueComparator?.call(initialValue, value) ?? (value == initialValue);
 
   /// Input does not have conversion error nor validation error.
   bool get isValid => !_conversionError && _validator(value).isValid;
