@@ -78,9 +78,6 @@ abstract class GladeModel extends ChangeNotifier {
       _lastUpdates.add(input);
     } else {
       _lastUpdates = [input];
-    }
-
-    if (!_groupEdit) {
       notifyListeners();
     }
   }

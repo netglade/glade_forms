@@ -97,9 +97,6 @@ class GladeInput<T> extends ChangeNotifier {
   /// String representattion of [value].
   String get stringValue => stringTovalueConverter?.convertBack(value) ?? value.toString();
 
-  /// Equals to [inputKey].
-  //String get inputName => inputKey;
-
   set value(T value) {
     _previousValue = _value;
 
