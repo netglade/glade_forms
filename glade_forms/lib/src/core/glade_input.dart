@@ -9,6 +9,7 @@ import 'package:glade_forms/src/core/type_helper.dart';
 import 'package:glade_forms/src/model/glade_model.dart';
 import 'package:glade_forms/src/validator/validator.dart';
 import 'package:glade_forms/src/validator/validator_result.dart';
+import 'package:meta/meta.dart';
 
 typedef ValueComparator<T> = bool Function(T? initial, T? value);
 typedef ValidatorFactory<T> = ValidatorInstance<T> Function(GladeValidator<T> v);
@@ -34,6 +35,8 @@ class GladeInput<T> extends ChangeNotifier {
   final InputDependenciesFactory dependenciesFactory;
 
   /// An input's identification.
+  ///
+  /// Used within listener changes and dependency related funcions such as validation.
   final String inputKey;
 
   /// Initial value - does not change after creating.
@@ -341,6 +344,7 @@ class GladeInput<T> extends ChangeNotifier {
         valueTransform: valueTransform,
       );
 
+  @internal
   // ignore: use_setters_to_change_properties, as method.
   void bindToModel(GladeModel model) => _bindedModel = model;
 

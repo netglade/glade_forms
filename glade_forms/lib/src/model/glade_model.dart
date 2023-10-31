@@ -44,6 +44,11 @@ abstract class GladeModel extends ChangeNotifier {
   @mustBeOverridden
   @protected
   void initialize() {
+    assert(
+      inputs.map((e) => e.inputKey).length == inputs.map((e) => e.inputKey).toSet().length,
+      'Model contains inputs with duplicated key!',
+    );
+
     for (final input in inputs) {
       input.bindToModel(this);
     }
