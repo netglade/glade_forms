@@ -143,7 +143,7 @@ class GladeInput<T> extends ChangeNotifier {
     required this.validatorInstance,
     required bool isPure,
     required this.valueComparator,
-    required this.inputKey,
+    required String? inputKey,
     required this.translateError,
     required this.stringTovalueConverter,
     required InputDependenciesFactory? dependenciesFactory,
@@ -157,6 +157,7 @@ class GladeInput<T> extends ChangeNotifier {
         _value = value,
         _initialValue = initialValue,
         dependenciesFactory = dependenciesFactory ?? (() => []),
+        inputKey = inputKey ?? '__${T.runtimeType}__${Random().nextInt(100000000)}',
         valueTransform = valueTransform ?? _defaultTransform,
         _textEditingController = textEditingController ??
             (createTextController
@@ -201,7 +202,7 @@ class GladeInput<T> extends ChangeNotifier {
       initialValue: initialValue,
       translateError: translateError,
       valueComparator: valueComparator,
-      inputKey: inputKey ?? '__${T.runtimeType}__${Random().nextInt(100)}',
+      inputKey: inputKey,
       stringTovalueConverter: valueConverter,
       dependenciesFactory: dependencies,
       onChange: onChange,
@@ -219,7 +220,7 @@ class GladeInput<T> extends ChangeNotifier {
   /// In case of need of any validation use [GladeInput.create] directly.
   factory GladeInput.optional({
     required T value,
-    required String inputKey,
+    String? inputKey,
     T? initialValue,
     bool pure = true,
     ErrorTranslator<T>? translateError,
@@ -252,7 +253,7 @@ class GladeInput<T> extends ChangeNotifier {
   /// In case of need of any aditional validation use [GladeInput.create] directly.
   factory GladeInput.required({
     required T value,
-    required String inputKey,
+    String? inputKey,
     T? initialValue,
     bool pure = true,
     ErrorTranslator<T>? translateError,
@@ -286,7 +287,7 @@ class GladeInput<T> extends ChangeNotifier {
 
   static GladeInput<int> intInput({
     required int value,
-    required String inputKey,
+    String? inputKey,
     ValidatorFactory<int>? validator,
     int? initialValue,
     bool pure = true,
@@ -316,7 +317,7 @@ class GladeInput<T> extends ChangeNotifier {
 
   static GladeInput<bool> boolInput({
     required bool value,
-    required String inputKey,
+    String? inputKey,
     ValidatorFactory<bool>? validator,
     bool? initialValue,
     bool pure = true,
@@ -345,7 +346,7 @@ class GladeInput<T> extends ChangeNotifier {
       );
 
   static GladeInput<String?> stringInput({
-    required String inputKey,
+    String? inputKey,
     String? value,
     StringValidatorFactory? validator,
     String? initialValue,
