@@ -70,7 +70,7 @@ class GladeModelDebugInfo extends StatelessWidget {
               for (final x in model.inputs)
                 TableRow(
                   children: [
-                    Center(child: Text(x.inputName)),
+                    Center(child: Text(x.inputKey)),
                     Center(child: Text(x.isUnchanged.toString())),
                     Center(child: Text(x.isValid.toString())),
                     Center(child: Text(x.errorFormatted())),

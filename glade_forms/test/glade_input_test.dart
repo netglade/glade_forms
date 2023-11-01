@@ -3,7 +3,7 @@ import 'package:test/test.dart';
 
 void main() {
   test('GladeInput with non-nullable type', () {
-    final input = GladeInput<int>.create(validator: (v) => v.build(), value: 0);
+    final input = GladeInput<int>.create(validator: (v) => v.build(), value: 0, inputKey: 'a');
 
     expect(input.isValid, isTrue);
   });

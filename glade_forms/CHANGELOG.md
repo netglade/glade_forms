@@ -1,3 +1,13 @@
+## 1.2.0
+- **[Feat]**: Add `GladeFormListener` widget allowing to listen for model's changes
+- **[Feat]**: Add `groupEdit()` method in GladeModel allows to update multiple inputs at once.
+  - Works great with `GladeFormListener`
+- **[Feat]**: Add `valueTransform` in GladeInput. Transform value before it is assigned into value.
+  - Firstly `stringToTypeConverter` is called if needed, then `valueTransform`.
+- **[Feat]**: Add `updateValue(T value)` as shorthand for inputs when field is not TextField.
+- **[Feat]**: Add `resetToPure` method allowing to reset input into pure state.
+- **[Fix]**: Conversion error does not update model's stats and formatted errors.
+
 ## 1.1.2
 - Fix links in readme
 

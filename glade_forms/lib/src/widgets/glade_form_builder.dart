@@ -12,17 +12,11 @@ class GladeFormBuilder<M extends GladeModel> extends StatelessWidget {
   final Widget? child;
 
   factory GladeFormBuilder({
-    required CreateModelFunction<M> create,
     required GladeFormWidgetBuilder<M> builder,
     Key? key,
     Widget? child,
   }) =>
-      GladeFormBuilder._(
-        builder: builder,
-        create: create,
-        key: key,
-        child: child,
-      );
+      GladeFormBuilder._(builder: builder, key: key, child: child);
 
   const GladeFormBuilder._({
     required this.builder,
@@ -31,6 +25,19 @@ class GladeFormBuilder<M extends GladeModel> extends StatelessWidget {
     this.value,
     this.child,
   });
+
+  factory GladeFormBuilder.create({
+    required CreateModelFunction<M> create,
+    required GladeFormWidgetBuilder<M> builder,
+    Widget? child,
+    Key? key,
+  }) =>
+      GladeFormBuilder._(
+        builder: builder,
+        create: create,
+        key: key,
+        child: child,
+      );
 
   factory GladeFormBuilder.value({
     required GladeFormWidgetBuilder<M> builder,

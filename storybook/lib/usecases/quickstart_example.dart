@@ -14,9 +14,9 @@ class _Model extends GladeModel {
 
   @override
   void initialize() {
-    name = GladeInput.stringInput();
-    age = GladeInput.intInput(value: 0);
-    email = GladeInput.stringInput(validator: (validator) => (validator..isEmail()).build());
+    name = GladeInput.stringInput(inputKey: 'name');
+    age = GladeInput.intInput(value: 0, inputKey: 'age');
+    email = GladeInput.stringInput(validator: (validator) => (validator..isEmail()).build(), inputKey: 'email');
 
     super.initialize();
   }
@@ -29,7 +29,7 @@ class QuickStartExample extends StatelessWidget {
   Widget build(BuildContext context) {
     return UsecaseContainer(
       shortDescription: 'Quick start example',
-      child: GladeFormBuilder(
+      child: GladeFormBuilder.create(
         create: (context) => _Model(),
         builder: (context, model, _) => Padding(
           padding: const EdgeInsets.all(32),

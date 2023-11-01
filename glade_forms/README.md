@@ -22,7 +22,8 @@ A universal way to define form validators with support of translations.
   - [Validation](#validation)
     - [Using validators without GladeInput](#using-validators-without-gladeinput)
   - [GladeModel](#glademodel)
-    - [`GladeFormBuilder` and `GladeFormProvider`](#gladeformbuilder-and-gladeformprovider)
+    - [Flutter widgets](#flutter-widgets)
+    - [Edit multiple inputs at once](#edit-multiple-inputs-at-once)
   - [Dependencies](#dependencies)
   - [Controlling other inputs](#controlling-other-inputs)
   - [Translation](#translation)
@@ -125,12 +126,17 @@ On each input we can define
  - **translateError** - If there are validation errors, function for error translations can be provided.
  - **inputKey** - For debug purposes and dependencies, each input can have unique name for simple identification.
  - **dependencies** - Each input can depend on another inputs for validation.
- - **valueConverter** - If input is used by TextField and `T` is not a `String`, value converter should be provided.
+ - **stringTovalueConverter** - If input is used by TextField and `T` is not a `String`, value converter should be provided.
  - **valueComparator** - Sometimes it is handy to provied `initialValue` which will be never updated after input is mutated. `valueComparator` should be provided to compare `initialValue` and `value` if `T` is not comparable type by default. 
+ - **valueTransform** - transform `T` value into different `T` value. An example of usage can be sanitazation of string input (trim(),...).
  - **defaultTranslation** - If error's translations are simple, the default translation settings can be set instead of custom `translateError` method.
  - **textEditingController** - It is possible to provide custom instance of controller instead of default one.
 
 Most of the time, input is created with `.create()` factory with defined validation, translation and other properties.
+
+An overview how each input's value is updated. If needed it is converted from `string` into `T`, then transformed via `valueTransform` (if provided), after that new value is set.
+
+![input-flow-example](https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/doc/flow-input-chart.png)
 
 #### StringInput
 
@@ -198,10 +204,39 @@ and properties such as `isValid` or `formattedErrors` will not work.
  
 For updating input call either `updateValueWithString(String?)` to update `T` value with string (will be converted if needed) or set `value` directly (via setter).
 
-#### `GladeFormBuilder` and `GladeFormProvider`
+#### Flutter widgets
 
 `GladeModelProvider` is predefined widget to provide `GladeModel` to widget's subtreee.
-Similarly `GladeFormBuilder` allows to listen to model's changes and rebuilts its child. 
+
+`GladeFormBuilder` allows to listen to model's changes and rebuilts its child. 
+
+`GladeFormListener` allows to listen to model's changes and react to it. Useful for invoking side-effects such as showing dialogs, snackbars etc. `listener` provides `lastUpdatedKeys` which is list of last updated input keys. 
+
+`GladeFormConsumer` combines GladeFormBuilder and GladeFormListener together.
+
+#### Edit multiple inputs at once
+With each update of input, via update or setting `.value` directly, listeners (if any) are triggered. Sometimes it is needed to edit multiple inputs at once and triggering listener in the end.
+
+For editing multiple values use `groupEdit()`. It takes void callback to update inputs.
+
+An example
+
+```dart
+class FormModel extends GladeModel {
+  late GladeInput<int> age;
+  late GladeInput<String> name;
+
+  // ....
+
+  groupEdit(() {
+    age.value = 18;
+    name.value = 'default john',
+  });
+}
+
+```
+
+After that listener will contain `lastUpdatedKeys` with keys of `age` and `name` inputs.
 
 ### Dependencies
 Input can have dependencies on other inputs to allow dependent validation. Define input's dependencies with `dependencies`.
