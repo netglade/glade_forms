@@ -5,8 +5,8 @@
 - **[Feat]**: Add `valueTransform` in GladeInput. Transform value before it is assigned into value.
   - Firstly `stringToTypeConverter` is called if needed, then `valueTransform`.
 - **[Feat]**: Add `updateValue(T value)` as shorthand for inputs when field is not TextField.
-- **[Breaking]**: `inputKey` is now **required**.
-  - This change will prevent for listener's errors.
+- **[Feat]**: Add `resetToPure` method allowing to reset input into pure state.
+- **[Fix]**: Conversion error does not update model's stats and formatted errors.
 
 ## 1.1.2
 - Fix links in readme
