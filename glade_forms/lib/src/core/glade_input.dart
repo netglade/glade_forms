@@ -162,9 +162,9 @@ class GladeInput<T> extends ChangeNotifier {
         _textEditingController = textEditingController ??
             (createTextController
                 ? TextEditingController(
-                    text: switch (initialValue) {
+                    text: switch (value) {
                       final String? x => x,
-                      != null => stringTovalueConverter?.convertBack(initialValue),
+                      != null => stringTovalueConverter?.convertBack(value),
                       _ => null,
                     },
                   )

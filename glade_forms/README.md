@@ -122,12 +122,14 @@ For simplicity we will interchange `input` and `GladeInput<T>`.
 Every input is *dirty* or *pure* based on whether value was updated (or not, yet).
 
 On each input we can define
+ - **value** - Current input's value
+ - **initialValue** - Cached initial value. Used with valueComparator. 
  - **validator** - Input's value must satisfy validation to be *valid* input.
  - **translateError** - If there are validation errors, function for error translations can be provided.
- - **inputKey** - For debug purposes and dependencies, each input can have unique name for simple identification.
+ - **inputKey** - Unique identification of each input. Used inside listeners or in dependencies.
  - **dependencies** - Each input can depend on another inputs for validation.
  - **stringTovalueConverter** - If input is used by TextField and `T` is not a `String`, value converter should be provided.
- - **valueComparator** - Sometimes it is handy to provied `initialValue` which will be never updated after input is mutated. `valueComparator` should be provided to compare `initialValue` and `value` if `T` is not comparable type by default. 
+ - **valueComparator** - Sometimes it is handy to provide `initialValue` which will be never updated after input is mutated. `valueComparator` should be provided to compare `initialValue` and `value` if `T` is not comparable type by default. 
  - **valueTransform** - transform `T` value into different `T` value. An example of usage can be sanitazation of string input (trim(),...).
  - **defaultTranslation** - If error's translations are simple, the default translation settings can be set instead of custom `translateError` method.
  - **textEditingController** - It is possible to provide custom instance of controller instead of default one.
