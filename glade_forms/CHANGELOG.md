@@ -1,3 +1,6 @@
+## 1.2.1
+- **[Fix]**: Value passed to factory constructor is not reflected in TextController.
+
 ## 1.2.0
 - **[Feat]**: Add `GladeFormListener` widget allowing to listen for model's changes
 - **[Feat]**: Add `groupEdit()` method in GladeModel allows to update multiple inputs at once.
