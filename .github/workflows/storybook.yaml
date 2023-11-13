@@ -46,7 +46,7 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: ${{ env.FLUTTER_CHANNEL }}
 
-      - uses: bluefireteam/melos-action@v2
+      - uses: bluefireteam/melos-action@v3
 
       - name: Setup
         run: |
