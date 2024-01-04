@@ -19,6 +19,8 @@ abstract class GladeModelBase extends ChangeNotifier {
 
   bool get isDirty => !isPure;
 
+  bool get isChanging => inputs.any((input) => input.isChanging);
+
   List<GladeInput<Object?>> get inputs;
 
   List<String> get lastUpdatedInputKeys => _lastUpdates.map((e) => e.inputKey).toList();

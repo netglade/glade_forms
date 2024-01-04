@@ -17,6 +17,7 @@ typedef ValueComparator<T> = bool Function(T? initial, T? value);
 typedef ValidatorFactory<T> = ValidatorInstance<T> Function(GladeValidator<T> v);
 typedef StringValidatorFactory = ValidatorInstance<String?> Function(StringValidator validator);
 typedef OnChange<T> = void Function(ChangesInfo<T> info, InputDependencies dependencies);
+typedef OnChangeAsync<T> = Future<void> Function(ChangesInfo<T> info, InputDependencies dependencies);
 typedef ValueTransform<T> = T Function(T input);
 
 typedef StringInput = GladeInput<String?>;
@@ -49,6 +50,9 @@ class GladeInput<T> extends ChangeNotifier {
   /// Called when input's value changed.
   OnChange<T>? onChange;
 
+  /// Called when input's value changed.
+  OnChangeAsync<T>? onChangeAsync;
+
   /// Transforms passed value before assigning it into input.
   ValueTransform<T> valueTransform;
 
@@ -72,6 +76,8 @@ class GladeInput<T> extends ChangeNotifier {
   ConvertError<T>? __conversionError;
 
   GladeModelBase? _bindedModel;
+
+  bool _isChanging = false;
 
   T? get initialValue => _initialValue;
 
@@ -100,6 +106,8 @@ class GladeInput<T> extends ChangeNotifier {
 
   /// String representattion of [value].
   String get stringValue => stringTovalueConverter?.convertBack(value) ?? value.toString();
+
+  bool get isChanging => _isChanging;
 
   set value(T value) {
     _previousValue = _value;
@@ -130,6 +138,8 @@ class GladeInput<T> extends ChangeNotifier {
     _bindedModel?.notifyInputUpdated(this);
 
     notifyListeners();
+
+    _onChangeAsyncCall();
   }
 
   // ignore: avoid_setters_without_getters, ok for internal use
@@ -500,6 +510,23 @@ class GladeInput<T> extends ChangeNotifier {
       textEditingController: textEditingController ?? this._textEditingController,
       valueTransform: valueTransform ?? this.valueTransform,
     );
+  }
+
+  Future<void> _onChangeAsyncCall() async {
+    _isChanging = true;
+
+    // propagate input's changes
+    await onChangeAsync?.call(
+      ChangesInfo(
+        previousValue: _previousValue,
+        value: value,
+        initialValue: initialValue,
+        validatorResult: validate(),
+      ),
+      dependenciesFactory(),
+    );
+
+    _isChanging = false;
   }
 
   /// Translates input's errors (validation or conversion).
