@@ -19,14 +19,7 @@ abstract class GladeModelAsync extends GladeModelBase {
   @mustBeOverridden
   @protected
   Future<void> initializeAsync() async {
-    assert(
-      inputs.map((e) => e.inputKey).length == inputs.map((e) => e.inputKey).toSet().length,
-      'Model contains inputs with duplicated key!',
-    );
-
-    for (final input in inputs) {
-      input.bindToModel(this);
-    }
+    super.initialize();
 
     _initialized = true;
     notifyListeners();

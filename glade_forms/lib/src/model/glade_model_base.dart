@@ -33,6 +33,22 @@ abstract class GladeModelBase extends ChangeNotifier {
 
   List<Object?> get errors => inputs.map((e) => e.validatorResult).toList();
 
+  /// Initialize model's inputs.
+  ///
+  /// `super.initialize()` must be called in the end.
+  @mustCallSuper
+  @protected
+  void initialize() {
+    assert(
+      inputs.map((e) => e.inputKey).length == inputs.map((e) => e.inputKey).toSet().length,
+      'Model contains inputs with duplicated key!',
+    );
+
+    for (final input in inputs) {
+      input.bindToModel(this);
+    }
+  }
+
   /// Updates model's input with String? value using its converter.
   void stringFieldUpdateInput<INPUT extends GladeInput<Object?>>(INPUT input, String? value) {
     if (input.value == value) return;

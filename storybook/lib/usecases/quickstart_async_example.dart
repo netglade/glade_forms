@@ -75,7 +75,7 @@ class QuickStartAsyncExample extends StatelessWidget {
                   ),
                 ),
               )
-            : CircularProgressIndicator(),
+            : const CircularProgressIndicator(),
       ),
     );
   }
