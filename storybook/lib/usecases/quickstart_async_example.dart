@@ -39,43 +39,41 @@ class QuickStartAsyncExample extends StatelessWidget {
       shortDescription: 'Quick start example',
       child: GladeFormBuilder.create(
         create: (context) => _Model(),
-        builder: (context, model, _) => model.isInitialized
-            ? Padding(
-                padding: const EdgeInsets.all(32),
-                child: Form(
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  child: Column(
-                    children: [
-                      TextFormField(
-                        controller: model.name.controller,
-                        validator: model.name.textFormFieldInputValidator,
-                        onChanged: model.name.updateValueWithString,
-                        decoration: const InputDecoration(labelText: 'Name'),
-                      ),
-                      TextFormField(
-                        controller: model.age.controller,
-                        validator: model.age.textFormFieldInputValidator,
-                        onChanged: model.age.updateValueWithString,
-                        decoration: const InputDecoration(labelText: 'Age'),
-                      ),
-                      TextFormField(
-                        controller: model.email.controller,
-                        validator: model.email.textFormFieldInputValidator,
-                        onChanged: model.email.updateValueWithString,
-                        decoration: const InputDecoration(labelText: 'Email'),
-                      ),
-                      const SizedBox(height: 10),
-                      ElevatedButton(
-                        onPressed: model.isValid
-                            ? () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved')))
-                            : null,
-                        child: const Text('Save'),
-                      ),
-                    ],
-                  ),
+        builder: (context, model, _) => Padding(
+          padding: const EdgeInsets.all(32),
+          child: Form(
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            child: Column(
+              children: [
+                TextFormField(
+                  controller: model.name.controller,
+                  validator: model.name.textFormFieldInputValidator,
+                  onChanged: model.name.updateValueWithString,
+                  decoration: const InputDecoration(labelText: 'Name'),
                 ),
-              )
-            : const CircularProgressIndicator(),
+                TextFormField(
+                  controller: model.age.controller,
+                  validator: model.age.textFormFieldInputValidator,
+                  onChanged: model.age.updateValueWithString,
+                  decoration: const InputDecoration(labelText: 'Age'),
+                ),
+                TextFormField(
+                  controller: model.email.controller,
+                  validator: model.email.textFormFieldInputValidator,
+                  onChanged: model.email.updateValueWithString,
+                  decoration: const InputDecoration(labelText: 'Email'),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: model.isValid
+                      ? () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved')))
+                      : null,
+                  child: const Text('Save'),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
