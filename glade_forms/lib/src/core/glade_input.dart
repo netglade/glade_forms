@@ -8,7 +8,7 @@ import 'package:glade_forms/src/core/error_translator.dart';
 import 'package:glade_forms/src/core/input_dependencies.dart';
 import 'package:glade_forms/src/core/string_to_type_converter.dart';
 import 'package:glade_forms/src/core/type_helper.dart';
-import 'package:glade_forms/src/model/glade_model.dart';
+import 'package:glade_forms/src/model/model.dart';
 import 'package:glade_forms/src/validator/validator.dart';
 import 'package:glade_forms/src/validator/validator_result.dart';
 import 'package:meta/meta.dart';
@@ -71,7 +71,7 @@ class GladeInput<T> extends ChangeNotifier {
   /// Input is in invalid state when there was conversion error.
   ConvertError<T>? __conversionError;
 
-  GladeModel? _bindedModel;
+  GladeModelBase? _bindedModel;
 
   T? get initialValue => _initialValue;
 
@@ -283,7 +283,7 @@ class GladeInput<T> extends ChangeNotifier {
 
   @internal
   // ignore: use_setters_to_change_properties, as method.
-  void bindToModel(GladeModel model) => _bindedModel = model;
+  void bindToModel(GladeModelBase model) => _bindedModel = model;
 
   static GladeInput<int> intInput({
     required int value,

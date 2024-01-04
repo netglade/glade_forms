@@ -6,6 +6,7 @@ import 'package:glade_forms_storybook/generated/locale_loader.g.dart';
 import 'package:glade_forms_storybook/localization_addon_custom.dart';
 import 'package:glade_forms_storybook/usecases/complex_object_mapping_example.dart';
 import 'package:glade_forms_storybook/usecases/one_checkbox_deps_validation.dart';
+import 'package:glade_forms_storybook/usecases/quickstart_async_example.dart';
 import 'package:glade_forms_storybook/usecases/quickstart_example.dart';
 import 'package:glade_forms_storybook/usecases/two_way_checkbox_change.dart';
 import 'package:widgetbook/widgetbook.dart';
@@ -45,6 +46,7 @@ class App extends StatelessWidget {
       ],
       directories: [
         WidgetbookUseCase(name: 'Quickstart form', builder: (context) => const QuickStartExample()),
+        WidgetbookUseCase(name: 'Quickstart async form', builder: (context) => const QuickStartAsyncExample()),
         WidgetbookCategory(
           name: 'Dependencies',
           children: [

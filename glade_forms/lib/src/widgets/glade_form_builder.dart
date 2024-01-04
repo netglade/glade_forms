@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:glade_forms/src/model/glade_model.dart';
+import 'package:glade_forms/src/model/model.dart';
 import 'package:glade_forms/src/widgets/glade_model_provider.dart';
 import 'package:provider/provider.dart';
 
-typedef GladeFormWidgetBuilder<M extends GladeModel> = Widget Function(BuildContext context, M model, Widget? child);
+typedef GladeFormWidgetBuilder<M extends GladeModelBase> = Widget Function(BuildContext context, M model, Widget? child);
 
-class GladeFormBuilder<M extends GladeModel> extends StatelessWidget {
+class GladeFormBuilder<M extends GladeModelBase> extends StatelessWidget {
   final CreateModelFunction<M>? create;
   final M? value;
   final GladeFormWidgetBuilder<M> builder;

@@ -1,9 +1,15 @@
+import 'dart:async';
+
 import 'package:glade_forms/src/model/model.dart';
 import 'package:meta/meta.dart';
 
-abstract class GladeModel extends GladeModelBase {
-  GladeModel() {
-    initialize();
+abstract class GladeModelAsync extends GladeModelBase {
+  bool _initialized = false;
+
+  bool get initialized => _initialized;
+
+  GladeModelAsync() {
+    unawaited(initializeAsync());
   }
 
   /// Initialize model's inputs.
@@ -12,7 +18,7 @@ abstract class GladeModel extends GladeModelBase {
   @mustCallSuper
   @mustBeOverridden
   @protected
-  void initialize() {
+  Future<void> initializeAsync() async {
     assert(
       inputs.map((e) => e.inputKey).length == inputs.map((e) => e.inputKey).toSet().length,
       'Model contains inputs with duplicated key!',
@@ -21,5 +27,8 @@ abstract class GladeModel extends GladeModelBase {
     for (final input in inputs) {
       input.bindToModel(this);
     }
+
+    _initialized = true;
+    notifyListeners();
   }
 }
