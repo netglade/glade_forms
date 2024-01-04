@@ -5,8 +5,11 @@ import 'package:meta/meta.dart';
 abstract class GladeModelBase extends ChangeNotifier {
   List<GladeInput<Object?>> _lastUpdates = [];
   bool _groupEdit = false;
+  bool _isInitialized = false;
 
-  bool get isValid => inputs.every((input) => input.isValid);
+  bool get isInitialized => _isInitialized;
+
+  bool get isValid => inputs.every((input) => input.isValid) && isInitialized;
 
   bool get isNotValid => !isValid;
 
@@ -47,6 +50,9 @@ abstract class GladeModelBase extends ChangeNotifier {
     for (final input in inputs) {
       input.bindToModel(this);
     }
+
+    _isInitialized = true;
+    notifyListeners();
   }
 
   /// Updates model's input with String? value using its converter.

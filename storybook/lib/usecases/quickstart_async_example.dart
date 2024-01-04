@@ -39,7 +39,7 @@ class QuickStartAsyncExample extends StatelessWidget {
       shortDescription: 'Quick start example',
       child: GladeFormBuilder.create(
         create: (context) => _Model(),
-        builder: (context, model, _) => model.initialized
+        builder: (context, model, _) => model.isInitialized
             ? Padding(
                 padding: const EdgeInsets.all(32),
                 child: Form(
