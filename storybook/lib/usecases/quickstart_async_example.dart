@@ -2,19 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:glade_forms/glade_forms.dart';
 import 'package:glade_forms_storybook/shared/usecase_container.dart';
 
-Future<String> _fetchName() async {
-  await Future.delayed(const Duration(seconds: 2));
-
-  return 'John Doe';
+Future<String> _fetchName() {
+  return Future.delayed(const Duration(seconds: 2), () => 'John Doe');
 }
 
 class _Model extends GladeModelAsync {
   late StringInput name;
   late GladeInput<int> age;
   late StringInput email;
+  late GladeInput<bool> vip;
 
   @override
-  List<GladeInput<Object?>> get inputs => [name, age, email];
+  List<GladeInput<Object?>> get inputs => [name, age, email, vip];
 
   _Model();
 
@@ -24,12 +23,13 @@ class _Model extends GladeModelAsync {
 
     name = GladeInput.stringInput(inputKey: 'name', value: nameValue);
     age = GladeInput.intInput(value: 0, inputKey: 'age');
-    email = GladeInput.stringInput(
-      validator: (validator) => (validator..isEmail()).build(),
-      inputKey: 'email',
+    email = GladeInput.stringInput(validator: (validator) => (validator..isEmail()).build(), inputKey: 'email');
+    vip = GladeInput.create(
+      validator: (v) => (v..notNull()).build(),
+      value: false,
+      inputKey: 'vip',
       dependencies: () => [name],
       onChangeAsync: (info, dependencies) async {
-        print(1);
         final nameInput = dependencies.byKey<String?>('name');
 
         final fetchedName = await _fetchName();
@@ -79,6 +79,11 @@ class QuickStartAsyncExample extends StatelessWidget {
                   onChanged: model.email.updateValueWithString,
                   decoration: const InputDecoration(labelText: 'Email'),
                   readOnly: model.isChanging,
+                ),
+                CheckboxListTile(
+                  value: model.vip.value,
+                  title: const Text('VIP Content'),
+                  onChanged: (v) => model.vip.value = v ?? false,
                 ),
                 const SizedBox(height: 10),
                 ElevatedButton(
