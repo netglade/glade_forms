@@ -31,8 +31,8 @@ abstract class GladeValidatorError<T> extends GladeInputError<T> with EquatableM
     this.extra,
     super.key,
   }) : devError = devError ??
-            ((value, _) =>
-                'Value "${value ?? 'NULL'}" does not satisfy validation. [This is default validation meessage. Consider to set `devErro` to cutomize validation errors]');
+            ((v, _) =>
+                'Value "${v ?? 'NULL'}" does not satisfy validation. [This is default validation meessage. Consider to set `devErro` to cutomize validation errors]');
 
   factory GladeValidatorError.cantBeNull(T? value, {Object? extra, Object? key}) =>
       ValueNullError<T>(value: value, key: key, extra: extra);
