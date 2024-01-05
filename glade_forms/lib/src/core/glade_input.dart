@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/widgets.dart';
@@ -139,7 +140,7 @@ class GladeInput<T> extends ChangeNotifier {
 
     notifyListeners();
 
-    _onChangeAsyncCall();
+    unawaited(_onChangeAsyncCall());
   }
 
   // ignore: avoid_setters_without_getters, ok for internal use
@@ -159,6 +160,7 @@ class GladeInput<T> extends ChangeNotifier {
     required InputDependenciesFactory? dependenciesFactory,
     required this.defaultTranslations,
     required this.onChange,
+    required this.onChangeAsync,
     required ValueTransform<T>? valueTransform,
     T? initialValue,
     TextEditingController? textEditingController,
@@ -198,6 +200,7 @@ class GladeInput<T> extends ChangeNotifier {
     StringToTypeConverter<T>? valueConverter,
     InputDependenciesFactory? dependencies,
     OnChange<T>? onChange,
+    OnChangeAsync<T>? onChangeAsync,
     TextEditingController? textEditingController,
     bool createTextController = true,
     ValueTransform<T>? valueTransform,
@@ -216,6 +219,7 @@ class GladeInput<T> extends ChangeNotifier {
       stringTovalueConverter: valueConverter,
       dependenciesFactory: dependencies,
       onChange: onChange,
+      onChangeAsync: onChangeAsync,
       textEditingController: textEditingController,
       createTextController: createTextController,
       valueTransform: valueTransform,
@@ -238,6 +242,7 @@ class GladeInput<T> extends ChangeNotifier {
     StringToTypeConverter<T>? valueConverter,
     InputDependenciesFactory? dependencies,
     OnChange<T>? onChange,
+    OnChangeAsync<T>? onChangeAsync,
     TextEditingController? textEditingController,
     bool createTextController = true,
     ValueTransform<T>? valueTransform,
@@ -253,6 +258,7 @@ class GladeInput<T> extends ChangeNotifier {
         pure: pure,
         dependencies: dependencies,
         onChange: onChange,
+        onChangeAsync: onChangeAsync,
         textEditingController: textEditingController,
         createTextController: createTextController,
         valueTransform: valueTransform,
@@ -271,6 +277,7 @@ class GladeInput<T> extends ChangeNotifier {
     StringToTypeConverter<T>? valueConverter,
     InputDependenciesFactory? dependencies,
     OnChange<T>? onChange,
+    OnChangeAsync<T>? onChangeAsync,
     TextEditingController? textEditingController,
     bool createTextController = true,
     ValueTransform<T>? valueTransform,
@@ -286,6 +293,7 @@ class GladeInput<T> extends ChangeNotifier {
         pure: pure,
         dependencies: dependencies,
         onChange: onChange,
+        onChangeAsync: onChangeAsync,
         textEditingController: textEditingController,
         createTextController: createTextController,
         valueTransform: valueTransform,
@@ -305,6 +313,7 @@ class GladeInput<T> extends ChangeNotifier {
     ValueComparator<int>? valueComparator,
     InputDependenciesFactory? dependencies,
     OnChange<int>? onChange,
+    OnChangeAsync<int>? onChangeAsync,
     TextEditingController? textEditingController,
     bool createTextController = true,
     ValueTransform<int>? valueTransform,
@@ -320,6 +329,7 @@ class GladeInput<T> extends ChangeNotifier {
         dependencies: dependencies,
         valueConverter: GladeTypeConverters.intConverter,
         onChange: onChange,
+        onChangeAsync: onChangeAsync,
         textEditingController: textEditingController,
         createTextController: createTextController,
         valueTransform: valueTransform,
@@ -335,6 +345,7 @@ class GladeInput<T> extends ChangeNotifier {
     ValueComparator<bool>? valueComparator,
     InputDependenciesFactory? dependencies,
     OnChange<bool>? onChange,
+    OnChangeAsync<bool>? onChangeAsync,
     TextEditingController? textEditingController,
     bool createTextController = true,
     ValueTransform<bool>? valueTransform,
@@ -350,6 +361,7 @@ class GladeInput<T> extends ChangeNotifier {
         dependencies: dependencies,
         valueConverter: GladeTypeConverters.boolConverter,
         onChange: onChange,
+        onChangeAsync: onChangeAsync,
         textEditingController: textEditingController,
         createTextController: createTextController,
         valueTransform: valueTransform,
@@ -365,6 +377,7 @@ class GladeInput<T> extends ChangeNotifier {
     DefaultTranslations? defaultTranslations,
     InputDependenciesFactory? dependencies,
     OnChange<String?>? onChange,
+    OnChangeAsync<String?>? onChangeAsync,
     TextEditingController? textEditingController,
     bool createTextController = true,
     bool isRequired = true,
@@ -384,6 +397,7 @@ class GladeInput<T> extends ChangeNotifier {
       inputKey: inputKey,
       dependenciesFactory: dependencies,
       onChange: onChange,
+      onChangeAsync: onChangeAsync,
       textEditingController: textEditingController,
       createTextController: createTextController,
       valueComparator: valueComparator,
@@ -490,6 +504,7 @@ class GladeInput<T> extends ChangeNotifier {
     bool? isPure,
     DefaultTranslations? defaultTranslations,
     OnChange<T>? onChange,
+    OnChangeAsync<T>? onChangeAsync,
     TextEditingController? textEditingController,
     // ignore: avoid-unused-parameters, it is here just to be linter happy ¯\_(ツ)_/¯
     bool? createTextController,
@@ -507,6 +522,7 @@ class GladeInput<T> extends ChangeNotifier {
       isPure: isPure ?? this.isPure,
       defaultTranslations: defaultTranslations ?? this.defaultTranslations,
       onChange: onChange ?? this.onChange,
+      onChangeAsync: onChangeAsync ?? this.onChangeAsync,
       textEditingController: textEditingController ?? this._textEditingController,
       valueTransform: valueTransform ?? this.valueTransform,
     );
@@ -527,6 +543,8 @@ class GladeInput<T> extends ChangeNotifier {
     );
 
     _isChanging = false;
+
+    notifyListeners();
   }
 
   /// Translates input's errors (validation or conversion).

@@ -24,7 +24,21 @@ class _Model extends GladeModelAsync {
 
     name = GladeInput.stringInput(inputKey: 'name', value: nameValue);
     age = GladeInput.intInput(value: 0, inputKey: 'age');
-    email = GladeInput.stringInput(validator: (validator) => (validator..isEmail()).build(), inputKey: 'email');
+    email = GladeInput.stringInput(
+      validator: (validator) => (validator..isEmail()).build(),
+      inputKey: 'email',
+      dependencies: () => [name],
+      onChangeAsync: (info, dependencies) async {
+        print(1);
+        final nameInput = dependencies.byKey<String?>('name');
+
+        final fetchedName = await _fetchName();
+
+        groupEdit(() {
+          nameInput.value = fetchedName;
+        });
+      },
+    );
 
     await super.initializeAsync();
   }
@@ -50,18 +64,21 @@ class QuickStartAsyncExample extends StatelessWidget {
                   validator: model.name.textFormFieldInputValidator,
                   onChanged: model.name.updateValueWithString,
                   decoration: const InputDecoration(labelText: 'Name'),
+                  readOnly: model.isChanging,
                 ),
                 TextFormField(
                   controller: model.age.controller,
                   validator: model.age.textFormFieldInputValidator,
                   onChanged: model.age.updateValueWithString,
                   decoration: const InputDecoration(labelText: 'Age'),
+                  readOnly: model.isChanging,
                 ),
                 TextFormField(
                   controller: model.email.controller,
                   validator: model.email.textFormFieldInputValidator,
                   onChanged: model.email.updateValueWithString,
                   decoration: const InputDecoration(labelText: 'Email'),
+                  readOnly: model.isChanging,
                 ),
                 const SizedBox(height: 10),
                 ElevatedButton(
