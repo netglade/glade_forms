@@ -78,7 +78,7 @@ class GladeInput<T> extends ChangeNotifier {
 
   GladeModelBase? _bindedModel;
 
-  bool _isChanging = false;
+  bool __isChanging = false;
 
   T? get initialValue => _initialValue;
 
@@ -108,7 +108,7 @@ class GladeInput<T> extends ChangeNotifier {
   /// String representattion of [value].
   String get stringValue => stringTovalueConverter?.convertBack(value) ?? value.toString();
 
-  bool get isChanging => _isChanging;
+  bool get isChanging => __isChanging;
 
   set value(T value) {
     _previousValue = _value;
@@ -136,17 +136,25 @@ class GladeInput<T> extends ChangeNotifier {
       dependenciesFactory(),
     );
 
+    unawaited(_onChangeAsyncCall());
+
     _bindedModel?.notifyInputUpdated(this);
 
     notifyListeners();
-
-    unawaited(_onChangeAsyncCall());
   }
 
   // ignore: avoid_setters_without_getters, ok for internal use
   set _conversionError(ConvertError<T> value) {
     __conversionError = value;
     _bindedModel?.notifyInputUpdated(this);
+  }
+
+  // ignore: avoid_setters_without_getters, ok for internal use
+  set _isChanging(bool value) {
+    __isChanging = value;
+
+    _bindedModel?.notifyInputUpdated(this);
+    notifyListeners();
   }
 
   GladeInput({
@@ -227,7 +235,6 @@ class GladeInput<T> extends ChangeNotifier {
     );
   }
 
-  // Predefined GenericInput without any validations.
   ///
   /// Useful for input which allows null value without additional validations.
   ///

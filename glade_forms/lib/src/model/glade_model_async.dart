@@ -14,7 +14,9 @@ abstract class GladeModelAsync extends GladeModelBase {
   @mustCallSuper
   @mustBeOverridden
   @protected
-  Future<void> initializeAsync() async {
+  Future<void> initializeAsync() {
     super.initialize();
+
+    return Future.value();
   }
 }

@@ -82,7 +82,12 @@ class QuickStartAsyncExample extends StatelessWidget {
                 ),
                 CheckboxListTile(
                   value: model.vip.value,
-                  title: const Text('VIP Content'),
+                  title: Row(
+                    children: [
+                      const Text('VIP Content '),
+                      if (model.isChanging) const Text('isChanging', style: TextStyle(color: Colors.red)),
+                    ],
+                  ),
                   onChanged: (v) => model.vip.value = v ?? false,
                 ),
                 const SizedBox(height: 10),
