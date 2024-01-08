@@ -42,7 +42,7 @@ With Glade Forms you create a model that holds glade inputs,
 setup validation, translation, dependencies, handling of updates,
 and more with ease.
 
-[📖 Glade Forms Widgetbook][storybook_demo_link] 
+[📖 Glade Forms Widgetbook][storybook_demo_link]
 
 ## 🚀 Getting started
 
@@ -73,7 +73,7 @@ Then use `GladeFormBuilder`
 and connect the model to standard Flutter form and it's inputs like this:
 
 ```dart
-GladeFormBuilder(
+GladeFormBuilder.create(
   create: (context) => _Model(),
   builder: (context, model) => Form(
     autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -104,7 +104,7 @@ GladeFormBuilder(
         ElevatedButton(onPressed: model.isValid ? () {} : null, child: const Text('Save')),
       ],
     ),
-  ),  
+  ),
 )
 ```
 
@@ -119,20 +119,21 @@ See [📖 Glade Forms Widgetbook][storybook_demo_link], complex, examples.
 Each form's input is represented by instance of `GladeInput<T>` where `T` is value held by input.
 For simplicity we will interchange `input` and `GladeInput<T>`.
 
-Every input is *dirty* or *pure* based on whether value was updated (or not, yet).
+Every input is _dirty_ or _pure_ based on whether value was updated (or not, yet).
 
 On each input we can define
- - **value** - Current input's value
- - **initialValue** - Cached initial value. Used with valueComparator. 
- - **validator** - Input's value must satisfy validation to be *valid* input.
- - **translateError** - If there are validation errors, function for error translations can be provided.
- - **inputKey** - Unique identification of each input. Used inside listeners or in dependencies.
- - **dependencies** - Each input can depend on another inputs for validation.
- - **stringTovalueConverter** - If input is used by TextField and `T` is not a `String`, value converter should be provided.
- - **valueComparator** - Sometimes it is handy to provide `initialValue` which will be never updated after input is mutated. `valueComparator` should be provided to compare `initialValue` and `value` if `T` is not comparable type by default. 
- - **valueTransform** - transform `T` value into different `T` value. An example of usage can be sanitazation of string input (trim(),...).
- - **defaultTranslation** - If error's translations are simple, the default translation settings can be set instead of custom `translateError` method.
- - **textEditingController** - It is possible to provide custom instance of controller instead of default one.
+
+- **value** - Current input's value
+- **initialValue** - Cached initial value. Used with valueComparator.
+- **validator** - Input's value must satisfy validation to be _valid_ input.
+- **translateError** - If there are validation errors, function for error translations can be provided.
+- **inputKey** - Unique identification of each input. Used inside listeners or in dependencies.
+- **dependencies** - Each input can depend on another inputs for validation.
+- **stringTovalueConverter** - If input is used by TextField and `T` is not a `String`, value converter should be provided.
+- **valueComparator** - Sometimes it is handy to provide `initialValue` which will be never updated after input is mutated. `valueComparator` should be provided to compare `initialValue` and `value` if `T` is not comparable type by default.
+- **valueTransform** - transform `T` value into different `T` value. An example of usage can be sanitazation of string input (trim(),...).
+- **defaultTranslation** - If error's translations are simple, the default translation settings can be set instead of custom `translateError` method.
+- **textEditingController** - It is possible to provide custom instance of controller instead of default one.
 
 Most of the time, input is created with `.create()` factory with defined validation, translation and other properties.
 
@@ -146,12 +147,13 @@ StringInput is specialized variant of GladeInput<String> which has additional, s
 
 ### Validation
 
-Validation is defined through part methods on ValidatorFactory such as `notNull()`, `satisfy()` and other parts. 
+Validation is defined through part methods on ValidatorFactory such as `notNull()`, `satisfy()` and other parts.
 
 Each validation rule defines
-  - **value validation**, e.g `notNull()` defines that value can not be null. `satisfy()` defines a predicate which has to be true to be valid etc. 
-  - **devErrorMessage** - a message which will be displayed if no translation is not provided. 
-  - **key** - Validation error's identification. Usable for translation. 
+
+- **value validation**, e.g `notNull()` defines that value can not be null. `satisfy()` defines a predicate which has to be true to be valid etc.
+- **devErrorMessage** - a message which will be displayed if no translation is not provided.
+- **key** - Validation error's identification. Usable for translation.
 
 This example defines validation that `int` value has to be greater or equal to 18.
 
@@ -174,11 +176,11 @@ ageInput = GladeInput.create(
 
 The order of each validation part matters. By default, the first failing part stops validation. Pass `stopOnFirstError: false` on `.build()` to validate all parts simultaneously.
 
-Fields connected with `textFormFieldInputValidator` will automatically call validator and validation error (if any) is passed down to fields. By default devError is used unless translation is specified. See below. 
+Fields connected with `textFormFieldInputValidator` will automatically call validator and validation error (if any) is passed down to fields. By default devError is used unless translation is specified. See below.
 
 #### Using validators without GladeInput
 
-It is possible to use GladeValidator without associated GladeInput. 
+It is possible to use GladeValidator without associated GladeInput.
 
 Just create instance of `GladeValidator` (or `StringValidator`) and use it.
 
@@ -189,9 +191,9 @@ final result = validator.validate(null);
 
 ### GladeModel
 
-GladeModel is base class for Form's model which holds all inputs together. 
-It is useful for cases where you want to sum up validations at once, 
-like disabling save button until all inputs are valid. 
+GladeModel is base class for Form's model which holds all inputs together.
+It is useful for cases where you want to sum up validations at once,
+like disabling save button until all inputs are valid.
 
 GladeModel is `ChangeNotifier` so all dependant widgets will be rebuilt.
 
@@ -201,22 +203,23 @@ There are **several rules** how to define models
 - Model has to override `initialize` method where each input field is created
 - In the end of `initialize` method, `super.initialize()` must be called to wire-up inputs with model.
 
-⚠️ Without wiring-up model, model will not be updated appropiately 
-and properties such as `isValid` or `formattedErrors` will not work. 
- 
+⚠️ Without wiring-up model, model will not be updated appropiately
+and properties such as `isValid` or `formattedErrors` will not work.
+
 For updating input call either `updateValueWithString(String?)` to update `T` value with string (will be converted if needed) or set `value` directly (via setter).
 
 #### Flutter widgets
 
 `GladeModelProvider` is predefined widget to provide `GladeModel` to widget's subtreee.
 
-`GladeFormBuilder` allows to listen to model's changes and rebuilts its child. 
+`GladeFormBuilder` allows to listen to model's changes and rebuilts its child.
 
-`GladeFormListener` allows to listen to model's changes and react to it. Useful for invoking side-effects such as showing dialogs, snackbars etc. `listener` provides `lastUpdatedKeys` which is list of last updated input keys. 
+`GladeFormListener` allows to listen to model's changes and react to it. Useful for invoking side-effects such as showing dialogs, snackbars etc. `listener` provides `lastUpdatedKeys` which is list of last updated input keys.
 
 `GladeFormConsumer` combines GladeFormBuilder and GladeFormListener together.
 
 #### Edit multiple inputs at once
+
 With each update of input, via update or setting `.value` directly, listeners (if any) are triggered. Sometimes it is needed to edit multiple inputs at once and triggering listener in the end.
 
 For editing multiple values use `groupEdit()`. It takes void callback to update inputs.
@@ -241,11 +244,12 @@ class FormModel extends GladeModel {
 After that listener will contain `lastUpdatedKeys` with keys of `age` and `name` inputs.
 
 ### Dependencies
+
 Input can have dependencies on other inputs to allow dependent validation. Define input's dependencies with `dependencies`.
 
-`inputKey` must be specified on inputs to be used as dependencies. 
+`inputKey` must be specified on inputs to be used as dependencies.
 
-In validation, translation or in `onChange()`, just call `dependencies.byKey()` to get dependent input. 
+In validation, translation or in `onChange()`, just call `dependencies.byKey()` to get dependent input.
 
 Note that `byKey()` will throw if no input is found. This is by design to provide immediate indication of error.
 
@@ -295,7 +299,7 @@ vipInput = GladeInput.create(
 
 Sometimes, it can be handy to update some input's value based on the changed value of another input.
 
-Each input has `onChange()` callback where these reactions can be created. 
+Each input has `onChange()` callback where these reactions can be created.
 
 An example could be automatically update `Age` value based on checked `VIP Content` input (checkbox).
 
@@ -311,6 +315,111 @@ onChange: (info, dependencies) {
 ```
 
 ![two-way-inputs-example](https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/doc/two-way-dependencies.gif)
+
+### Asynchronous form
+
+When the default data for the form are for example fetched from external API you can use `GladeModelAsync` like this:
+
+```dart
+Future<String> _fetchName() {
+  return Future.delayed(const Duration(seconds: 2), () => 'John Doe');
+}
+
+class _Model extends GladeModelAsync {
+  late StringInput name;
+  late GladeInput<int> age;
+  late StringInput email;
+  late GladeInput<bool> vip;
+
+  @override
+  List<GladeInput<Object?>> get inputs => [name, age, email, vip];
+
+  _Model();
+
+  @override
+  Future<void> initializeAsync() async {
+    final nameValue = await _fetchName();
+
+    name = GladeInput.stringInput(inputKey: 'name', value: nameValue);
+    age = GladeInput.intInput(value: 0, inputKey: 'age');
+    email = GladeInput.stringInput(validator: (validator) => (validator..isEmail()).build(), inputKey: 'email');
+    vip = GladeInput.create(
+      validator: (v) => (v..notNull()).build(),
+      value: false,
+      inputKey: 'vip',
+      dependencies: () => [name],
+      onChangeAsync: (info, dependencies) async {
+        final nameInput = dependencies.byKey<String?>('name');
+
+        final fetchedName = await _fetchName();
+
+        groupEdit(() {
+          nameInput.value = fetchedName;
+        });
+      },
+    );
+
+    await super.initializeAsync();
+  }
+}
+```
+
+Then use `GladeFormBuilder` and connect the model to standard Flutter form and it's inputs like this:
+
+```dart
+GladeFormBuilder.create(
+  create: (context) => _Model(),
+  builder: (context, model, _) => Padding(
+    padding: const EdgeInsets.all(32),
+    child: Form(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      child: Column(
+        children: [
+          if (model.isChanging) const LinearProgressIndicator(color: Colors.red, backgroundColor: Colors.grey),
+          TextFormField(
+            controller: model.name.controller,
+            validator: model.name.textFormFieldInputValidator,
+            onChanged: model.name.updateValueWithString,
+            decoration: const InputDecoration(labelText: 'Name'),
+            readOnly: model.isChanging,
+          ),
+          TextFormField(
+            controller: model.age.controller,
+            validator: model.age.textFormFieldInputValidator,
+            onChanged: model.age.updateValueWithString,
+            decoration: const InputDecoration(labelText: 'Age'),
+            readOnly: model.isChanging,
+          ),
+          TextFormField(
+            controller: model.email.controller,
+            validator: model.email.textFormFieldInputValidator,
+            onChanged: model.email.updateValueWithString,
+            decoration: const InputDecoration(labelText: 'Email'),
+            readOnly: model.isChanging,
+          ),
+          CheckboxListTile(
+            value: model.vip.value,
+            title: Row(
+              children: [
+                const Text('VIP Content '),
+                if (model.isChanging) const Text('isChanging', style: TextStyle(color: Colors.red)),
+              ],
+            ),
+            onChanged: (v) => model.vip.value = v ?? false,
+          ),
+          const SizedBox(height: 10),
+          ElevatedButton(
+            onPressed: model.isValid
+                ? () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved')))
+                : null,
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    ),
+  ),
+),
+```
 
 ### Translation
 
@@ -337,17 +446,17 @@ translateError: (error, key, devMessage, {required dependencies}) {
 
 ### Converters
 
-As noted before, if `T` is not a String, a converter from String to `T` has to be provided. 
+As noted before, if `T` is not a String, a converter from String to `T` has to be provided.
 
 GladeForms provides some predefined converters such as `IntConverter` and more. See `GladeTypeConverters` for more.
 
 ### Debugging
 
-There are some getters and methods on GladeInput / GladeModel which can be used for debugging. 
+There are some getters and methods on GladeInput / GladeModel which can be used for debugging.
 
-Use `model.formattedValidationErrors` to get all input's error formatted for simple debugging. 
+Use `model.formattedValidationErrors` to get all input's error formatted for simple debugging.
 
-There is also `GladeModelDebugInfo` widget which displays table of all model's inputs 
+There is also `GladeModelDebugInfo` widget which displays table of all model's inputs
 and their properties such as `isValid` or `validation error`.
 
 ![GladeModelDebugInfo](https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/doc/glade-model-debug.png)

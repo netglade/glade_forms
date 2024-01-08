@@ -29,7 +29,7 @@ class UsecaseContainer extends HookWidget {
         appBar: AppBar(
           title: Text(shortDescription),
           bottom: TabBar(
-            tabs: <Widget>[
+            tabs: [
               const Tab(text: 'Live Preview', icon: Icon(Icons.live_tv)),
               if (className != null) const Tab(text: 'Example code', icon: Icon(Icons.code)),
               if (description != null) const Tab(text: 'Notes', icon: Icon(Icons.notes)),
@@ -37,7 +37,7 @@ class UsecaseContainer extends HookWidget {
           ),
         ),
         body: TabBarView(
-          children: <Widget>[
+          children: [
             Center(child: child),
             if (className case final classNameX?) _CodeSample(fileName: classNameX),
             if (description case final descriptionX?) Markdown(data: descriptionX),
@@ -52,14 +52,13 @@ class _CodeSample extends HookWidget {
   final String fileName;
   const _CodeSample({required this.fileName});
 
-  Future<String> getFileContent() {
+  Future<String> _getFileContent() {
     return rootBundle.loadString('lib/usecases/$fileName');
   }
 
   @override
   Widget build(BuildContext context) {
-    // ignore: avoid-async-call-in-sync-function, memoize future
-    final getFileContentFutureMemo = useMemoized(getFileContent);
+    final getFileContentFutureMemo = useMemoized(_getFileContent);
     final getFileFuture = useFuture(getFileContentFutureMemo);
 
     if (getFileFuture.connectionState == ConnectionState.waiting) {

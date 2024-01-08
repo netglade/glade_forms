@@ -1,19 +1,22 @@
+import 'dart:async';
+
 import 'package:glade_forms/src/model/model.dart';
 import 'package:meta/meta.dart';
 
-abstract class GladeModel extends GladeModelBase {
-  GladeModel() {
-    initialize();
+abstract class GladeModelAsync extends GladeModelBase {
+  GladeModelAsync() {
+    unawaited(initializeAsync());
   }
 
   /// Initialize model's inputs.
   ///
   /// `super.initialize()` must be called in the end.
-  @override
   @mustCallSuper
   @mustBeOverridden
   @protected
-  void initialize() {
+  Future<void> initializeAsync() {
     super.initialize();
+
+    return Future.value();
   }
 }
