@@ -59,6 +59,7 @@ class QuickStartAsyncExample extends StatelessWidget {
             autovalidateMode: AutovalidateMode.onUserInteraction,
             child: Column(
               children: [
+                if (model.isChanging) const LinearProgressIndicator(color: Colors.red, backgroundColor: Colors.grey),
                 TextFormField(
                   controller: model.name.controller,
                   validator: model.name.textFormFieldInputValidator,
