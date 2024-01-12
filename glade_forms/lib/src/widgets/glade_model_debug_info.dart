@@ -119,7 +119,7 @@ class _DangerStrips extends StatelessWidget {
     required this.gap,
   });
 
-  List<Widget> getListOfStripes(int count) {
+  List<Widget> _getListOfStripes(int count) {
     final stripes = <Widget>[];
     for (var i = 0; i < count; i++) {
       stripes.add(
@@ -140,8 +140,7 @@ class _DangerStrips extends StatelessWidget {
       width: double.infinity,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          // ignore: avoid-returning-widgets, ok here
-          return Stack(children: getListOfStripes((constraints.maxWidth / 2).ceil()));
+          return Stack(children: _getListOfStripes((constraints.maxWidth / 2).ceil()));
         },
       ),
     );

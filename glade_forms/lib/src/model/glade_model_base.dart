@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:glade_forms/src/core/core.dart';
 import 'package:meta/meta.dart';
 
+typedef OnEdit = void Function();
+
 abstract class GladeModelBase extends ChangeNotifier {
   List<GladeInput<Object?>> _lastUpdates = [];
   bool _groupEdit = false;
@@ -86,7 +88,7 @@ abstract class GladeModelBase extends ChangeNotifier {
   }
 
   /// Use it to update multiple inputs at once before these changes are popragated through notifyListeners().
-  void groupEdit(void Function() edit) {
+  void groupEdit(OnEdit edit) {
     _groupEdit = true;
 
     edit();

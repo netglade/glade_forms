@@ -517,7 +517,7 @@ class GladeInput<T> extends ChangeNotifier {
     bool? createTextController,
     ValueTransform<T>? valueTransform,
   }) {
-    return GladeInput<T>(
+    return GladeInput(
       value: value ?? this.value,
       valueComparator: valueComparator ?? this.valueComparator,
       validatorInstance: validatorInstance ?? this.validatorInstance,

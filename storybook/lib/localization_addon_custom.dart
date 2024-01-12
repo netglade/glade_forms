@@ -37,6 +37,7 @@ class LocalizationAddonCustom extends WidgetbookAddon<Locale> {
           initialLocale == null || locales.contains(initialLocale),
           'initialLocale must be in locales',
         ),
+        // ignore: avoid-unsafe-collection-methods, the locales are set programmatically and should have at least one element
         initialLocale = initialLocale ?? locales.first,
         super(name: 'Locale');
 
