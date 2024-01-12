@@ -5,3 +5,5 @@ dart_code_metrics:
     - package:netglade_analysis/dcm.yaml
   rules:
     - prefer-correct-callback-field-name: false
+  pubspec-rules:
+    prefer-publish-to-none: false
