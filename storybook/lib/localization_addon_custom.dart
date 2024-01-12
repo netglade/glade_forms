@@ -19,7 +19,7 @@ class LocalizationAddonCustom extends WidgetbookAddon<Locale> {
         values: locales,
         initialValue: initialLocale,
         labelBuilder: (locale) => locale.toLanguageTag(),
-        onChanged: (context, locale) => locale != null ? onChange(locale) : null,
+        // onChanged: (context, locale) => locale != null ? onChange(locale) : null,
       ),
     ];
   }
