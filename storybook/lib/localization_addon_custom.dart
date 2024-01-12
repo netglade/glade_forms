@@ -9,6 +9,7 @@ class LocalizationAddonCustom extends WidgetbookAddon<Locale> {
   // ignore: avoid-dynamic, ok here
   final List<LocalizationsDelegate<dynamic>> localizationsDelegates;
   final ValueChanged<Locale> onChange;
+  final Locale initialLocale;
 
   @override
   List<Field> get fields {
@@ -16,7 +17,7 @@ class LocalizationAddonCustom extends WidgetbookAddon<Locale> {
       ListField<Locale>(
         name: 'name',
         values: locales,
-        initialValue: initialSetting,
+        initialValue: initialLocale,
         labelBuilder: (locale) => locale.toLanguageTag(),
         onChanged: (context, locale) => locale != null ? onChange(locale) : null,
       ),
@@ -36,11 +37,8 @@ class LocalizationAddonCustom extends WidgetbookAddon<Locale> {
           initialLocale == null || locales.contains(initialLocale),
           'initialLocale must be in locales',
         ),
-        super(
-          name: 'Locale',
-          // ignore: avoid-unsafe-collection-methods, ok here
-          initialSetting: initialLocale ?? locales.first,
-        );
+        initialLocale = initialLocale ?? locales.first,
+        super(name: 'Locale');
 
   @override
   Locale valueFromQueryGroup(Map<String, String> group) {
