@@ -440,10 +440,10 @@ class GladeInput<T> extends ChangeNotifier {
       final convertedError = _validator(convertedValue);
 
       return !convertedError.isValid ? _translate(delimiter: delimiter, customError: convertedError) : null;
-    } on ConvertError<T> catch (formatError) {
-      return formatError.error != null
-          ? _translate(delimiter: delimiter, customError: formatError)
-          : formatError.devError(value, extra: validatorResult);
+    } on ConvertError<T> catch (e) {
+      return e.error != null
+          ? _translate(delimiter: delimiter, customError: e)
+          : e.devError(value, extra: validatorResult);
     }
   }
 
@@ -471,8 +471,8 @@ class GladeInput<T> extends ChangeNotifier {
 
     try {
       this.value = converter.convert(strValue);
-    } on ConvertError<T> catch (conversionError) {
-      _conversionError = conversionError;
+    } on ConvertError<T> catch (e) {
+      _conversionError = e;
     }
   }
 
