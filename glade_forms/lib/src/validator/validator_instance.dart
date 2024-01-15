@@ -28,10 +28,10 @@ class ValidatorInstance<T> {
       if (error != null) {
         errors.add(error);
 
-        if (stopOnFirstError) return ValidatorResult<T>(errors: errors, associatedInput: _input);
+        if (stopOnFirstError) return ValidatorResult(errors: errors, associatedInput: _input);
       }
     }
 
-    return ValidatorResult<T>(errors: errors, associatedInput: _input);
+    return ValidatorResult(errors: errors, associatedInput: _input);
   }
 }

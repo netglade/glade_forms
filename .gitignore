@@ -6,6 +6,7 @@
 melos_my_project.iml
 .vscode/*
 !.vscode/tasks.json
+!.vscode/launch.json
 !.vscode/settings.json
 
 .packages

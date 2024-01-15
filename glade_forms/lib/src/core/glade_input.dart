@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/widgets.dart';
@@ -8,7 +9,7 @@ import 'package:glade_forms/src/core/error_translator.dart';
 import 'package:glade_forms/src/core/input_dependencies.dart';
 import 'package:glade_forms/src/core/string_to_type_converter.dart';
 import 'package:glade_forms/src/core/type_helper.dart';
-import 'package:glade_forms/src/model/glade_model.dart';
+import 'package:glade_forms/src/model/model.dart';
 import 'package:glade_forms/src/validator/validator.dart';
 import 'package:glade_forms/src/validator/validator_result.dart';
 import 'package:meta/meta.dart';
@@ -17,6 +18,7 @@ typedef ValueComparator<T> = bool Function(T? initial, T? value);
 typedef ValidatorFactory<T> = ValidatorInstance<T> Function(GladeValidator<T> v);
 typedef StringValidatorFactory = ValidatorInstance<String?> Function(StringValidator validator);
 typedef OnChange<T> = void Function(ChangesInfo<T> info, InputDependencies dependencies);
+typedef OnChangeAsync<T> = Future<void> Function(ChangesInfo<T> info, InputDependencies dependencies);
 typedef ValueTransform<T> = T Function(T input);
 
 typedef StringInput = GladeInput<String?>;
@@ -49,6 +51,9 @@ class GladeInput<T> extends ChangeNotifier {
   /// Called when input's value changed.
   OnChange<T>? onChange;
 
+  /// Called when input's value changed.
+  OnChangeAsync<T>? onChangeAsync;
+
   /// Transforms passed value before assigning it into input.
   ValueTransform<T> valueTransform;
 
@@ -71,7 +76,9 @@ class GladeInput<T> extends ChangeNotifier {
   /// Input is in invalid state when there was conversion error.
   ConvertError<T>? __conversionError;
 
-  GladeModel? _bindedModel;
+  GladeModelBase? _bindedModel;
+
+  bool __isChanging = false;
 
   T? get initialValue => _initialValue;
 
@@ -101,6 +108,8 @@ class GladeInput<T> extends ChangeNotifier {
   /// String representattion of [value].
   String get stringValue => stringTovalueConverter?.convertBack(value) ?? value.toString();
 
+  bool get isChanging => __isChanging;
+
   set value(T value) {
     _previousValue = _value;
 
@@ -127,6 +136,8 @@ class GladeInput<T> extends ChangeNotifier {
       dependenciesFactory(),
     );
 
+    unawaited(_onChangeAsyncCall());
+
     _bindedModel?.notifyInputUpdated(this);
 
     notifyListeners();
@@ -136,6 +147,14 @@ class GladeInput<T> extends ChangeNotifier {
   set _conversionError(ConvertError<T> value) {
     __conversionError = value;
     _bindedModel?.notifyInputUpdated(this);
+  }
+
+  // ignore: avoid_setters_without_getters, ok for internal use
+  set _isChanging(bool value) {
+    __isChanging = value;
+
+    _bindedModel?.notifyInputUpdated(this);
+    notifyListeners();
   }
 
   GladeInput({
@@ -149,6 +168,7 @@ class GladeInput<T> extends ChangeNotifier {
     required InputDependenciesFactory? dependenciesFactory,
     required this.defaultTranslations,
     required this.onChange,
+    required this.onChangeAsync,
     required ValueTransform<T>? valueTransform,
     T? initialValue,
     TextEditingController? textEditingController,
@@ -188,6 +208,7 @@ class GladeInput<T> extends ChangeNotifier {
     StringToTypeConverter<T>? valueConverter,
     InputDependenciesFactory? dependencies,
     OnChange<T>? onChange,
+    OnChangeAsync<T>? onChangeAsync,
     TextEditingController? textEditingController,
     bool createTextController = true,
     ValueTransform<T>? valueTransform,
@@ -206,6 +227,7 @@ class GladeInput<T> extends ChangeNotifier {
       stringTovalueConverter: valueConverter,
       dependenciesFactory: dependencies,
       onChange: onChange,
+      onChangeAsync: onChangeAsync,
       textEditingController: textEditingController,
       createTextController: createTextController,
       valueTransform: valueTransform,
@@ -213,7 +235,6 @@ class GladeInput<T> extends ChangeNotifier {
     );
   }
 
-  // Predefined GenericInput without any validations.
   ///
   /// Useful for input which allows null value without additional validations.
   ///
@@ -228,6 +249,7 @@ class GladeInput<T> extends ChangeNotifier {
     StringToTypeConverter<T>? valueConverter,
     InputDependenciesFactory? dependencies,
     OnChange<T>? onChange,
+    OnChangeAsync<T>? onChangeAsync,
     TextEditingController? textEditingController,
     bool createTextController = true,
     ValueTransform<T>? valueTransform,
@@ -243,6 +265,7 @@ class GladeInput<T> extends ChangeNotifier {
         pure: pure,
         dependencies: dependencies,
         onChange: onChange,
+        onChangeAsync: onChangeAsync,
         textEditingController: textEditingController,
         createTextController: createTextController,
         valueTransform: valueTransform,
@@ -261,6 +284,7 @@ class GladeInput<T> extends ChangeNotifier {
     StringToTypeConverter<T>? valueConverter,
     InputDependenciesFactory? dependencies,
     OnChange<T>? onChange,
+    OnChangeAsync<T>? onChangeAsync,
     TextEditingController? textEditingController,
     bool createTextController = true,
     ValueTransform<T>? valueTransform,
@@ -276,6 +300,7 @@ class GladeInput<T> extends ChangeNotifier {
         pure: pure,
         dependencies: dependencies,
         onChange: onChange,
+        onChangeAsync: onChangeAsync,
         textEditingController: textEditingController,
         createTextController: createTextController,
         valueTransform: valueTransform,
@@ -283,7 +308,7 @@ class GladeInput<T> extends ChangeNotifier {
 
   @internal
   // ignore: use_setters_to_change_properties, as method.
-  void bindToModel(GladeModel model) => _bindedModel = model;
+  void bindToModel(GladeModelBase model) => _bindedModel = model;
 
   static GladeInput<int> intInput({
     required int value,
@@ -295,6 +320,7 @@ class GladeInput<T> extends ChangeNotifier {
     ValueComparator<int>? valueComparator,
     InputDependenciesFactory? dependencies,
     OnChange<int>? onChange,
+    OnChangeAsync<int>? onChangeAsync,
     TextEditingController? textEditingController,
     bool createTextController = true,
     ValueTransform<int>? valueTransform,
@@ -310,6 +336,7 @@ class GladeInput<T> extends ChangeNotifier {
         dependencies: dependencies,
         valueConverter: GladeTypeConverters.intConverter,
         onChange: onChange,
+        onChangeAsync: onChangeAsync,
         textEditingController: textEditingController,
         createTextController: createTextController,
         valueTransform: valueTransform,
@@ -325,6 +352,7 @@ class GladeInput<T> extends ChangeNotifier {
     ValueComparator<bool>? valueComparator,
     InputDependenciesFactory? dependencies,
     OnChange<bool>? onChange,
+    OnChangeAsync<bool>? onChangeAsync,
     TextEditingController? textEditingController,
     bool createTextController = true,
     ValueTransform<bool>? valueTransform,
@@ -340,6 +368,7 @@ class GladeInput<T> extends ChangeNotifier {
         dependencies: dependencies,
         valueConverter: GladeTypeConverters.boolConverter,
         onChange: onChange,
+        onChangeAsync: onChangeAsync,
         textEditingController: textEditingController,
         createTextController: createTextController,
         valueTransform: valueTransform,
@@ -355,6 +384,7 @@ class GladeInput<T> extends ChangeNotifier {
     DefaultTranslations? defaultTranslations,
     InputDependenciesFactory? dependencies,
     OnChange<String?>? onChange,
+    OnChangeAsync<String?>? onChangeAsync,
     TextEditingController? textEditingController,
     bool createTextController = true,
     bool isRequired = true,
@@ -374,6 +404,7 @@ class GladeInput<T> extends ChangeNotifier {
       inputKey: inputKey,
       dependenciesFactory: dependencies,
       onChange: onChange,
+      onChangeAsync: onChangeAsync,
       textEditingController: textEditingController,
       createTextController: createTextController,
       valueComparator: valueComparator,
@@ -409,10 +440,10 @@ class GladeInput<T> extends ChangeNotifier {
       final convertedError = _validator(convertedValue);
 
       return !convertedError.isValid ? _translate(delimiter: delimiter, customError: convertedError) : null;
-    } on ConvertError<T> catch (formatError) {
-      return formatError.error != null
-          ? _translate(delimiter: delimiter, customError: formatError)
-          : formatError.devError(value, extra: validatorResult);
+    } on ConvertError<T> catch (e) {
+      return e.error != null
+          ? _translate(delimiter: delimiter, customError: e)
+          : e.devError(value, extra: validatorResult);
     }
   }
 
@@ -440,8 +471,8 @@ class GladeInput<T> extends ChangeNotifier {
 
     try {
       this.value = converter.convert(strValue);
-    } on ConvertError<T> catch (conversionError) {
-      _conversionError = conversionError;
+    } on ConvertError<T> catch (e) {
+      _conversionError = e;
     }
   }
 
@@ -480,12 +511,13 @@ class GladeInput<T> extends ChangeNotifier {
     bool? isPure,
     DefaultTranslations? defaultTranslations,
     OnChange<T>? onChange,
+    OnChangeAsync<T>? onChangeAsync,
     TextEditingController? textEditingController,
     // ignore: avoid-unused-parameters, it is here just to be linter happy ¯\_(ツ)_/¯
     bool? createTextController,
     ValueTransform<T>? valueTransform,
   }) {
-    return GladeInput<T>(
+    return GladeInput(
       value: value ?? this.value,
       valueComparator: valueComparator ?? this.valueComparator,
       validatorInstance: validatorInstance ?? this.validatorInstance,
@@ -497,9 +529,31 @@ class GladeInput<T> extends ChangeNotifier {
       isPure: isPure ?? this.isPure,
       defaultTranslations: defaultTranslations ?? this.defaultTranslations,
       onChange: onChange ?? this.onChange,
+      onChangeAsync: onChangeAsync ?? this.onChangeAsync,
       textEditingController: textEditingController ?? this._textEditingController,
       valueTransform: valueTransform ?? this.valueTransform,
     );
+  }
+
+  Future<void> _onChangeAsyncCall() async {
+    if (onChangeAsync == null) return;
+
+    _isChanging = true;
+
+    // propagate input's changes
+    await onChangeAsync?.call(
+      ChangesInfo(
+        previousValue: _previousValue,
+        value: value,
+        initialValue: initialValue,
+        validatorResult: validate(),
+      ),
+      dependenciesFactory(),
+    );
+
+    _isChanging = false;
+
+    notifyListeners();
   }
 
   /// Translates input's errors (validation or conversion).

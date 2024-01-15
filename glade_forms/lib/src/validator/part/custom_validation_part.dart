@@ -1,13 +1,7 @@
-import 'package:glade_forms/src/core/core.dart';
-import 'package:glade_forms/src/validator/part/input_validator_part.dart';
-import 'package:glade_forms/src/validator/validator_error/glade_validator_error.dart';
+import 'package:glade_forms/src/src.dart';
 
 class CustomValidationPart<T> extends InputValidatorPart<T> {
-  final GladeValidatorError<T>? Function(
-    T value, {
-    required InputDependencies dependencies,
-    Object? extra,
-  }) customValidator;
+  final ValidateFunction<T> customValidator;
 
   const CustomValidationPart({
     required this.customValidator,
