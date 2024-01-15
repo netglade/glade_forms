@@ -536,6 +536,8 @@ class GladeInput<T> extends ChangeNotifier {
   }
 
   Future<void> _onChangeAsyncCall() async {
+    if (onChangeAsync == null) return;
+
     _isChanging = true;
 
     // propagate input's changes
