@@ -117,7 +117,9 @@ class GladeModelDebugInfo extends StatelessWidget {
                     if (showIsValid) Center(child: Text(x.isValid.toString())),
                     if (showValidationError) Center(child: Text(x.errorFormatted())),
                     if (showConversionError) Center(child: Text(x.hasConversionError.toString())),
+                    // ignore: avoid-nullable-tostring, this is ok
                     if (showValue) Center(child: Text(x.value.toString())),
+                    // ignore: avoid-nullable-tostring, this is ok
                     if (showInitialValue) Center(child: Text(x.initialValue.toString())),
                   ],
                 ),
@@ -163,7 +165,7 @@ class _DangerStrips extends StatelessWidget {
     required this.gap,
   });
 
-  List<Widget> getListOfStripes(int count) {
+  List<Widget> _getListOfStripes(int count) {
     final stripes = <Widget>[];
     for (var i = 0; i < count; i++) {
       stripes.add(
@@ -184,7 +186,7 @@ class _DangerStrips extends StatelessWidget {
       width: double.infinity,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          return Stack(children: getListOfStripes((constraints.maxWidth / 2).ceil()));
+          return Stack(children: _getListOfStripes((constraints.maxWidth / 2).ceil()));
         },
       ),
     );

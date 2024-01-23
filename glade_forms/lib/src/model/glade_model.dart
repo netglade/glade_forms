@@ -83,7 +83,7 @@ abstract class GladeModel extends ChangeNotifier {
   }
 
   /// Use it to update multiple inputs at once before these changes are popragated through notifyListeners().
-  void groupEdit(void Function() edit) {
+  void groupEdit(VoidCallback edit) {
     _groupEdit = true;
 
     edit();

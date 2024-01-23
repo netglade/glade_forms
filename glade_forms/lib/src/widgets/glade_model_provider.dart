@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 typedef CreateModelFunction<M extends GladeModel> = M Function(BuildContext context);
 
 class GladeModelProvider<M extends GladeModel> extends StatelessWidget {
+  // ignore: prefer-correct-callback-field-name, ok name
   final CreateModelFunction<M>? create;
   final M? value;
   final Widget child;

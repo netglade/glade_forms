@@ -94,6 +94,7 @@ If *age* is changed to value under 18, *vip content* is unchecked and vice-versa
       description: markdownData,
       className: 'two_way_checkbox_change.dart',
       child: GladeFormBuilder.create(
+        // ignore: avoid-undisposed-instances, handled by GladeFormBuilder
         create: (context) => AgeRestrictedModel(),
         builder: (context, formModel, _) => Padding(
           padding: const EdgeInsets.all(8),

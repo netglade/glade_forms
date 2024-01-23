@@ -26,6 +26,7 @@ T _defaultTransform<T>(T input) => input;
 class GladeInput<T> extends ChangeNotifier {
   /// Compares initial and current value.
   @protected
+  // ignore: prefer-correct-callback-field-name, ok name
   final ValueComparator<T>? valueComparator;
 
   @protected
@@ -34,6 +35,7 @@ class GladeInput<T> extends ChangeNotifier {
   @protected
   final StringToTypeConverter<T>? stringTovalueConverter;
 
+  // ignore: prefer-correct-callback-field-name, ok name
   final InputDependenciesFactory dependenciesFactory;
 
   /// An input's identification.
@@ -41,6 +43,7 @@ class GladeInput<T> extends ChangeNotifier {
   /// Used within listener changes and dependency related funcions such as validation.
   final String inputKey;
 
+  // ignore: prefer-correct-callback-field-name, ok name
   final ErrorTranslator<T>? translateError;
 
   /// Validation message for conversion error.
@@ -50,6 +53,7 @@ class GladeInput<T> extends ChangeNotifier {
   OnChange<T>? onChange;
 
   /// Transforms passed value before assigning it into input.
+  // ignore: prefer-correct-callback-field-name, ok name
   ValueTransform<T> valueTransform;
 
   /// Initial value - does not change after creating.
@@ -414,10 +418,10 @@ class GladeInput<T> extends ChangeNotifier {
       final convertedError = _validator(convertedValue);
 
       return !convertedError.isValid ? _translate(delimiter: delimiter, customError: convertedError) : null;
-    } on ConvertError<T> catch (formatError) {
-      return formatError.error != null
-          ? _translate(delimiter: delimiter, customError: formatError)
-          : formatError.devError(value, extra: validatorResult);
+    } on ConvertError<T> catch (e) {
+      return e.error != null
+          ? _translate(delimiter: delimiter, customError: e)
+          : e.devError(value, extra: validatorResult);
     }
   }
 
@@ -445,8 +449,8 @@ class GladeInput<T> extends ChangeNotifier {
 
     try {
       this.value = converter.convert(strValue);
-    } on ConvertError<T> catch (conversionError) {
-      _conversionError = conversionError;
+    } on ConvertError<T> catch (e) {
+      _conversionError = e;
     }
   }
 
@@ -490,7 +494,7 @@ class GladeInput<T> extends ChangeNotifier {
     bool? createTextController,
     ValueTransform<T>? valueTransform,
   }) {
-    return GladeInput<T>(
+    return GladeInput(
       value: value ?? this.value,
       valueComparator: valueComparator ?? this.valueComparator,
       validatorInstance: validatorInstance ?? this.validatorInstance,

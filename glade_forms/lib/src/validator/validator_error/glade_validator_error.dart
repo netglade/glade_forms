@@ -7,6 +7,7 @@ typedef OnValidateError<T> = String Function(T? value, Object? extra);
 
 abstract class GladeValidatorError<T> extends GladeInputError<T> with EquatableMixin {
   /// Error message when translation is not used. Useful for development.
+  // ignore: prefer-correct-callback-field-name, ok name
   final OnValidateError<T> devError;
 
   // ignore: no-object-declaration, extra can be any object

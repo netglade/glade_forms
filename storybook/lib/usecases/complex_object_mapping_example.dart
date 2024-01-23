@@ -68,6 +68,7 @@ class ComplexObjectMappingExample extends StatelessWidget {
       shortDescription: 'Converters and complex objects',
       className: 'complex_object_mapping_example.dart',
       child: GladeFormBuilder.create(
+        // ignore: avoid-undisposed-instances, handled by GladeFormBuilder
         create: (context) => _Model(),
         builder: (context, model, _) {
           return Form(
