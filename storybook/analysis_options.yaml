@@ -6,6 +6,12 @@ analyzer:
     - "**/*.freezed.dart"
     - "build/"
 
+linter:
+  rules:
+    avoid_redundant_argument_values: false
+
 dart_code_metrics:
   extends:
     - package:netglade_analysis/dcm.yaml
+  rules:
+    - avoid-passing-default-values
