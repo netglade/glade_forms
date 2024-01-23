@@ -1,6 +1,6 @@
 ## 1.3.0
-- **[Fix]**: When using `GladeInput.create`, passing only `value` ended up in UI vs model not being synced. Not that's fixed.
-- **[Fix]**: StringInput only works with `String` now.
+- **[Fix]**: When using `GladeInput.create`, passing only `value` ended up in UI vs model not being synced. Now that's fixed.
+- **[Breaking]**: StringInput only works with `String` now.
 
 ## 1.2.1
 - **[Fix]**: Value passed to factory constructor is not reflected in TextController.

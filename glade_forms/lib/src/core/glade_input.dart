@@ -181,11 +181,12 @@ class GladeInput<T> extends ChangeNotifier {
     String? inputKey,
 
     /// Sets current value of input.
+    /// When value is null, it is set to [initialValue].
     T? value,
 
     /// Initial value when GenericInput is created.
     ///
-    /// This value can potentially differ from value.
+    /// This value can potentially differ from [value].
     /// Used for computing [isUnchanged].
     T? initialValue,
     ValidatorFactory<T>? validator,

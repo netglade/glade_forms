@@ -27,7 +27,6 @@ class _Model extends GladeModel {
   void initialize() {
     selectedItem = GladeInput.create(
       validator: (v) => (v..notNull()).build(),
-      value: null,
       inputKey: 'selectedItem',
     );
     availableStats = GladeInput.create(
