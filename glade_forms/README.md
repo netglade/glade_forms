@@ -123,7 +123,7 @@ Every input is *dirty* or *pure* based on whether value was updated (or not, yet
 
 On each input we can define
  - **value** - Current input's value
- - **initialValue** - Cached initial value. Used with valueComparator. 
+ - **initialValue** - Initial input's value. Used with valueComparator and computing `isUncahged`.
  - **validator** - Input's value must satisfy validation to be *valid* input.
  - **translateError** - If there are validation errors, function for error translations can be provided.
  - **inputKey** - Unique identification of each input. Used inside listeners or in dependencies.
