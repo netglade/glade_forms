@@ -172,6 +172,7 @@ class GladeInput<T> extends ChangeNotifier {
     validatorInstance.bindInput(this);
   }
 
+  /// At least one of [value] or [initialValue] MUST be set.
   factory GladeInput.create({
     String? inputKey,
 
