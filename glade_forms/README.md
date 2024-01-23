@@ -1,5 +1,5 @@
 <a href="https://github.com/netglade">
-    <img alt="netglade" height='120px' src="https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/doc/badge_dark.png">  
+    <img alt="netglade" height='120px' src="https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/doc/badge.png">  
 </a>
 
 Developed with 💚 by [netglade][netglade_link]

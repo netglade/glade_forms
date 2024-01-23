@@ -1,5 +1,7 @@
 name: glade_forms_workspace
 
+sdkPath: .fvm/flutter_sdk
+
 packages:
   - glade_forms
   - glade_forms/example
