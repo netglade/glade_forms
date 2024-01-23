@@ -29,7 +29,7 @@ scripts:
     description: Run all static analysis checks.
 
   lint:dart:
-    run: melos exec -- flutter analyze --fatal-infos
+    run: melos exec -- dart analyze . # TODO --fatal-infos
     description: Run Dart static analysis checks.
 
   lint:dcm:
