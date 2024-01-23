@@ -5,7 +5,34 @@ import 'package:glade_forms/src/model/glade_model.dart';
 class GladeModelDebugInfo extends StatelessWidget {
   final GladeModel model;
 
-  const GladeModelDebugInfo({required this.model, super.key});
+  final bool showIsUnchanged;
+  final bool showIsValid;
+  final bool showValidationError;
+  final bool showConversionError;
+  final bool showValue;
+  final bool showInitialValue;
+
+  const GladeModelDebugInfo({
+    required this.model,
+    super.key,
+    this.showIsUnchanged = true,
+    this.showIsValid = true,
+    this.showValidationError = true,
+    this.showConversionError = true,
+    this.showValue = false,
+    this.showInitialValue = false,
+  });
+
+  const GladeModelDebugInfo.clean({
+    required this.model,
+    super.key,
+    this.showIsUnchanged = false,
+    this.showIsValid = false,
+    this.showValidationError = false,
+    this.showConversionError = false,
+    this.showValue = false,
+    this.showInitialValue = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,9 +45,12 @@ class GladeModelDebugInfo extends StatelessWidget {
           Text('Model isValid: ${model.isValid}'),
           Text('Model isUnchanged: ${model.isUnchanged}'),
           const SizedBox(height: 20),
+
+          // Table.
           Table(
             border: TableBorder.symmetric(outside: const BorderSide()),
             children: [
+              // Main header.
               TableRow(
                 decoration: const BoxDecoration(color: Colors.black12),
                 children: [
@@ -28,53 +58,67 @@ class GladeModelDebugInfo extends StatelessWidget {
                     padding: EdgeInsets.all(8),
                     child: Text('Debug model info'),
                   ),
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Text('IsValid: ${model.isValid}'),
+                  if (showIsUnchanged)
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Text('IsUnchanged: ${model.isUnchanged}'),
+                      ),
                     ),
-                  ),
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Text('IsUnchanged: ${model.isUnchanged}'),
+                  if (showIsValid)
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Text('IsValid: ${model.isValid}'),
+                      ),
                     ),
-                  ),
-                  const SizedBox(),
-                  const SizedBox(),
+                  if (showValidationError) const SizedBox(),
+                  if (showConversionError) const SizedBox(),
+                  if (showValue) const SizedBox(),
+                  if (showInitialValue) const SizedBox(),
                 ],
               ),
-              const TableRow(
-                decoration: BoxDecoration(color: Colors.black12),
+
+              // Inputs info note header.
+              TableRow(
+                decoration: const BoxDecoration(color: Colors.black12),
                 children: [
-                  Padding(
+                  const Padding(
                     padding: EdgeInsets.all(8),
                     child: Text('Inputs info'),
                   ),
-                  SizedBox(),
-                  SizedBox(),
-                  SizedBox(),
-                  SizedBox(),
+                  if (showIsUnchanged) const SizedBox(),
+                  if (showIsValid) const SizedBox(),
+                  if (showValidationError) const SizedBox(),
+                  if (showConversionError) const SizedBox(),
+                  if (showValue) const SizedBox(),
+                  if (showInitialValue) const SizedBox(),
                 ],
               ),
-              const TableRow(
-                decoration: BoxDecoration(color: Colors.black12, border: Border(bottom: BorderSide())),
+
+              // Colums header.
+              TableRow(
+                decoration: const BoxDecoration(color: Colors.black12, border: Border(bottom: BorderSide())),
                 children: [
-                  Center(child: Text('Input')),
-                  Center(child: Text('isUnchanged')),
-                  Center(child: Text('isValid')),
-                  Center(child: Text('validation error')),
-                  Center(child: Text('Conversion error')),
+                  const Center(child: Text('Input')),
+                  if (showIsUnchanged) const Center(child: Text('isUnchanged')),
+                  if (showIsValid) const Center(child: Text('isValid')),
+                  if (showValidationError) const Center(child: Text('validation error')),
+                  if (showConversionError) const Center(child: Text('Conversion error')),
+                  if (showValue) const Center(child: Text('value')),
+                  if (showInitialValue) const Center(child: Text('initialValue')),
                 ],
               ),
               for (final x in model.inputs)
                 TableRow(
                   children: [
                     Center(child: Text(x.inputKey)),
-                    Center(child: Text(x.isUnchanged.toString())),
-                    Center(child: Text(x.isValid.toString())),
-                    Center(child: Text(x.errorFormatted())),
-                    Center(child: Text(x.hasConversionError.toString())),
+                    if (showIsUnchanged) Center(child: Text(x.isUnchanged.toString())),
+                    if (showIsValid) Center(child: Text(x.isValid.toString())),
+                    if (showValidationError) Center(child: Text(x.errorFormatted())),
+                    if (showConversionError) Center(child: Text(x.hasConversionError.toString())),
+                    if (showValue) Center(child: Text(x.value.toString())),
+                    if (showInitialValue) Center(child: Text(x.initialValue.toString())),
                   ],
                 ),
             ],
@@ -140,7 +184,6 @@ class _DangerStrips extends StatelessWidget {
       width: double.infinity,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          // ignore: avoid-returning-widgets, ok here
           return Stack(children: getListOfStripes((constraints.maxWidth / 2).ceil()));
         },
       ),

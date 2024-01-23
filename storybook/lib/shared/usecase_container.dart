@@ -58,7 +58,6 @@ class _CodeSample extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ignore: avoid-async-call-in-sync-function, memoize future
     final getFileContentFutureMemo = useMemoized(getFileContent);
     final getFileFuture = useFuture(getFileContentFutureMemo);
 

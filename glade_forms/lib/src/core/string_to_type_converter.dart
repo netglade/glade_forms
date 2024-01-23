@@ -29,7 +29,7 @@ class StringToTypeConverter<T> {
     /// Converts [T] back to string.
     TypeConverterToString<T>? converterBack,
     //OnErrorCallback<T>? onError,
-  })  : _converterBack = converterBack ?? ((rawInput) => rawInput.toString()),
+  })  : _converterBack = converterBack ?? ((rawInput) => rawInput?.toString() ?? ''),
         onError = ((rawValue, error) => ConvertError<T>(input: rawValue, error: error));
 
   T convert(String? input) {

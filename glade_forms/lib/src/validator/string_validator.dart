@@ -3,12 +3,12 @@ import 'package:glade_forms/src/validator/glade_validator.dart';
 import 'package:glade_forms/src/validator/regex_patterns.dart';
 import 'package:glade_forms/src/validator/validator_error/glade_validator_error.dart';
 
-class StringValidator extends GladeValidator<String?> {
+class StringValidator extends GladeValidator<String> {
   StringValidator();
 
   /// Given value can't be empty string (or null).
   void notEmpty({OnValidateError<String>? devError, Object? extra, Object? key}) => satisfy(
-        (input, extra, __) => input?.isNotEmpty ?? false,
+        (input, extra, __) => input.isNotEmpty,
         devError: devError ?? (_, __) => "Value can't be empty",
         extra: extra,
         key: key ?? GladeErrorKeys.stringEmpty,
@@ -25,14 +25,13 @@ class StringValidator extends GladeValidator<String?> {
   }) =>
       satisfy(
         (x, _, __) {
-          if (x?.isEmpty ?? true) {
+          if (x.isEmpty) {
             return allowEmpty;
           }
 
           final regExp = RegExp(RegexPatterns.email);
 
-          // ignore: avoid-non-null-assertion, already asserted to non-null
-          return regExp.hasMatch(x!);
+          return regExp.hasMatch(x);
         },
         devError: devError ?? (value, _) => 'Value "${value ?? 'NULL'}" is not in e-mail format',
         extra: extra,
@@ -51,12 +50,11 @@ class StringValidator extends GladeValidator<String?> {
   }) =>
       satisfy(
         (x, _, __) {
-          if (x?.isEmpty ?? true) {
+          if (x.isEmpty) {
             return allowEmpty;
           }
 
-          // ignore: avoid-non-null-assertion, already asserted to non-null
-          final uri = Uri.tryParse(x!);
+          final uri = Uri.tryParse(x);
 
           if (uri == null) return false;
 
@@ -82,8 +80,6 @@ class StringValidator extends GladeValidator<String?> {
   }) =>
       satisfy(
         (value, extra, dependencies) {
-          if (value == null) return false;
-
           final regex =
               RegExp(pattern, multiLine: multiline, caseSensitive: caseSensitive, dotAll: dotAll, unicode: unicode);
 
@@ -103,8 +99,6 @@ class StringValidator extends GladeValidator<String?> {
   }) =>
       satisfy(
         (value, extra, dependencies) {
-          if (value == null) return false;
-
           return value.length >= length;
         },
         devError: devError ?? (value, _) => 'Value "${value ?? 'NULL'}" is shorter than allowed length $length',
@@ -121,8 +115,6 @@ class StringValidator extends GladeValidator<String?> {
   }) =>
       satisfy(
         (value, extra, dependencies) {
-          if (value == null) return false;
-
           return value.length < length;
         },
         devError: devError ?? (value, _) => 'Value "${value ?? 'NULL'}" is longer than allowed length $length',
@@ -139,8 +131,6 @@ class StringValidator extends GladeValidator<String?> {
   }) =>
       satisfy(
         (value, extra, dependencies) {
-          if (value == null) return false;
-
           return value.length == length;
         },
         devError: devError ?? (value, _) => 'Value "${value ?? 'NULL'}" has to be $length long characters.',

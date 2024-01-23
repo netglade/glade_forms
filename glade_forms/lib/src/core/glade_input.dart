@@ -15,7 +15,7 @@ import 'package:meta/meta.dart';
 
 typedef ValueComparator<T> = bool Function(T? initial, T? value);
 typedef ValidatorFactory<T> = ValidatorInstance<T> Function(GladeValidator<T> v);
-typedef StringValidatorFactory = ValidatorInstance<String?> Function(StringValidator validator);
+typedef StringValidatorFactory = ValidatorInstance<String> Function(StringValidator validator);
 typedef OnChange<T> = void Function(ChangesInfo<T> info, InputDependencies dependencies);
 typedef ValueTransform<T> = T Function(T input);
 
@@ -173,15 +173,17 @@ class GladeInput<T> extends ChangeNotifier {
   }
 
   factory GladeInput.create({
-    /// Sets current value of input.
-    required T value,
     String? inputKey,
-    ValidatorFactory<T>? validator,
+
+    /// Sets current value of input.
+    T? value,
 
     /// Initial value when GenericInput is created.
     ///
-    /// This value can potentially differ from value. Used for computing `isUnchanged`.
+    /// This value can potentially differ from value.
+    /// Used for computing [isUnchanged].
     T? initialValue,
+    ValidatorFactory<T>? validator,
     bool pure = true,
     ErrorTranslator<T>? translateError,
     ValueComparator<T>? valueComparator,
@@ -193,10 +195,12 @@ class GladeInput<T> extends ChangeNotifier {
     ValueTransform<T>? valueTransform,
     DefaultTranslations? defaultTranslations,
   }) {
+    assert(value != null || initialValue != null, 'At least one of value or initialValue must be set');
+
     final validatorInstance = validator?.call(GladeValidator<T>()) ?? GladeValidator<T>().build();
 
     return GladeInput(
-      value: value,
+      value: (value ?? initialValue) as T,
       isPure: pure,
       validatorInstance: validatorInstance,
       initialValue: initialValue,
@@ -220,8 +224,8 @@ class GladeInput<T> extends ChangeNotifier {
   /// In case of need of any validation use [GladeInput.create] directly.
   factory GladeInput.optional({
     required T value,
-    String? inputKey,
     T? initialValue,
+    String? inputKey,
     bool pure = true,
     ErrorTranslator<T>? translateError,
     ValueComparator<T>? valueComparator,
@@ -253,8 +257,8 @@ class GladeInput<T> extends ChangeNotifier {
   /// In case of need of any aditional validation use [GladeInput.create] directly.
   factory GladeInput.required({
     required T value,
-    String? inputKey,
     T? initialValue,
+    String? inputKey,
     bool pure = true,
     ErrorTranslator<T>? translateError,
     ValueComparator<T>? valueComparator,
@@ -288,8 +292,8 @@ class GladeInput<T> extends ChangeNotifier {
   static GladeInput<int> intInput({
     required int value,
     String? inputKey,
-    ValidatorFactory<int>? validator,
     int? initialValue,
+    ValidatorFactory<int>? validator,
     bool pure = true,
     ErrorTranslator<int>? translateError,
     ValueComparator<int>? valueComparator,
@@ -318,8 +322,8 @@ class GladeInput<T> extends ChangeNotifier {
   static GladeInput<bool> boolInput({
     required bool value,
     String? inputKey,
-    ValidatorFactory<bool>? validator,
     bool? initialValue,
+    ValidatorFactory<bool>? validator,
     bool pure = true,
     ErrorTranslator<bool>? translateError,
     ValueComparator<bool>? valueComparator,
@@ -345,29 +349,29 @@ class GladeInput<T> extends ChangeNotifier {
         valueTransform: valueTransform,
       );
 
-  static GladeInput<String?> stringInput({
+  static GladeInput<String> stringInput({
     String? inputKey,
     String? value,
-    StringValidatorFactory? validator,
     String? initialValue,
+    StringValidatorFactory? validator,
     bool pure = true,
-    ErrorTranslator<String?>? translateError,
+    ErrorTranslator<String>? translateError,
     DefaultTranslations? defaultTranslations,
     InputDependenciesFactory? dependencies,
-    OnChange<String?>? onChange,
+    OnChange<String>? onChange,
     TextEditingController? textEditingController,
     bool createTextController = true,
     bool isRequired = true,
-    ValueTransform<String?>? valueTransform,
-    ValueComparator<String?>? valueComparator,
+    ValueTransform<String>? valueTransform,
+    ValueComparator<String>? valueComparator,
   }) {
     final requiredInstance = validator?.call(StringValidator()..notEmpty()) ?? (StringValidator()..notEmpty()).build();
     final optionalInstance = validator?.call(StringValidator()) ?? StringValidator().build();
 
     return GladeInput(
-      value: value,
+      value: value ?? initialValue ?? '',
       isPure: pure,
-      initialValue: initialValue,
+      initialValue: initialValue ?? '',
       validatorInstance: isRequired ? requiredInstance : optionalInstance,
       translateError: translateError,
       defaultTranslations: defaultTranslations,
