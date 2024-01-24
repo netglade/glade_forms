@@ -17,9 +17,11 @@ typedef TypeConverterToString<T> = String? Function(T rawInput);
 
 /// Used to convert string input into `T` value.
 class StringToTypeConverter<T> {
+  // ignore: prefer-correct-callback-field-name, ok name
   final ConverterToType<T> converter;
   final OnErrorCallback<T> onError;
 
+  // ignore: prefer-correct-callback-field-name, ok name
   final TypeConverterToString<T> _converterBack;
 
   StringToTypeConverter({
@@ -29,7 +31,7 @@ class StringToTypeConverter<T> {
     /// Converts [T] back to string.
     TypeConverterToString<T>? converterBack,
     //OnErrorCallback<T>? onError,
-  })  : _converterBack = converterBack ?? ((rawInput) => rawInput.toString()),
+  })  : _converterBack = converterBack ?? ((rawInput) => rawInput?.toString() ?? ''),
         onError = ((rawValue, error) => ConvertError<T>(input: rawValue, error: error));
 
   T convert(String? input) {

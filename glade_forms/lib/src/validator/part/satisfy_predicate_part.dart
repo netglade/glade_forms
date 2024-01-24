@@ -5,11 +5,13 @@ import 'package:glade_forms/src/validator/validator_error/validator_error.dart';
 typedef SatisfyPredicate<T> = bool Function(T value, Object? extra, InputDependencies dependencies);
 
 class SatisfyPredicatePart<T> extends InputValidatorPart<T> {
+  // ignore: prefer-correct-callback-field-name, ok name
   final OnValidateError<T> devError;
 
   // ignore: no-object-declaration, extra can be any object
   final Object? extra;
 
+  // ignore: prefer-correct-callback-field-name, ok name
   final SatisfyPredicate<T> predicate;
 
   const SatisfyPredicatePart({

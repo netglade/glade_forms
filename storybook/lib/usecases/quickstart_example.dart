@@ -30,6 +30,7 @@ class QuickStartExample extends StatelessWidget {
     return UsecaseContainer(
       shortDescription: 'Quick start example',
       child: GladeFormBuilder.create(
+        // ignore: avoid-undisposed-instances, handled by GladeFormBuilder
         create: (context) => _Model(),
         builder: (context, model, _) => Padding(
           padding: const EdgeInsets.all(32),

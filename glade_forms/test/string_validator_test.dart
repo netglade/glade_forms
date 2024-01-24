@@ -5,15 +5,6 @@ import 'package:test/test.dart';
 
 void main() {
   group('notEmpty', () {
-    test('When value is null, notEmpty fails', () {
-      final validator = (StringValidator()..notEmpty()).build();
-
-      final result = validator.validate(null);
-
-      expect(result.isValid, isFalse);
-      expect(result.errors.firstOrNull?.key, equals(GladeErrorKeys.stringEmpty));
-    });
-
     test('When value is empty, notEmpty fails', () {
       final validator = (StringValidator()..notEmpty()).build();
 
@@ -33,15 +24,6 @@ void main() {
   });
 
   group('isEmail', () {
-    test('When value is null, isEmail() fails', () {
-      final validator = (StringValidator()..isEmail()).build();
-
-      final result = validator.validate(null);
-
-      expect(result.isValid, isFalse);
-      expect(result.errors.firstOrNull?.key, equals(GladeErrorKeys.stringNotEmail));
-    });
-
     test('When value is empty, isEmail() fails', () {
       final validator = (StringValidator()..isEmail()).build();
 
@@ -70,15 +52,6 @@ void main() {
   });
 
   group('isUrl', () {
-    test('When value is null, isUrl() fails', () {
-      final validator = (StringValidator()..isUri()).build();
-
-      final result = validator.validate(null);
-
-      expect(result.isValid, isFalse);
-      expect(result.errors.firstOrNull?.key, equals(GladeErrorKeys.stringNotUrl));
-    });
-
     test('When value is empty, isUrl() fails', () {
       final validator = (StringValidator()..isUri()).build();
 
@@ -116,15 +89,6 @@ void main() {
       expect(result.isValid, isTrue);
     });
 
-    test('exactLength(), null value fails', () {
-      final validator = (StringValidator()..exactLength(length: 4)).build();
-
-      final result = validator.validate(null);
-
-      expect(result.isValid, isFalse);
-      expect(result.errors.firstOrNull?.key, equals(GladeErrorKeys.stringExactLength));
-    });
-
     test('exactLength(), empty value fails', () {
       final validator = (StringValidator()..exactLength(length: 4)).build();
 
@@ -153,15 +117,6 @@ void main() {
       expect(result.isValid, isTrue);
     });
 
-    test('maxLength(), null value fails', () {
-      final validator = (StringValidator()..maxLength(length: 4)).build();
-
-      final result = validator.validate(null);
-
-      expect(result.isValid, isFalse);
-      expect(result.errors.firstOrNull?.key, equals(GladeErrorKeys.stringMaxLength));
-    });
-
     test('maxLength(), empty value pass', () {
       final validator = (StringValidator()..maxLength(length: 4)).build();
 
@@ -187,15 +142,6 @@ void main() {
       final result = validator.validate('abcd');
 
       expect(result.isValid, isTrue);
-    });
-
-    test('minLength(), null value fails', () {
-      final validator = (StringValidator()..minLength(length: 4)).build();
-
-      final result = validator.validate(null);
-
-      expect(result.isValid, isFalse);
-      expect(result.errors.firstOrNull?.key, equals(GladeErrorKeys.stringMinLength));
     });
 
     test('minLength(), empty value fails', () {

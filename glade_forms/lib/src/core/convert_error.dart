@@ -5,6 +5,7 @@ import 'package:glade_forms/src/core/glade_input_error.dart';
 typedef OnConvertError = String Function(String? rawInput, {Object? extra, Object? key});
 
 class ConvertError<T> extends GladeInputError<T> with EquatableMixin implements Exception {
+  // ignore: prefer-correct-callback-field-name, more suitable name
   final OnConvertError devError;
 
   final String? input;

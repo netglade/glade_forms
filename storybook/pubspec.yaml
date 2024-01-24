@@ -13,14 +13,15 @@ dependencies:
   flutter_highlighter: ^0.1.1
   flutter_hooks: ^0.20.1
   flutter_markdown: ^0.6.17+3
-  glade_forms: ^1.1.0
+  glade_forms:
+    path: ../glade_forms
   provider: ^6.0.2
   widgetbook: ^3.3.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  netglade_analysis: ^5.0.0
+  netglade_analysis: ^7.0.0
 
 flutter:
   uses-material-design: true

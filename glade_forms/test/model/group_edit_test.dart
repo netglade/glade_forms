@@ -31,7 +31,7 @@ void main() {
     expect(listenerCount, equals(1), reason: 'Should be called');
   });
 
-  test('When updating [a] listeners is called', () {
+  test('When updating [b] listeners is called', () {
     final model = _Model();
     var listenerCount = 0;
     model.addListener(() {

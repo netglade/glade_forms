@@ -20,7 +20,7 @@ class GladeValidator<T> {
     /// Beware that some validators assume non-null value.
     bool stopOnFirstError = true,
   }) =>
-      ValidatorInstance<T>(parts: parts, stopOnFirstError: stopOnFirstError);
+      ValidatorInstance(parts: parts, stopOnFirstError: stopOnFirstError);
 
   void clear() => parts = [];
 

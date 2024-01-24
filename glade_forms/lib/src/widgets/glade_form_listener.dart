@@ -10,6 +10,7 @@ typedef GladeFormListenerFn<M extends GladeModel> = void Function(
 
 class GladeFormListener<M extends GladeModel> extends StatefulWidget {
   final Widget child;
+  // ignore: prefer-correct-callback-field-name, ok name
   final GladeFormListenerFn<M> listener;
 
   const GladeFormListener({
@@ -23,7 +24,7 @@ class GladeFormListener<M extends GladeModel> extends StatefulWidget {
 }
 
 class _GladeFormListenerState<M extends GladeModel> extends State<GladeFormListener<M>> {
-  M? model;
+  M? _model;
 
   @override
   void initState() {
@@ -33,13 +34,13 @@ class _GladeFormListenerState<M extends GladeModel> extends State<GladeFormListe
 
   @override
   void dispose() {
-    model?.removeListener(_onModelUpdate);
+    _model?.removeListener(_onModelUpdate);
     super.dispose();
   }
 
   @override
   void didChangeDependencies() {
-    model = context.read<M>();
+    _model = context.read<M>();
     super.didChangeDependencies();
   }
 
