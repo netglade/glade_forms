@@ -201,7 +201,7 @@ class GladeInput<T> extends ChangeNotifier {
     ValueTransform<T>? valueTransform,
     DefaultTranslations? defaultTranslations,
   }) {
-    assert(value != null || initialValue != null, 'At least one of value or initialValue must be set');
+    assert(value != null || initialValue != null || TypeHelper.typeIsNullable<T>(), 'If type is not nullable, at least one of value or initialValue must be set');
 
     final validatorInstance = validator?.call(GladeValidator<T>()) ?? GladeValidator<T>().build();
 
