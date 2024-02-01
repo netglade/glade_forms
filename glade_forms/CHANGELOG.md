@@ -1,3 +1,6 @@
+## 1.3.1
+- **[Fix]**: Fixed `GladeInput.create` assert to allow null for `value` and `initialValue` when input's type is nullable.
+
 ## 1.3.0
 - **[Fix]**: When using `GladeInput.create`, passing only `value` ended up in UI vs model not being synced. Now that's fixed.
 - **[Breaking]**: StringInput only works with `String` now.
