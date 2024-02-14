@@ -1,3 +1,6 @@
+## 1.3.2
+- **[Fix]**: `GladeInput` now preserves selection. (Before, a cursor jumped at the end.)
+
 ## 1.3.1
 - **[Fix]**: Fixed `GladeInput.create` assert to allow null for `value` and `initialValue` when input's type is nullable.
 
