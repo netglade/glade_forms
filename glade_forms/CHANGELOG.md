@@ -1,5 +1,6 @@
 ## 1.4.0
 - **[Feat]**: Support non-data-holding inputs to enable "view" inputs.
+- **[Feat]**: Add the `shouldTriggerOnChange` paramete to `updateValue` so one can opt-out from `onChange` callback being triggered.
 - **[Fix]**: Export `ChangesInfo`.
 
 ## 1.3.2
