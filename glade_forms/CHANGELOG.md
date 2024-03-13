@@ -1,3 +1,7 @@
+## 1.4.0
+- **[Feat]**: Support non-data-holding inputs to enable "view" inputs.
+- **[Fix]**: Export `ChangesInfo`.
+
 ## 1.3.2
 - **[Fix]**: `GladeInput` now preserves selection. (Before, a cursor jumped at the end.)
 

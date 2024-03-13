@@ -1,3 +1,4 @@
+export 'changes_info.dart';
 export 'convert_error.dart';
 export 'error_translator.dart';
 export 'glade_error_keys.dart';
