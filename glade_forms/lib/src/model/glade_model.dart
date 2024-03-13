@@ -12,7 +12,7 @@ abstract class GladeModel extends ChangeNotifier {
 
   bool get isPure => inputs.every((input) => input.isPure);
 
-  bool get isUnchanged => inputs.every((input) => input.isUnchanged);
+  bool get isUnchanged => inputs.where((input) => input.trackUnchanged).every((input) => input.isUnchanged);
 
   bool get isDirty => !isPure;
 

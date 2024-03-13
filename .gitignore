@@ -30,4 +30,4 @@ build/
 .last_build_id
 *.iml
 
-.fvm/flutter_sdk
+.fvm/

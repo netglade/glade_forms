@@ -52,6 +52,11 @@ class GladeInput<T> extends ChangeNotifier {
   /// Called when input's value changed.
   OnChange<T>? onChange;
 
+  /// Determines whether this input will be considered in isUnchanged on model.
+  ///
+  /// That means, when the value is false, it will opt-out this input from the computation.
+  bool trackUnchanged;
+
   /// Transforms passed value before assigning it into input.
   // ignore: prefer-correct-callback-field-name, ok name
   ValueTransform<T> valueTransform;
@@ -105,36 +110,7 @@ class GladeInput<T> extends ChangeNotifier {
   /// String representattion of [value].
   String get stringValue => stringTovalueConverter?.convertBack(value) ?? value.toString();
 
-  set value(T value) {
-    _previousValue = _value;
-
-    _value = valueTransform(value);
-
-    final strValue = stringValue;
-    // synchronize text controller with value
-    _textEditingController?.value = TextEditingValue(
-      text: strValue,
-      selection: _textEditingController?.selection ?? const TextSelection.collapsed(offset: -1),
-    );
-
-    _isPure = false;
-    __conversionError = null;
-
-    // propagate input's changes
-    onChange?.call(
-      ChangesInfo(
-        previousValue: _previousValue,
-        value: value,
-        initialValue: initialValue,
-        validatorResult: validate(),
-      ),
-      dependenciesFactory(),
-    );
-
-    _bindedModel?.notifyInputUpdated(this);
-
-    notifyListeners();
-  }
+  set value(T value) => _setValue(value, shouldTriggerOnChange: true);
 
   // ignore: avoid_setters_without_getters, ok for internal use
   set _conversionError(ConvertError<T> value) {
@@ -157,6 +133,7 @@ class GladeInput<T> extends ChangeNotifier {
     T? initialValue,
     TextEditingController? textEditingController,
     bool createTextController = true,
+    this.trackUnchanged = true,
   })  : _isPure = isPure,
         _value = value,
         _initialValue = initialValue,
@@ -200,6 +177,7 @@ class GladeInput<T> extends ChangeNotifier {
     bool createTextController = true,
     ValueTransform<T>? valueTransform,
     DefaultTranslations? defaultTranslations,
+    bool trackUnchanged = true,
   }) {
     assert(
       value != null || initialValue != null || TypeHelper.typeIsNullable<T>(),
@@ -223,10 +201,10 @@ class GladeInput<T> extends ChangeNotifier {
       createTextController: createTextController,
       valueTransform: valueTransform,
       defaultTranslations: defaultTranslations,
+      trackUnchanged: trackUnchanged,
     );
   }
 
-  // Predefined GenericInput without any validations.
   ///
   /// Useful for input which allows null value without additional validations.
   ///
@@ -244,6 +222,7 @@ class GladeInput<T> extends ChangeNotifier {
     TextEditingController? textEditingController,
     bool createTextController = true,
     ValueTransform<T>? valueTransform,
+    bool trackUnchanged = true,
   }) =>
       GladeInput.create(
         validator: (v) => v.build(),
@@ -259,6 +238,7 @@ class GladeInput<T> extends ChangeNotifier {
         textEditingController: textEditingController,
         createTextController: createTextController,
         valueTransform: valueTransform,
+        trackUnchanged: trackUnchanged,
       );
 
   /// Predefined GenericInput with predefined `notNull` validation.
@@ -277,6 +257,7 @@ class GladeInput<T> extends ChangeNotifier {
     TextEditingController? textEditingController,
     bool createTextController = true,
     ValueTransform<T>? valueTransform,
+    bool trackUnchanged = true,
   }) =>
       GladeInput.create(
         validator: (v) => (v..notNull()).build(),
@@ -292,6 +273,7 @@ class GladeInput<T> extends ChangeNotifier {
         textEditingController: textEditingController,
         createTextController: createTextController,
         valueTransform: valueTransform,
+        trackUnchanged: trackUnchanged,
       );
 
   @internal
@@ -311,6 +293,7 @@ class GladeInput<T> extends ChangeNotifier {
     TextEditingController? textEditingController,
     bool createTextController = true,
     ValueTransform<int>? valueTransform,
+    bool trackUnchanged = true,
   }) =>
       GladeInput.create(
         value: value,
@@ -326,6 +309,7 @@ class GladeInput<T> extends ChangeNotifier {
         textEditingController: textEditingController,
         createTextController: createTextController,
         valueTransform: valueTransform,
+        trackUnchanged: trackUnchanged,
       );
 
   static GladeInput<bool> boolInput({
@@ -341,6 +325,7 @@ class GladeInput<T> extends ChangeNotifier {
     TextEditingController? textEditingController,
     bool createTextController = true,
     ValueTransform<bool>? valueTransform,
+    bool trackUnchanged = true,
   }) =>
       GladeInput.create(
         value: value,
@@ -356,6 +341,7 @@ class GladeInput<T> extends ChangeNotifier {
         textEditingController: textEditingController,
         createTextController: createTextController,
         valueTransform: valueTransform,
+        trackUnchanged: trackUnchanged,
       );
 
   static GladeInput<String> stringInput({
@@ -458,8 +444,11 @@ class GladeInput<T> extends ChangeNotifier {
     }
   }
 
-  // ignore: use_setters_to_change_properties, used as shorthand for field setter.
-  void updateValue(T value) => this.value = value;
+  /// Used as shorthand for field setter.
+  ///
+  /// When [shouldTriggerOnChange] is set to false, the `onChange` callback will not be called.
+  void updateValue(T value, {bool shouldTriggerOnChange = true}) =>
+      _setValue(value, shouldTriggerOnChange: shouldTriggerOnChange);
 
   /// Resets input into pure state.
   ///
@@ -497,6 +486,7 @@ class GladeInput<T> extends ChangeNotifier {
     // ignore: avoid-unused-parameters, it is here just to be linter happy ¯\_(ツ)_/¯
     bool? createTextController,
     ValueTransform<T>? valueTransform,
+    bool? trackUnchanged,
   }) {
     return GladeInput(
       value: value ?? this.value,
@@ -512,7 +502,41 @@ class GladeInput<T> extends ChangeNotifier {
       onChange: onChange ?? this.onChange,
       textEditingController: textEditingController ?? this._textEditingController,
       valueTransform: valueTransform ?? this.valueTransform,
+      trackUnchanged: trackUnchanged ?? this.trackUnchanged,
     );
+  }
+
+  void _setValue(T value, {required bool shouldTriggerOnChange}) {
+    _previousValue = _value;
+
+    _value = valueTransform(value);
+
+    final strValue = stringValue;
+    // synchronize text controller with value
+    _textEditingController?.value = TextEditingValue(
+      text: strValue,
+      selection: _textEditingController?.selection ?? const TextSelection.collapsed(offset: -1),
+    );
+
+    _isPure = false;
+    __conversionError = null;
+
+    // propagate input's changes
+    if (shouldTriggerOnChange) {
+      onChange?.call(
+        ChangesInfo(
+          previousValue: _previousValue,
+          value: value,
+          initialValue: initialValue,
+          validatorResult: validate(),
+        ),
+        dependenciesFactory(),
+      );
+    }
+
+    _bindedModel?.notifyInputUpdated(this);
+
+    notifyListeners();
   }
 
   /// Translates input's errors (validation or conversion).
