@@ -450,6 +450,17 @@ class GladeInput<T> extends ChangeNotifier {
   void updateValue(T value, {bool shouldTriggerOnChange = true}) =>
       _setValue(value, shouldTriggerOnChange: shouldTriggerOnChange);
 
+  /// Used as shorthand for field setter.
+  ///
+  /// If `T` is non-nullable type and provided value is `null`, update is **not invoked**.
+  ///
+  /// When [shouldTriggerOnChange] is set to false, the `onChange` callback will not be called.
+  void updateValueWhenNotNull(T? value, {bool shouldTriggerOnChange = true}) {
+    if (value == null) return;
+
+    return _setValue(value, shouldTriggerOnChange: shouldTriggerOnChange);
+  }
+
   /// Resets input into pure state.
   ///
   /// Allows to sets new initialValue and value if needed.

@@ -1,3 +1,6 @@
+## 1.5.0
+- **[Feat]**: Add `updateWhenNotNull` to support shorthand syntax for Widgets with nullable type parameter.
+
 ## 1.4.0
 - **[Feat]**: Support non-data-holding inputs to enable "view" inputs.
 - **[Feat]**: Add the `shouldTriggerOnChange` parameter to `updateValue` so one can opt-out from `onChange` callback being triggered.
