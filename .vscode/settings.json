@@ -1,4 +1,5 @@
 {
-    "dart.flutterSdkPath": ".fvm/flutter_sdk",
-    "dart.lineLength": 120,
+  "dart.flutterSdkPath": ".fvm\\versions\\3.13.3",
+  "dart.lineLength": 120,
+  "yaml.schemaStore.enable": false
 }

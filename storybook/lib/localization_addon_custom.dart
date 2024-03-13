@@ -39,7 +39,7 @@ class LocalizationAddonCustom extends WidgetbookAddon<Locale> {
         ),
         // ignore: avoid-unsafe-collection-methods, the locales are set programmatically and should have at least one element
         initialLocale = initialLocale ?? locales.first,
-        super(name: 'Locale');
+        super(name: 'Locale', initialSetting: initialLocale!);
 
   @override
   Locale valueFromQueryGroup(Map<String, String> group) {

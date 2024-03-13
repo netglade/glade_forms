@@ -11,6 +11,12 @@ typedef ValidateFunction<T> = GladeValidatorError<T>? Function(
   Object? extra,
 });
 
+typedef ValidateFunctionAsync<T> = Future<GladeValidatorError<T>?> Function(
+  T value, {
+  required InputDependencies dependencies,
+  Object? extra,
+});
+
 class GladeValidator<T> {
   List<InputValidatorPart<T>> parts = [];
 
@@ -31,6 +37,14 @@ class GladeValidator<T> {
     InputDependencies dependencies = const [],
   }) =>
       parts.add(CustomValidationPart(customValidator: onValidate, key: key, dependencies: dependencies));
+
+  /// Checks value with custom validation function.
+  void customAsync(
+    ValidateFunctionAsync<T> onValidate, {
+    Object? key,
+    InputDependencies dependencies = const [],
+  }) =>
+      parts.add(CustomValidationPartAsync(customValidator: onValidate, key: key, dependencies: dependencies));
 
   /// Checks value through custom validator [part].
   void customPart(InputValidatorPart<T> part) => parts.add(part);
@@ -57,6 +71,24 @@ class GladeValidator<T> {
   }) =>
       parts.add(
         SatisfyPredicatePart(
+          predicate: predicate,
+          devError: devError ?? (value, _) => 'Value ${value ?? 'NULL'} does not satisfy given predicate.',
+          extra: extra,
+          dependencies: dependencies,
+          key: key,
+        ),
+      );
+
+  /// Value must satisfy given [predicate]. Returns [ValueSatisfyPredicateError].
+  void satisfyAsync(
+    SatisfyPredicateAsync<T> predicate, {
+    OnValidateError<T>? devError,
+    InputDependencies dependencies = const [],
+    Object? extra,
+    Object? key,
+  }) =>
+      parts.add(
+        SatisfyPredicatePartAsync(
           predicate: predicate,
           devError: devError ?? (value, _) => 'Value ${value ?? 'NULL'} does not satisfy given predicate.',
           extra: extra,

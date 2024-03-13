@@ -1,7 +1,8 @@
-import 'package:glade_forms/src/model/model.dart';
+import 'package:glade_forms/src/core/glade_input.dart';
+import 'package:glade_forms/src/model/glade_model_base.dart';
 import 'package:meta/meta.dart';
 
-abstract class GladeModel extends GladeModelBase {
+abstract class GladeModel extends GladeModelBase<GladeInput<Object?>> {
   GladeModel() {
     initialize();
   }

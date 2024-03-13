@@ -14,4 +14,10 @@ abstract class InputValidatorPart<T> {
     required Object? extra,
     InputDependencies dependencies = const [],
   });
+
+  Future<GladeValidatorError<T>?> validateAsync(
+    T value, {
+    required Object? extra,
+    InputDependencies dependencies = const [],
+  });
 }

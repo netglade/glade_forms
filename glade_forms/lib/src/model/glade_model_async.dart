@@ -1,9 +1,11 @@
 import 'dart:async';
 
+import 'package:glade_forms/src/core/glade_input_base.dart';
 import 'package:glade_forms/src/model/model.dart';
 import 'package:meta/meta.dart';
 
-abstract class GladeModelAsync extends GladeModelBase {
+/// Async version of GladeModel.
+abstract class GladeModelAsync extends GladeModelBase<GladeInputBase<Object?>> {
   GladeModelAsync() {
     unawaited(initializeAsync());
   }

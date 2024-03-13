@@ -8,12 +8,12 @@ Future<String> _fetchName() {
 
 class _Model extends GladeModelAsync {
   late StringInput name;
-  late GladeInput<int> age;
+  late AsyncGladeInput<int> age;
   late StringInput email;
-  late GladeInput<bool> vip;
+  late AsyncGladeInput<bool> vip;
 
   @override
-  List<GladeInput<Object?>> get inputs => [name, age, email, vip];
+  List<GladeInputBase<Object?>> get inputs => [name, age, email, vip];
 
   _Model();
 
@@ -22,22 +22,13 @@ class _Model extends GladeModelAsync {
     final nameValue = await _fetchName();
 
     name = GladeInput.stringInput(inputKey: 'name', value: nameValue);
-    age = GladeInput.intInput(value: 0, inputKey: 'age');
+    age = AsyncGladeInput.intInput(value: 0, inputKey: 'age');
     email = GladeInput.stringInput(validator: (validator) => (validator..isEmail()).build(), inputKey: 'email');
-    vip = GladeInput.create(
+    vip = AsyncGladeInput.create(
       validator: (v) => (v..notNull()).build(),
       value: false,
       inputKey: 'vip',
       dependencies: () => [name],
-      onChangeAsync: (info, dependencies) async {
-        final nameInput = dependencies.byKey<String?>('name');
-
-        final fetchedName = await _fetchName();
-
-        groupEdit(() {
-          nameInput.value = fetchedName;
-        });
-      },
     );
 
     await super.initializeAsync();
@@ -69,7 +60,7 @@ class QuickStartAsyncExample extends StatelessWidget {
                 ),
                 TextFormField(
                   controller: model.age.controller,
-                  validator: model.age.textFormFieldInputValidator,
+                  //  validator: model.age.textFormFieldInputValidator, //TODO
                   onChanged: model.age.updateValueWithString,
                   decoration: const InputDecoration(labelText: 'Age'),
                   readOnly: model.isChanging,
@@ -89,7 +80,7 @@ class QuickStartAsyncExample extends StatelessWidget {
                       if (model.isChanging) const Text('isChanging', style: TextStyle(color: Colors.red)),
                     ],
                   ),
-                  onChanged: (v) => model.vip.value = v ?? false,
+                  onChanged: (v) => model.vip.updateValueAsync(v ?? false),
                 ),
                 const SizedBox(height: 10),
                 ElevatedButton(

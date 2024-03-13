@@ -4,8 +4,8 @@ import 'package:meta/meta.dart';
 
 typedef OnEdit = void Function();
 
-abstract class GladeModelBase extends ChangeNotifier {
-  List<GladeInput<Object?>> _lastUpdates = [];
+abstract class GladeModelBase<TINPUT extends GladeInputBase<Object?>> extends ChangeNotifier {
+  List<TINPUT> _lastUpdates = [];
   bool _groupEdit = false;
   bool _isInitialized = false;
 
@@ -23,7 +23,7 @@ abstract class GladeModelBase extends ChangeNotifier {
 
   bool get isChanging => inputs.any((input) => input.isChanging);
 
-  List<GladeInput<Object?>> get inputs;
+  List<TINPUT> get inputs;
 
   List<String> get lastUpdatedInputKeys => _lastUpdates.map((e) => e.inputKey).toList();
 
@@ -68,17 +68,17 @@ abstract class GladeModelBase extends ChangeNotifier {
   }
 
   /// Updates model's input value.
-  void updateInput<INPUT extends GladeInput<T?>, T>(INPUT input, T value) {
+  void updateInput<INPUT extends TINPUT, T>(INPUT input, T value) {
     if (input.value == value) return;
 
     _lastUpdates = [input];
 
-    input.value = value;
+    input.updateValue(value);
     notifyListeners();
   }
 
   @internal
-  void notifyInputUpdated(GladeInput<Object?> input) {
+  void notifyInputUpdated(TINPUT input) {
     if (_groupEdit) {
       _lastUpdates.add(input);
     } else {
