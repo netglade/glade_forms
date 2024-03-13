@@ -113,7 +113,8 @@ class GladeModelDebugInfo extends StatelessWidget {
                 TableRow(
                   children: [
                     Center(child: Text(x.inputKey)),
-                    if (showIsUnchanged) Center(child: Text(x.isUnchanged.toString())),
+                    if (showIsUnchanged)
+                      Center(child: Text(x.trackUnchanged ? '${x.isUnchanged}' : '(${x.isUnchanged})')),
                     if (showIsValid) Center(child: Text(x.isValid.toString())),
                     if (showValidationError) Center(child: Text(x.errorFormatted())),
                     if (showConversionError) Center(child: Text(x.hasConversionError.toString())),
