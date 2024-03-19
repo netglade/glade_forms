@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart';
 import 'package:glade_forms/src/converters/glade_type_converters.dart';
 import 'package:glade_forms/src/core/changes_info.dart';
@@ -19,9 +20,10 @@ typedef StringValidatorFactory = ValidatorInstance<String> Function(StringValida
 typedef OnChange<T> = void Function(ChangesInfo<T> info, InputDependencies dependencies);
 typedef ValueTransform<T> = T Function(T input);
 
-typedef StringInput = GladeInput<String?>;
+typedef StringInput = GladeInput<String>;
 
 T _defaultTransform<T>(T input) => input;
+Type _typeOf<T>() => T;
 
 class GladeInput<T> extends ChangeNotifier {
   /// Compares initial and current value.
@@ -98,7 +100,7 @@ class GladeInput<T> extends ChangeNotifier {
   /// [value] is equal to [initialValue].
   ///
   /// Can be dirty or pure.
-  bool get isUnchanged => valueComparator?.call(initialValue, value) ?? (value == initialValue);
+  bool get isUnchanged => valueComparator?.call(initialValue, value) ?? _valueEqualsToInitialValue;
 
   /// Input does not have conversion error nor validation error.
   bool get isValid => !hasConversionError && _validator(value).isValid;
@@ -109,6 +111,14 @@ class GladeInput<T> extends ChangeNotifier {
 
   /// String representattion of [value].
   String get stringValue => stringTovalueConverter?.convertBack(value) ?? value.toString();
+
+  bool get _valueEqualsToInitialValue {
+    if (identical(value, initialValue)) return true;
+
+    if (value is Iterable || value is Map) return const DeepCollectionEquality().equals(value, initialValue);
+
+    return value == initialValue;
+  }
 
   set value(T value) => _setValue(value, shouldTriggerOnChange: true);
 
@@ -210,7 +220,7 @@ class GladeInput<T> extends ChangeNotifier {
   ///
   /// In case of need of any validation use [GladeInput.create] directly.
   factory GladeInput.optional({
-    required T value,
+    T? value,
     T? initialValue,
     String? inputKey,
     bool pure = true,
@@ -297,7 +307,7 @@ class GladeInput<T> extends ChangeNotifier {
   }) =>
       GladeInput.create(
         value: value,
-        initialValue: initialValue,
+        initialValue: initialValue ?? value,
         validator: validator,
         pure: pure,
         translateError: translateError,
@@ -329,7 +339,7 @@ class GladeInput<T> extends ChangeNotifier {
   }) =>
       GladeInput.create(
         value: value,
-        initialValue: initialValue,
+        initialValue: initialValue ?? value,
         validator: validator,
         pure: pure,
         translateError: translateError,
@@ -359,6 +369,7 @@ class GladeInput<T> extends ChangeNotifier {
     bool isRequired = true,
     ValueTransform<String>? valueTransform,
     ValueComparator<String>? valueComparator,
+    bool trackUnchanged = true,
   }) {
     final requiredInstance = validator?.call(StringValidator()..notEmpty()) ?? (StringValidator()..notEmpty()).build();
     final optionalInstance = validator?.call(StringValidator()) ?? StringValidator().build();
@@ -378,6 +389,7 @@ class GladeInput<T> extends ChangeNotifier {
       valueComparator: valueComparator,
       stringTovalueConverter: null,
       valueTransform: valueTransform,
+      trackUnchanged: trackUnchanged,
     );
   }
 
@@ -385,11 +397,11 @@ class GladeInput<T> extends ChangeNotifier {
 
   String? translate({String delimiter = '.'}) => _translate(delimiter: delimiter, customError: validatorResult);
 
-  String errorFormatted({String delimiter = '|'}) {
+  String errorFormatted() {
     // ignore: avoid-non-null-assertion, it is not null
     if (hasConversionError) return _translateConversionError(__conversionError!);
 
-    return validatorResult.isInvalid ? validatorResult.errors.map((e) => e.toString()).join(delimiter) : '';
+    return validatorResult.isInvalid ? translate() ?? '' : '';
   }
 
   /// Shorthand validator for TextFieldForm inputs.
@@ -601,7 +613,8 @@ class GladeInput<T> extends ChangeNotifier {
     }
 
     return inputErrors.errors.map((e) {
-      if (defaultTranslationsTmp != null && (e.isNullError || e.hasStringEmptyOrNullErrorKey)) {
+      if (defaultTranslationsTmp != null &&
+          (e.isNullError || e.hasStringEmptyOrNullErrorKey || e.hasNullValueOrEmptyValueKey)) {
         return defaultTranslationsTmp.defaultValueIsNullOrEmptyMessage ?? e.toString();
       }
 

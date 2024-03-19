@@ -14,6 +14,7 @@ abstract class GladeInputError<T> {
   bool get isNullError => this is ValueNullError<T>;
 
   bool get hasStringEmptyOrNullErrorKey => key == GladeErrorKeys.stringEmpty;
+  bool get hasNullValueOrEmptyValueKey => key == GladeErrorKeys.valueIsNull || key == GladeErrorKeys.valueIsEmpty;
 
   const GladeInputError({this.key});
 }
