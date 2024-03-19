@@ -36,7 +36,7 @@ void main() async {
 }
 
 class _DebugModelApp extends StatelessWidget {
-  const _DebugModelApp({super.key});
+  const _DebugModelApp();
 
   @override
   Widget build(BuildContext context) {

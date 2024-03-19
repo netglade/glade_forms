@@ -1,3 +1,5 @@
+// ignore_for_file: prefer-match-file-name
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:glade_forms/glade_forms.dart';
@@ -102,9 +104,8 @@ class DebugModelExample extends StatelessWidget {
                 Builder(
                   builder: (context) {
                     return TextButton(
-                      onPressed: () {
-                        GladeModelDebugInfoModal.showDebugInfoModel(context, context.read<AgeRestrictedModel>());
-                      },
+                      onPressed: () =>
+                          GladeModelDebugInfoModal.showDebugInfoModel(context, context.read<AgeRestrictedModel>()),
                       child: const Text('Debug modal'),
                     );
                   },

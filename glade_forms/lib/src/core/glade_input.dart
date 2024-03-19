@@ -23,7 +23,6 @@ typedef ValueTransform<T> = T Function(T input);
 typedef StringInput = GladeInput<String>;
 
 T _defaultTransform<T>(T input) => input;
-Type _typeOf<T>() => T;
 
 class GladeInput<T> extends ChangeNotifier {
   /// Compares initial and current value.

@@ -73,8 +73,9 @@ class GladeModelDebugInfo<M extends GladeModel> extends StatelessWidget {
                   ),
                   const Spacer(),
                   IconButton(
+                    // ignore: prefer-extracting-callbacks, its ok.
                     onPressed: () {
-                      showDialog(
+                      final _ = showDialog<void>(
                         context: context,
                         builder: (context) => const AlertDialog(
                           content: Column(
@@ -170,7 +171,6 @@ class _Table extends StatelessWidget {
     required this.showInitialValue,
     required this.model,
     required this.hiddenKeys,
-    super.key,
   });
 
   @override
@@ -206,9 +206,7 @@ class _Table extends StatelessWidget {
               if (showIsValid) _RowValue(value: x.isValid),
               if (showValidationError) _RowValue(value: x.errorFormatted()),
               if (showConversionError) _RowValue(value: x.hasConversionError),
-              // ignore: avoid-nullable-tostring, this is ok
               if (showValue) _RowValue(value: x.value),
-              // ignore: avoid-nullable-tostring, this is ok
               if (showInitialValue) _RowValue(value: x.initialValue),
             ],
           ),
@@ -221,7 +219,7 @@ class _Table extends StatelessWidget {
 class _ColumnHeader extends StatelessWidget {
   final String label;
 
-  const _ColumnHeader(this.label, {super.key});
+  const _ColumnHeader(this.label);
 
   @override
   Widget build(BuildContext context) {
@@ -230,12 +228,13 @@ class _ColumnHeader extends StatelessWidget {
 }
 
 class _RowValue extends StatelessWidget {
+  // ignore: no-object-declaration, can be any value.
   final Object? value;
   final bool tracked;
   final bool wrap;
   final bool center;
 
-  const _RowValue({required this.value, super.key, this.wrap = false, this.tracked = true, this.center = true});
+  const _RowValue({required this.value, this.wrap = false, this.tracked = true, this.center = true});
 
   @override
   Widget build(BuildContext context) {
@@ -266,7 +265,7 @@ class _BoolIcon extends StatelessWidget {
   final bool value;
   final bool colorize;
 
-  const _BoolIcon({required this.value, super.key, this.colorize = true});
+  const _BoolIcon({required this.value, this.colorize = true});
 
   @override
   Widget build(BuildContext context) {

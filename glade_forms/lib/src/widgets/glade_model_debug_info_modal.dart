@@ -10,6 +10,7 @@ class GladeModelDebugInfoModal {
       context: context,
       builder: (builderContext) => GladeModelProvider.value(
         value: model,
+        // ignore: no-empty-block, empty is ok.
         child: BottomSheet(onClosing: () {}, builder: (context) => const GladeModelDebugInfo()),
       ),
     );

@@ -24,7 +24,8 @@ abstract class GladeValidatorError<T> extends GladeInputError<T> with EquatableM
 
   @override
   List<Object?> get props =>
-      [value, devError, extra, key, error, isConversionError, isNullError, hasStringEmptyOrNullErrorKey];
+      // ignore: list-all-equatable-fields, wait for DCM update
+      [value, devError, extra, key, error, isConversionError, isNullError];
 
   GladeValidatorError({
     required this.value,

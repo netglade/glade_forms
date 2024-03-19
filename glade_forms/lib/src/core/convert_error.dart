@@ -14,13 +14,9 @@ class ConvertError<T> extends GladeInputError<T> with EquatableMixin implements 
   final Object? _convertError;
 
   @override
-  List<Object?> get props => [
-        input,
-        devError,
-        error,
-        key,
-        _convertError
-      ];
+  // TODO(dcm): wait for DCM update.
+  // ignore: list-all-equatable-fields, wait for DCM update
+  List<Object?> get props => [input, devError, error, key, _convertError];
 
   String get targetType => T.runtimeType.toString();
 
