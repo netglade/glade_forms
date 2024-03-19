@@ -18,6 +18,7 @@ typedef ErrorTranslator<T> = String Function(
 );
 
 class DefaultTranslations {
+  /// Used when one of values `GladeErrorKeys.valueIsEmpty`,`GladeErrorKeys.valueIsNull`, `GladeErrorKeys.stringEmpty` is present.
   final String? defaultValueIsNullOrEmptyMessage;
   final String? defaultConversionMessage;
 

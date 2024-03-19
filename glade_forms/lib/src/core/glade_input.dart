@@ -100,7 +100,7 @@ class GladeInput<T> extends ChangeNotifier {
   /// [value] is equal to [initialValue].
   ///
   /// Can be dirty or pure.
-  bool get isUnchanged => valueComparator?.call(initialValue, value) ?? _valueEqualsToInitialValue;
+  bool get isUnchanged => valueComparator?.call(initialValue, value) ?? _valueIsSameAsInitialValue;
 
   /// Input does not have conversion error nor validation error.
   bool get isValid => !hasConversionError && _validator(value).isValid;
@@ -112,10 +112,12 @@ class GladeInput<T> extends ChangeNotifier {
   /// String representattion of [value].
   String get stringValue => stringTovalueConverter?.convertBack(value) ?? value.toString();
 
-  bool get _valueEqualsToInitialValue {
+  bool get _valueIsSameAsInitialValue {
     if (identical(value, initialValue)) return true;
 
-    if (value is Iterable || value is Map) return const DeepCollectionEquality().equals(value, initialValue);
+    if (value is List || value is Map || value is Set) {
+      return const DeepCollectionEquality().equals(value, initialValue);
+    }
 
     return value == initialValue;
   }
@@ -236,7 +238,7 @@ class GladeInput<T> extends ChangeNotifier {
   }) =>
       GladeInput.create(
         validator: (v) => v.build(),
-        value: value,
+        value: value ?? initialValue,
         initialValue: initialValue,
         translateError: translateError,
         valueComparator: valueComparator,
@@ -401,7 +403,7 @@ class GladeInput<T> extends ChangeNotifier {
     // ignore: avoid-non-null-assertion, it is not null
     if (hasConversionError) return _translateConversionError(__conversionError!);
 
-    return validatorResult.isInvalid ? translate() ?? '' : '';
+    return validatorResult.isInvalid ? _translate() ?? '' : '';
   }
 
   /// Shorthand validator for TextFieldForm inputs.

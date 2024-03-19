@@ -16,7 +16,14 @@ abstract class GladeModel extends ChangeNotifier {
 
   bool get isDirty => !isPure;
 
+  /// Currently tracked inputs by GladeModel.
+  ///
+  /// Be aware that on initialize() these input are binded to model. Later included inputs are not automatically binded.
+  ///
+  /// Either use allInputs getter to list all possible model's input or use [bindToModel] method to manually bind input.
   List<GladeInput<Object?>> get inputs;
+
+  List<GladeInput<Object?>> get allInputs => inputs;
 
   List<String> get lastUpdatedInputKeys => _lastUpdates.map((e) => e.inputKey).toList();
 
@@ -60,10 +67,12 @@ abstract class GladeModel extends ChangeNotifier {
       'Model contains inputs with duplicated key!',
     );
 
-    for (final input in inputs) {
+    for (final input in allInputs) {
       input.bindToModel(this);
     }
   }
+
+  void bindToModel(GladeInput<Object?> input) => input.bindToModel(this);
 
   /// Updates model's input with String? value using its converter.
   void stringFieldUpdateInput<INPUT extends GladeInput<Object?>>(INPUT input, String? value) {
