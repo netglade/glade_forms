@@ -1,3 +1,8 @@
+## 1.6.0
+- **Improvement**: GladeModelDebugInfo is more colorfull and polished.
+- **Improvement**: Support deep collection equality when comparing `value` and `initialValue`.
+- **[Feat]**: `allInputs` getter to support "dynamic" model's inputs validation.
+
 ## 1.5.0
 - **[Feat]**: Add `updateWhenNotNull` to support shorthand syntax for Widgets with nullable type parameter.
 

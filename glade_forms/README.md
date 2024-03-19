@@ -22,11 +22,13 @@ A universal way to define form validators with support of translations.
   - [Validation](#validation)
     - [Using validators without GladeInput](#using-validators-without-gladeinput)
   - [GladeModel](#glademodel)
+    - [Inputs](#inputs)
     - [Flutter widgets](#flutter-widgets)
     - [Edit multiple inputs at once](#edit-multiple-inputs-at-once)
-  - [Dependencies](#dependencies)
+  - [Dependencies (WIP)](#dependencies-wip)
   - [Controlling other inputs](#controlling-other-inputs)
   - [Translation](#translation)
+    - [Default translations](#default-translations)
   - [Converters](#converters)
   - [Debugging](#debugging)
 - [👏 Contributing](#-contributing)
@@ -133,6 +135,7 @@ On each input we can define
  - **valueTransform** - transform `T` value into different `T` value. An example of usage can be sanitazation of string input (trim(),...).
  - **defaultTranslation** - If error's translations are simple, the default translation settings can be set instead of custom `translateError` method.
  - **textEditingController** - It is possible to provide custom instance of controller instead of default one.
+ - **trackUnchanged** - If false GladeModel will not account with input in `isUnchanged` property.
 
 Most of the time, input is created with `.create()` factory with defined validation, translation and other properties.
 
@@ -206,6 +209,13 @@ and properties such as `isValid` or `formattedErrors` will not work.
  
 For updating input call either `updateValueWithString(String?)` to update `T` value with string (will be converted if needed) or set `value` directly (via setter).
 
+#### Inputs
+Each GladeModel consists of several `inputs`. Sometimes it can be handy to dynamically include/exclude individual inputs from model, for example when some input is not always visible and therefore doesnt need validation. 
+
+In that case override `allInputs` getter to list all inputs within GladeModel. Use `inputs`  getter for dynamic behavior.
+
+By default `allInputs` equals to `inputs`.
+
 #### Flutter widgets
 
 `GladeModelProvider` is predefined widget to provide `GladeModel` to widget's subtreee.
@@ -240,7 +250,9 @@ class FormModel extends GladeModel {
 
 After that listener will contain `lastUpdatedKeys` with keys of `age` and `name` inputs.
 
-### Dependencies
+### Dependencies (WIP)
+**NOTICE** - in future versions, dependencies will be used only for dependent listenner. Use your variables directly without need to lookup dependencies.
+
 Input can have dependencies on other inputs to allow dependent validation. Define input's dependencies with `dependencies`.
 
 `inputKey` must be specified on inputs to be used as dependencies. 
@@ -333,6 +345,11 @@ translateError: (error, key, devMessage, {required dependencies}) {
 }
 ```
 
+Predefined validators and GladeInput variants defines error keys. Those keys can be found in `GladeErrorKeys` as static constants. Use them within translation. 
+
+#### Default translations
+Use `defaultTranslation` to provide default translations for common error such as `nullValue` or  `emptyValue`. 
+
 ![translation-example](https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/doc/translation.gif)
 
 ### Converters
@@ -345,10 +362,10 @@ GladeForms provides some predefined converters such as `IntConverter` and more. 
 
 There are some getters and methods on GladeInput / GladeModel which can be used for debugging. 
 
-Use `model.formattedValidationErrors` to get all input's error formatted for simple debugging. 
+Use `model.formattedValidationErrorsDebug` to get all input's error formatted for simple debugging. 
 
 There is also `GladeModelDebugInfo` widget which displays table of all model's inputs 
-and their properties such as `isValid` or `validation error`.
+and their properties such as `isValid`, `validation error` or current `value`. Widget is customizable, see its properties for more info.
 
 ![GladeModelDebugInfo](https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/doc/glade-model-debug.png)
 

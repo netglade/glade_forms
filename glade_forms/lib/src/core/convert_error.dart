@@ -19,11 +19,7 @@ class ConvertError<T> extends GladeInputError<T> with EquatableMixin implements 
         devError,
         error,
         key,
-        _convertError,
-        isConversionError,
-        isNullError,
-        hasStringEmptyOrNullErrorKey,
-        hasEmptyOrNullErrorKey,
+        _convertError
       ];
 
   String get targetType => T.runtimeType.toString();

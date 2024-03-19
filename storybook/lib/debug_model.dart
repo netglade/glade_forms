@@ -134,8 +134,7 @@ class DebugModelExample extends StatelessWidget {
                     child: const Text('Save'),
                   ),
                 ),
-                GladeModelDebugInfo(
-                  model: formModel,
+                const GladeModelDebugInfo<AgeRestrictedModel>(
                   showValue: true,
                   showInitialValue: true,
                 ),
