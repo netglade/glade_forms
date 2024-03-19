@@ -1,10 +1,8 @@
-// ignore_for_file: prefer-match-file-name, avoid-passing-self-as-argument
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:glade_forms/glade_forms.dart';
 import 'package:glade_forms_storybook/generated/locale_keys.g.dart';
-import 'package:glade_forms_storybook/shared/usecase_container.dart';
+import 'package:provider/provider.dart';
 
 class _ErrorKeys {
   static const String ageRestriction = 'age-restriction';
@@ -12,11 +10,12 @@ class _ErrorKeys {
 
 class AgeRestrictedModel extends GladeModel {
   late StringInput nameInput;
+  late StringInput fooInput;
   late GladeInput<int> ageInput;
   late GladeInput<bool> vipInput;
 
   @override
-  List<GladeInput<Object?>> get inputs => [nameInput, ageInput, vipInput];
+  List<GladeInput<Object?>> get inputs => [nameInput, fooInput, ageInput, vipInput];
 
   @override
   void initialize() {
@@ -25,6 +24,13 @@ class AgeRestrictedModel extends GladeModel {
       defaultTranslations: DefaultTranslations(
         defaultValueIsNullOrEmptyMessage: LocaleKeys.empty.tr(),
       ),
+    );
+    fooInput = GladeInput.stringInput(
+      inputKey: 'foo-input',
+      defaultTranslations: DefaultTranslations(
+        defaultValueIsNullOrEmptyMessage: LocaleKeys.empty.tr(),
+      ),
+      trackUnchanged: false,
     );
     ageInput = GladeInput.create(
       validator: (v) => (v
@@ -78,22 +84,13 @@ class AgeRestrictedModel extends GladeModel {
   }
 }
 
-class TwoWayCheckboxExample extends StatelessWidget {
-  const TwoWayCheckboxExample({super.key});
+class DebugModelExample extends StatelessWidget {
+  const DebugModelExample({super.key});
 
   @override
   Widget build(BuildContext context) {
-    const markdownData = '''
-If *VIP content* is checked, **age** must be over 18 or it is changed to 18.
-
-If *age* is changed to value under 18, *vip content* is unchecked and vice-versa.
- ''';
-
-    return UsecaseContainer(
-      shortDescription: "Age input depends on checkbox's value automatically",
-      description: markdownData,
-      className: 'two_way_checkbox_change.dart',
-      child: GladeFormBuilder.create(
+    return Scaffold(
+      body: GladeFormBuilder.create(
         // ignore: avoid-undisposed-instances, handled by GladeFormBuilder
         create: (context) => AgeRestrictedModel(),
         builder: (context, formModel, _) => Padding(
@@ -102,6 +99,16 @@ If *age* is changed to value under 18, *vip content* is unchecked and vice-versa
             autovalidateMode: AutovalidateMode.always,
             child: ListView(
               children: [
+                Builder(
+                  builder: (context) {
+                    return TextButton(
+                      onPressed: () {
+                        GladeModelDebugInfoModal.showDebugInfoModel(context, context.read<AgeRestrictedModel>());
+                      },
+                      child: const Text('Debug modal'),
+                    );
+                  },
+                ),
                 TextFormField(
                   controller: formModel.nameInput.controller,
                   decoration: const InputDecoration(labelText: 'Name'),

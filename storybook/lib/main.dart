@@ -2,6 +2,7 @@
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:glade_forms_storybook/debug_model.dart';
 import 'package:glade_forms_storybook/generated/locale_loader.g.dart';
 import 'package:glade_forms_storybook/localization_addon_custom.dart';
 import 'package:glade_forms_storybook/usecases/complex_object_mapping_example.dart';
@@ -17,6 +18,12 @@ void main() async {
   final _ = WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
 
+  const debugModel = String.fromEnvironment('DEBUG_MODEL', defaultValue: 'false') == 'true';
+
+  if (debugModel) {
+    return runApp(const _DebugModelApp());
+  }
+
   runApp(
     EasyLocalization(
       supportedLocales: const [Locale('en', 'US'), Locale('cs', 'CZ')],
@@ -26,6 +33,15 @@ void main() async {
       child: const App(),
     ),
   );
+}
+
+class _DebugModelApp extends StatelessWidget {
+  const _DebugModelApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(home: DebugModelExample());
+  }
 }
 
 class App extends StatelessWidget {
