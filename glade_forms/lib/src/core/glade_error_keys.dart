@@ -8,4 +8,5 @@ class GladeErrorKeys {
   static const String stringMaxLength = 'string-max-length';
   static const String stringExactLength = 'string-exact-length';
   static const String valueIsNull = 'value-is-null';
+  static const String valueIsEmpty = 'value-is-empty';
 }

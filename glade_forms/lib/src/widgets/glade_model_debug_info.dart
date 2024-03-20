@@ -1,10 +1,10 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:glade_forms/src/model/glade_model.dart';
+import 'package:glade_forms/src/widgets/glade_form_builder.dart';
 
 /// Provides debug table displaying model's inputs and validation errors.
-class GladeModelDebugInfo extends StatelessWidget {
-  final GladeModel model;
-
+class GladeModelDebugInfo<M extends GladeModel> extends StatelessWidget {
   final bool showIsUnchanged;
   final bool showIsValid;
   final bool showValidationError;
@@ -12,8 +12,12 @@ class GladeModelDebugInfo extends StatelessWidget {
   final bool showValue;
   final bool showInitialValue;
 
+  /// Inputs (defined by key) which are hidden from listing.
+  final List<String> hiddenKeys;
+
+  final bool scrollable;
+
   const GladeModelDebugInfo({
-    required this.model,
     super.key,
     this.showIsUnchanged = true,
     this.showIsValid = true,
@@ -21,10 +25,11 @@ class GladeModelDebugInfo extends StatelessWidget {
     this.showConversionError = true,
     this.showValue = false,
     this.showInitialValue = false,
+    this.hiddenKeys = const [],
+    this.scrollable = true,
   });
 
   const GladeModelDebugInfo.clean({
-    required this.model,
     super.key,
     this.showIsUnchanged = false,
     this.showIsValid = false,
@@ -32,103 +37,243 @@ class GladeModelDebugInfo extends StatelessWidget {
     this.showConversionError = false,
     this.showValue = false,
     this.showInitialValue = false,
+    this.hiddenKeys = const [],
+    this.scrollable = true,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const _DangerStrips(color1: Colors.black, color2: Colors.red, gap: 5),
-          Text('Model isValid: ${model.isValid}'),
-          Text('Model isUnchanged: ${model.isUnchanged}'),
-          const SizedBox(height: 20),
-
-          // Table.
-          Table(
-            border: TableBorder.symmetric(outside: const BorderSide()),
+    return GladeFormBuilder<M>(
+      builder: (context, model, _) {
+        return Padding(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Main header.
-              TableRow(
-                decoration: const BoxDecoration(color: Colors.black12),
+              const _DangerStrips(color1: Colors.black, color2: Colors.red, gap: 5),
+              // Table.
+              Row(
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.all(8),
-                    child: Text('Debug model info'),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Text('IsValid:'),
+                          _BoolIcon(value: model.isValid),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          const Text('isUnchanged:'),
+                          _BoolIcon(value: model.isUnchanged),
+                        ],
+                      ),
+                    ],
                   ),
-                  if (showIsUnchanged)
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Text('IsUnchanged: ${model.isUnchanged}'),
-                      ),
-                    ),
-                  if (showIsValid)
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Text('IsValid: ${model.isValid}'),
-                      ),
-                    ),
-                  if (showValidationError) const SizedBox(),
-                  if (showConversionError) const SizedBox(),
-                  if (showValue) const SizedBox(),
-                  if (showInitialValue) const SizedBox(),
+                  const Spacer(),
+                  IconButton(
+                    // ignore: prefer-extracting-callbacks, its ok.
+                    onPressed: () {
+                      final _ = showDialog<void>(
+                        context: context,
+                        builder: (context) => const AlertDialog(
+                          content: Column(
+                            children: [
+                              Text("Each column's value has tooltip. Use it to display full value."),
+                              Text('Bool values with black color mark untracked values within model.'),
+                              Row(
+                                children: [
+                                  Icon(Icons.check, color: Colors.green),
+                                  Text('True value, tracked'),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Icon(Icons.close, color: Colors.red),
+                                  Text('False value, tracked'),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Icon(Icons.check, color: Colors.black),
+                                  Icon(Icons.close, color: Colors.black),
+                                  Text('True/False untracked'),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.help),
+                  ),
                 ],
               ),
 
-              // Inputs info note header.
-              TableRow(
-                decoration: const BoxDecoration(color: Colors.black12),
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.all(8),
-                    child: Text('Inputs info'),
-                  ),
-                  if (showIsUnchanged) const SizedBox(),
-                  if (showIsValid) const SizedBox(),
-                  if (showValidationError) const SizedBox(),
-                  if (showConversionError) const SizedBox(),
-                  if (showValue) const SizedBox(),
-                  if (showInitialValue) const SizedBox(),
-                ],
-              ),
+              const SizedBox(height: 5),
 
-              // Colums header.
-              TableRow(
-                decoration: const BoxDecoration(color: Colors.black12, border: Border(bottom: BorderSide())),
-                children: [
-                  const Center(child: Text('Input')),
-                  if (showIsUnchanged) const Center(child: Text('isUnchanged')),
-                  if (showIsValid) const Center(child: Text('isValid')),
-                  if (showValidationError) const Center(child: Text('validation error')),
-                  if (showConversionError) const Center(child: Text('Conversion error')),
-                  if (showValue) const Center(child: Text('value')),
-                  if (showInitialValue) const Center(child: Text('initialValue')),
-                ],
-              ),
-              for (final x in model.inputs)
-                TableRow(
-                  children: [
-                    Center(child: Text(x.inputKey)),
-                    if (showIsUnchanged)
-                      Center(child: Text(x.trackUnchanged ? '${x.isUnchanged}' : '(${x.isUnchanged})')),
-                    if (showIsValid) Center(child: Text(x.isValid.toString())),
-                    if (showValidationError) Center(child: Text(x.errorFormatted())),
-                    if (showConversionError) Center(child: Text(x.hasConversionError.toString())),
-                    // ignore: avoid-nullable-tostring, this is ok
-                    if (showValue) Center(child: Text(x.value.toString())),
-                    // ignore: avoid-nullable-tostring, this is ok
-                    if (showInitialValue) Center(child: Text(x.initialValue.toString())),
-                  ],
+              if (scrollable)
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: _Table(
+                    scrollable: scrollable,
+                    showIsUnchanged: showIsUnchanged,
+                    showIsValid: showIsValid,
+                    showValidationError: showValidationError,
+                    showConversionError: showConversionError,
+                    showValue: showValue,
+                    showInitialValue: showInitialValue,
+                    hiddenKeys: hiddenKeys,
+                    model: model,
+                  ),
+                )
+              else
+                _Table(
+                  scrollable: scrollable,
+                  showIsUnchanged: showIsUnchanged,
+                  showIsValid: showIsValid,
+                  showValidationError: showValidationError,
+                  showConversionError: showConversionError,
+                  showValue: showValue,
+                  showInitialValue: showInitialValue,
+                  hiddenKeys: hiddenKeys,
+                  model: model,
                 ),
+              const SizedBox(height: 10),
+              const _DangerStrips(color1: Colors.black, color2: Colors.red, gap: 5),
             ],
           ),
-          const SizedBox(height: 10),
-          const _DangerStrips(color1: Colors.black, color2: Colors.red, gap: 5),
-        ],
+        );
+      },
+    );
+  }
+}
+
+class _Table extends StatelessWidget {
+  final bool scrollable;
+  final bool showIsUnchanged;
+  final bool showIsValid;
+  final bool showValidationError;
+  final bool showConversionError;
+  final bool showValue;
+  final bool showInitialValue;
+  final GladeModel model;
+  final List<String> hiddenKeys;
+
+  const _Table({
+    required this.scrollable,
+    required this.showIsUnchanged,
+    required this.showIsValid,
+    required this.showValidationError,
+    required this.showConversionError,
+    required this.showValue,
+    required this.showInitialValue,
+    required this.model,
+    required this.hiddenKeys,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final inputs = model.inputs.where((element) => !hiddenKeys.contains(element.inputKey));
+
+    return Table(
+      defaultColumnWidth: scrollable ? const IntrinsicColumnWidth() : const FlexColumnWidth(),
+      border: TableBorder.symmetric(outside: const BorderSide()),
+      children: [
+        // Columns header.
+        TableRow(
+          decoration: const BoxDecoration(color: Colors.black12, border: Border(bottom: BorderSide())),
+          children: [
+            const _ColumnHeader('Input'),
+            if (showIsUnchanged) const _ColumnHeader('isUnchanged'),
+            if (showIsValid) const _ColumnHeader('isValid'),
+            if (showValidationError) const _ColumnHeader('Validation'),
+            if (showConversionError) const _ColumnHeader('Conversion error'),
+            if (showValue) const _ColumnHeader('value'),
+            if (showInitialValue) const _ColumnHeader('initialValue'),
+          ],
+        ),
+        ...inputs.mapIndexed(
+          (index, x) => TableRow(
+            decoration: BoxDecoration(color: index.isEven ? Colors.white : const Color.fromARGB(255, 235, 234, 234)),
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 5),
+                child: _RowValue(value: x.inputKey, wrap: true, center: false),
+              ),
+              if (showIsUnchanged) _RowValue(value: x.isUnchanged, tracked: x.trackUnchanged),
+              if (showIsValid) _RowValue(value: x.isValid),
+              if (showValidationError) _RowValue(value: x.errorFormatted()),
+              if (showConversionError) _RowValue(value: x.hasConversionError),
+              if (showValue) _RowValue(value: x.value),
+              if (showInitialValue) _RowValue(value: x.initialValue),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ColumnHeader extends StatelessWidget {
+  final String label;
+
+  const _ColumnHeader(this.label);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(padding: const EdgeInsets.only(left: 10), child: Center(child: Text(label)));
+  }
+}
+
+class _RowValue extends StatelessWidget {
+  // ignore: no-object-declaration, can be any value.
+  final Object? value;
+  final bool tracked;
+  final bool wrap;
+  final bool center;
+
+  const _RowValue({required this.value, this.wrap = false, this.tracked = true, this.center = true});
+
+  @override
+  Widget build(BuildContext context) {
+    if (value == null) return const Center(child: Text('NULL'));
+
+    if (value case final bool? x when x != null) {
+      return _BoolIcon(value: x, colorize: tracked);
+    }
+
+    return Align(
+      alignment: center ? Alignment.center : Alignment.centerLeft,
+      child: Tooltip(
+        message: value?.toString(),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 200),
+          child: Text(
+            value?.toString() ?? '',
+            softWrap: wrap,
+            overflow: wrap ? null : TextOverflow.ellipsis,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BoolIcon extends StatelessWidget {
+  final bool value;
+  final bool colorize;
+
+  const _BoolIcon({required this.value, this.colorize = true});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Icon(
+        value ? Icons.check : Icons.close,
+        size: 16,
+        color: colorize ? (value ? Colors.green : Colors.red) : null,
       ),
     );
   }

@@ -112,7 +112,7 @@ If *VIP content* is checked, **age** must be over 18.
                     child: const Text('Save'),
                   ),
                 ),
-                GladeModelDebugInfo(model: formModel),
+                const GladeModelDebugInfo<AgeRestrictedModel>(),
               ],
             ),
           ),
