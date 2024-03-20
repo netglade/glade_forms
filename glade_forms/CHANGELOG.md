@@ -1,5 +1,5 @@
 ## 1.6.0
-- **Improvement**: GladeModelDebugInfo is more colorfull and polished.
+- **Improvement**: GladeModelDebugInfo is more colorful and polished.
 - **Improvement**: Support deep collection equality when comparing `value` and `initialValue`.
 - **[Feat]**: `allInputs` getter to support "dynamic" model's inputs validation.
 
