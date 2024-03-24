@@ -95,70 +95,11 @@ class DebugModelExample extends HookWidget {
 
     return Scaffold(
       body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: textController,
-              onChanged: (v) => textController.text = v,
-            ),
-          ],
+        child: TextField(
+          controller: textController,
+          onChanged: (v) => textController.text = v,
         ),
       ),
     );
-    // return Scaffold(
-    //   body: GladeFormBuilder.create(
-    //     // ignore: avoid-undisposed-instances, handled by GladeFormBuilder
-    //     create: (context) => AgeRestrictedModel(),
-    //     builder: (context, formModel, _) => Padding(
-    //       padding: const EdgeInsets.all(8),
-    //       child: Form(
-    //         autovalidateMode: AutovalidateMode.always,
-    //         child: ListView(
-    //           children: [
-    //             Builder(
-    //               builder: (context) {
-    //                 return TextButton(
-    //                   onPressed: () =>
-    //                       GladeModelDebugInfoModal.showDebugInfoModel(context, context.read<AgeRestrictedModel>()),
-    //                   child: const Text('Debug modal'),
-    //                 );
-    //               },
-    //             ),
-    //             TextFormField(
-    //               controller: formModel.nameInput.controller,
-    //               decoration: const InputDecoration(labelText: 'Name'),
-    //               onChanged: formModel.nameInput.updateValue,
-    //               validator: formModel.nameInput.textFormFieldInputValidator,
-    //             ),
-    //             TextFormField(
-    //               controller: formModel.ageInput.controller,
-    //               decoration: const InputDecoration(labelText: 'Age'),
-    //               onChanged: formModel.ageInput.updateValueWithString,
-    //               validator: (v) => formModel.ageInput.textFormFieldInputValidator(v),
-    //             ),
-    //             CheckboxListTile(
-    //               value: formModel.vipInput.value,
-    //               title: const Text('VIP Content'),
-    //               onChanged: (v) => formModel.vipInput.value = v ?? false,
-    //             ),
-    //             Center(
-    //               child: ElevatedButton(
-    //                 onPressed: formModel.isValid
-    //                     ? () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved')))
-    //                     : null,
-    //                 child: const Text('Save'),
-    //               ),
-    //             ),
-    //             const GladeModelDebugInfo<AgeRestrictedModel>(
-    //               showValue: true,
-    //               showInitialValue: true,
-    //             ),
-    //           ],
-    //         ),
-    //       ),
-    //     ),
-    //   ),
-    // );
   }
 }

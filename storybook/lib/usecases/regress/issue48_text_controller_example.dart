@@ -1,4 +1,4 @@
-// ignore_for_file: prefer-single-widget-per-file
+// ignore_for_file: prefer-single-widget-per-file, avoid-undisposed-instances
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -66,9 +66,7 @@ class HookExample extends HookWidget {
           autovalidateMode: AutovalidateMode.onUserInteraction,
           child: TextField(
             controller: wrongField,
-            onChanged: (v) {
-              numb.value = v.length;
-            },
+            onChanged: (v) => numb.value = v.length,
           ),
         ),
       ],
@@ -97,9 +95,7 @@ class ModelB extends HookWidget {
                 decoration: const InputDecoration(labelText: 'Name'),
               ),
               TextButton(
-                onPressed: () {
-                  model.nameWithController.updateValue('Reseted value');
-                },
+                onPressed: () => model.nameWithController.updateValue('Reseted value'),
                 child: const Text('Reset name value'),
               ),
               const Divider(),
