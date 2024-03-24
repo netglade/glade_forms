@@ -122,8 +122,6 @@ If *age* is changed to value under 18, *vip content* is unchecked and vice-versa
                   ),
                 ),
                 const GladeModelDebugInfo<AgeRestrictedModel>(
-                  showValue: true,
-                  showInitialValue: true,
                   showControllerText: true,
                 ),
               ],

@@ -126,7 +126,13 @@ class GladeInput<T> extends ChangeNotifier {
     return value == initialValue;
   }
 
-  set value(T value) => _setValue(value, shouldTriggerOnChange: true);
+  set value(T value) {
+    if (_useTextEditingController) {
+      _syncValueWithController(value, shouldTriggerOnChange: true);
+    } else {
+      _setValue(value, shouldTriggerOnChange: true);
+    }
+  }
 
   // ignore: avoid_setters_without_getters, ok for internal use
   set _conversionError(ConvertError<T> value) {

@@ -52,6 +52,7 @@ class _Model extends GladeModel {
         },
         converterBack: (input) => input.join(','),
       ),
+      useTextEditingController: true,
     );
 
     super.initialize();
@@ -75,39 +76,57 @@ class ComplexObjectMappingExample extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: Column(
-                    children: [
-                      TextFormField(
-                        decoration: const InputDecoration(labelText: 'Characters stats'),
-                        controller: model.availableStats.controller,
-                        validator: model.availableStats.textFormFieldInputValidator,
-                      ),
-                      DropdownButton(
-                        items: model.availableItems
-                            .map(
-                              (e) => DropdownMenuItem(
-                                value: e.id,
-                                child: Text(e.name),
-                              ),
-                            )
-                            .toList(),
-                        value: model.selectedItem.value?.id,
-                        onChanged: (v) => model.updateInput(
-                          model.selectedItem,
-                          // ignore: avoid-unsafe-collection-methods, ok here.
-                          model.availableItems.firstWhere((element) => element.id == v),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          decoration: const InputDecoration(labelText: 'Characters stats'),
+                          controller: model.availableStats.controller,
+                          validator: model.availableStats.textFormFieldInputValidator,
                         ),
-                      ),
-                    ],
+                        Row(
+                          children: [
+                            const Text('Character item'),
+                            const SizedBox(width: 30),
+                            DropdownButton(
+                              items: model.availableItems
+                                  .map(
+                                    (e) => DropdownMenuItem(
+                                      value: e.id,
+                                      child: Text(e.name),
+                                    ),
+                                  )
+                                  .toList(),
+                              value: model.selectedItem.value?.id,
+                              onChanged: (v) => model.updateInput(
+                                model.selectedItem,
+                                // ignore: avoid-unsafe-collection-methods, ok here.
+                                model.availableItems.firstWhere((element) => element.id == v),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
                   child: Column(
                     children: [
-                      const Text('Character stats'),
-                      ...model.availableStats.value.map((e) => Text(e.toString())),
-                      const Text('Selected item'),
-                      Text(model.selectedItem.value?.name ?? ''),
+                      Text(
+                        'Character stats',
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(decoration: TextDecoration.underline),
+                      ),
+                      if (model.availableStats.value.isEmpty)
+                        const Text('No stats')
+                      else
+                        ...model.availableStats.value.map((e) => Text(e.toString())),
+                      Text(
+                        'Selected item',
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(decoration: TextDecoration.underline),
+                      ),
+                      Text(model.selectedItem.value?.name ?? 'No item selected'),
                     ],
                   ),
                 ),

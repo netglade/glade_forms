@@ -31,9 +31,7 @@ class AgeRestrictedModel extends GladeModel {
             ..notNull()
             ..satisfy(
               (value, extra, dependencies) {
-                final vipContentInput = dependencies.byKey<bool>('vip-input');
-
-                if (!vipContentInput.value) {
+                if (!vipInput.value) {
                   return true;
                 }
 
@@ -44,7 +42,6 @@ class AgeRestrictedModel extends GladeModel {
             ))
           .build(),
       value: 0,
-      dependencies: () => [vipInput],
       valueConverter: GladeTypeConverters.intConverter,
       inputKey: 'age-input',
       translateError: (error, key, devMessage, dependencies) {
