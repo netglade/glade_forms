@@ -81,7 +81,6 @@ class ComplexObjectMappingExample extends StatelessWidget {
                         decoration: const InputDecoration(labelText: 'Characters stats'),
                         controller: model.availableStats.controller,
                         validator: model.availableStats.textFormFieldInputValidator,
-                        onChanged: (value) => model.stringFieldUpdateInput(model.availableStats, value),
                       ),
                       DropdownButton(
                         items: model.availableItems

@@ -11,6 +11,7 @@ class GladeModelDebugInfo<M extends GladeModel> extends StatelessWidget {
   final bool showConversionError;
   final bool showValue;
   final bool showInitialValue;
+  final bool showControllerText;
 
   /// Inputs (defined by key) which are hidden from listing.
   final List<String> hiddenKeys;
@@ -25,6 +26,7 @@ class GladeModelDebugInfo<M extends GladeModel> extends StatelessWidget {
     this.showConversionError = true,
     this.showValue = false,
     this.showInitialValue = false,
+    this.showControllerText = false,
     this.hiddenKeys = const [],
     this.scrollable = true,
   });
@@ -37,6 +39,7 @@ class GladeModelDebugInfo<M extends GladeModel> extends StatelessWidget {
     this.showConversionError = false,
     this.showValue = false,
     this.showInitialValue = false,
+    this.showControllerText = false,
     this.hiddenKeys = const [],
     this.scrollable = true,
   });
@@ -124,6 +127,7 @@ class GladeModelDebugInfo<M extends GladeModel> extends StatelessWidget {
                     showConversionError: showConversionError,
                     showValue: showValue,
                     showInitialValue: showInitialValue,
+                    showControllerText: showControllerText,
                     hiddenKeys: hiddenKeys,
                     model: model,
                   ),
@@ -137,6 +141,7 @@ class GladeModelDebugInfo<M extends GladeModel> extends StatelessWidget {
                   showConversionError: showConversionError,
                   showValue: showValue,
                   showInitialValue: showInitialValue,
+                  showControllerText: showControllerText,
                   hiddenKeys: hiddenKeys,
                   model: model,
                 ),
@@ -158,6 +163,7 @@ class _Table extends StatelessWidget {
   final bool showConversionError;
   final bool showValue;
   final bool showInitialValue;
+  final bool showControllerText;
   final GladeModel model;
   final List<String> hiddenKeys;
 
@@ -171,6 +177,7 @@ class _Table extends StatelessWidget {
     required this.showInitialValue,
     required this.model,
     required this.hiddenKeys,
+    required this.showControllerText,
   });
 
   @override
@@ -192,6 +199,7 @@ class _Table extends StatelessWidget {
             if (showConversionError) const _ColumnHeader('Conversion error'),
             if (showValue) const _ColumnHeader('value'),
             if (showInitialValue) const _ColumnHeader('initialValue'),
+            if (showControllerText) const _ColumnHeader('controller.text'),
           ],
         ),
         ...inputs.mapIndexed(
@@ -208,6 +216,7 @@ class _Table extends StatelessWidget {
               if (showConversionError) _RowValue(value: x.hasConversionError),
               if (showValue) _RowValue(value: x.value),
               if (showInitialValue) _RowValue(value: x.initialValue),
+              if (showControllerText) _RowValue(value: x.controller?.text),
             ],
           ),
         ),

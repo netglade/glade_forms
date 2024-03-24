@@ -2,12 +2,12 @@
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:glade_forms_storybook/debug_model.dart';
 import 'package:glade_forms_storybook/generated/locale_loader.g.dart';
 import 'package:glade_forms_storybook/localization_addon_custom.dart';
 import 'package:glade_forms_storybook/usecases/complex_object_mapping_example.dart';
 import 'package:glade_forms_storybook/usecases/one_checkbox_deps_validation.dart';
 import 'package:glade_forms_storybook/usecases/quickstart_example.dart';
+import 'package:glade_forms_storybook/usecases/regress/issue48_text_controller_example.dart';
 import 'package:glade_forms_storybook/usecases/two_way_checkbox_change.dart';
 import 'package:widgetbook/widgetbook.dart';
 
@@ -40,7 +40,7 @@ class _DebugModelApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(home: DebugModelExample());
+    return const MaterialApp(home: Issue48TextControllerExample());
   }
 }
 
@@ -80,6 +80,15 @@ class App extends StatelessWidget {
             WidgetbookUseCase(
               name: 'Complex objects & converters',
               builder: (context) => const ComplexObjectMappingExample(),
+            ),
+          ],
+        ),
+        WidgetbookCategory(
+          name: 'Issues',
+          children: [
+            WidgetbookUseCase(
+              name: 'TextEditingController issue',
+              builder: (context) => const Issue48TextControllerExample(),
             ),
           ],
         ),

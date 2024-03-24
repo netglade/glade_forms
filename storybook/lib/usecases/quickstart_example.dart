@@ -15,7 +15,7 @@ class _Model extends GladeModel {
   @override
   void initialize() {
     name = GladeInput.stringInput(inputKey: 'name');
-    age = GladeInput.intInput(value: 0, inputKey: 'age');
+    age = GladeInput.intInput(value: 0, inputKey: 'age', useTextEditingController: true);
     email = GladeInput.stringInput(validator: (validator) => (validator..isEmail()).build(), inputKey: 'email');
 
     super.initialize();
@@ -41,19 +41,16 @@ class QuickStartExample extends StatelessWidget {
                 TextFormField(
                   controller: model.name.controller,
                   validator: model.name.textFormFieldInputValidator,
-                  onChanged: model.name.updateValueWithString,
                   decoration: const InputDecoration(labelText: 'Name'),
                 ),
                 TextFormField(
                   controller: model.age.controller,
                   validator: model.age.textFormFieldInputValidator,
-                  onChanged: model.age.updateValueWithString,
                   decoration: const InputDecoration(labelText: 'Age'),
                 ),
                 TextFormField(
                   controller: model.email.controller,
                   validator: model.email.textFormFieldInputValidator,
-                  onChanged: model.email.updateValueWithString,
                   decoration: const InputDecoration(labelText: 'Email'),
                 ),
                 const SizedBox(height: 10),

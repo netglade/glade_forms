@@ -90,13 +90,11 @@ If *VIP content* is checked, **age** must be over 18.
                 TextFormField(
                   controller: formModel.nameInput.controller,
                   decoration: const InputDecoration(labelText: 'Name'),
-                  onChanged: formModel.nameInput.updateValueWithString,
                   validator: formModel.nameInput.textFormFieldInputValidator,
                 ),
                 TextFormField(
                   controller: formModel.ageInput.controller,
                   decoration: const InputDecoration(labelText: 'Age'),
-                  onChanged: formModel.ageInput.updateValueWithString,
                   validator: (v) => formModel.ageInput.textFormFieldInputValidator(v),
                 ),
                 CheckboxListTile(

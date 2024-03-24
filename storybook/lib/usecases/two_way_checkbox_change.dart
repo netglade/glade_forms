@@ -31,9 +31,7 @@ class AgeRestrictedModel extends GladeModel {
             ..notNull()
             ..satisfy(
               (value, extra, dependencies) {
-                final vipContentInput = dependencies.byKey<bool>('vip-input');
-
-                if (!vipContentInput.value) {
+                if (!vipInput.value) {
                   return true;
                 }
 
@@ -44,7 +42,6 @@ class AgeRestrictedModel extends GladeModel {
             ))
           .build(),
       value: 0,
-      dependencies: () => [vipInput],
       valueConverter: GladeTypeConverters.intConverter,
       inputKey: 'age-input',
       translateError: (error, key, devMessage, dependencies) {
@@ -55,8 +52,9 @@ class AgeRestrictedModel extends GladeModel {
         return devMessage;
       },
       onChange: (info, dependencies) {
-        dependencies.byKey<bool>('vip-input').value = info.value >= 18;
+        vipInput.value = info.value >= 18;
       },
+      useTextEditingController: true,
     );
     vipInput = GladeInput.create(
       validator: (v) => (v..notNull()).build(),
@@ -64,12 +62,8 @@ class AgeRestrictedModel extends GladeModel {
       inputKey: 'vip-input',
       dependencies: () => [ageInput],
       onChange: (info, dependencies) {
-        final age = dependencies.byKey<int>('age-input');
-
-        if (info.value && age.value < 18) {
-          groupEdit(() {
-            age.value = 18;
-          });
+        if (info.value && ageInput.value < 18) {
+          ageInput.value = 18;
         }
       },
     );
@@ -105,13 +99,13 @@ If *age* is changed to value under 18, *vip content* is unchecked and vice-versa
                 TextFormField(
                   controller: formModel.nameInput.controller,
                   decoration: const InputDecoration(labelText: 'Name'),
-                  onChanged: formModel.nameInput.updateValueWithString,
+                  // onChanged: formModel.nameInput.updateValueWithString,
                   validator: formModel.nameInput.textFormFieldInputValidator,
                 ),
                 TextFormField(
                   controller: formModel.ageInput.controller,
                   decoration: const InputDecoration(labelText: 'Age'),
-                  onChanged: formModel.ageInput.updateValueWithString,
+                  //  onChanged: formModel.ageInput.updateValueWithString,
                   validator: (v) => formModel.ageInput.textFormFieldInputValidator(v),
                 ),
                 CheckboxListTile(
@@ -130,6 +124,7 @@ If *age* is changed to value under 18, *vip content* is unchecked and vice-versa
                 const GladeModelDebugInfo<AgeRestrictedModel>(
                   showValue: true,
                   showInitialValue: true,
+                  showControllerText: true,
                 ),
               ],
             ),
