@@ -1,5 +1,6 @@
 ## 2.0.0
 - **[Breaking]**: TextEditingController is no more created automatically. When TextEditingController is used, input's behavior is slightly changed. See README.md for full info.
+- **[Breaking]**: GladeInput's controller is now private. Use factory constructors to create input.
 
 ## 1.6.0
 - **Improvement**: GladeModelDebugInfo is more colorful and polished.
