@@ -26,7 +26,7 @@ A universal way to define form validators with support of translations.
     - [Inputs](#inputs)
     - [Flutter widgets](#flutter-widgets)
     - [Edit multiple inputs at once](#edit-multiple-inputs-at-once)
-  - [Dependencies (WIP)](#dependencies-wip)
+  - [Dependencies](#dependencies)
   - [Controlling other inputs](#controlling-other-inputs)
   - [Translation](#translation)
     - [Default translations](#default-translations)
@@ -179,9 +179,7 @@ ageInput = GladeInput.create(
   validator: (v) => (v
         ..notNull()
         ..satisfy(
-          (value, extra, dependencies) {
-            return value >= 18;
-          },
+          (value) => value >= 18,
           devError: (_, __) => 'Value must be greater or equal to 18',
           key: _ErrorKeys.ageRestriction,
         ))
@@ -267,66 +265,35 @@ class FormModel extends GladeModel {
 
 After that listener will contain `lastUpdatedKeys` with keys of `age` and `name` inputs.
 
-### Dependencies (WIP)
-**NOTICE** - in future versions, dependencies will be used only for dependent listenner. Use your variables directly without need to lookup dependencies.
+### Dependencies
+An input can depend on other inputs to enable updates based on those dependencies. To define these dependencies, use the dependencies attribute. It's essential to specify inputKey on any inputs that are intended to serve as dependencies.
 
-Input can have dependencies on other inputs to allow dependent validation. Define input's dependencies with `dependencies`.
-
-`inputKey` must be specified on inputs to be used as dependencies. 
-
-In validation, translation or in `onChange()`, just call `dependencies.byKey()` to get dependent input. 
-
-Note that `byKey()` will throw if no input is found. This is by design to provide immediate indication of error.
-
-For example, we want to restrict "Age input" to be at least 18 when "VIP Content" is checked.
+For instance, consider a scenario where we want the "VIP Content" option to be automatically selected when the 'ageInput' is updated and its value exceeds 18.
 
 ```dart
-ageInput = GladeInput.create(
-  validator: (v) => (v
-        ..notNull()
-        ..satisfy(
-          (value, extra, dependencies) {
-            final vipContentInput = dependencies.byKey<bool>('vip-input');
-
-            if (!vipContentInput.value) {
-              return true;
-            }
-
-            return value >= 18;
-          },
-          devError: (_, __) => 'When VIP enabled you must be at least 18 years old.',
-          key: _ErrorKeys.ageRestriction,
-        ))
-      .build(),
-  value: 0,
-  dependencies: () => [vipInput], // <--- Dependency
-  valueConverter: GladeTypeConverters.intConverter,
-  inputKey: 'age-input',
-  translateError: (error, key, devMessage, dependencies) {
-    if (key == _ErrorKeys.ageRestriction) return LocaleKeys.ageRestriction_under18.tr();
-
-    if (error.isConversionError) return LocaleKeys.ageRestriction_ageFormat.tr();
-
-    return devMessage;
-  },
-);
-
-vipInput = GladeInput.create(
-  validator: (v) => (v..notNull()).build(),
-  value: false,
-  inputKey: 'vip-input',
-);
+ ageInput = GladeInput.create(
+      value: 0,
+      valueConverter: GladeTypeConverters.intConverter,
+      inputKey: 'age-input',
+ );
+ vipInput = GladeInput.create(
+    inputKey: 'vip-input',
+    dependencies: () => [ageInput],
+    onDependencyChange: (key) {
+      if (key == 'age-input') {
+        vipInput.value = ageInput.value >= 18;
+      }
+    },
+ );
 ```
 
 ![dependent-validation](https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/doc/depend-validation.gif)
 
 ### Controlling other inputs
 
-Sometimes, it can be handy to update some input's value based on the changed value of another input.
+Sometimes, it can be handy to update some input's value based on the changed value of another input. As developer you have two options.
 
-Each input has `onChange()` callback where these reactions can be created. 
-
-An example could be automatically update `Age` value based on checked `VIP Content` input (checkbox).
+You can listen for `onChange()` callback and update other inputs based on input's changed value. An example could be automatically update `Age` value based on checked `VIP Content` input (checkbox).
 
 ```dart
 // In vipContent input
@@ -338,6 +305,27 @@ onChange: (info, dependencies) {
 ```
 
 ![two-way-inputs-example](https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/doc/two-way-dependencies.gif)
+
+Second approach is to use `dependencies` and `onDependencyChange` callback and react when different input was changed.
+
+In this example, when age-input updats its value (dependency), checkbox's value (vipInput) is updated.
+
+```dart
+ vipInput = GladeInput.create(
+    inputKey: 'vip-input',
+    dependencies: () => [ageInput],
+    onChange: (info) {
+      if (info.value && ageInput.value < 18) {
+        ageInput.value = 18;
+      }
+    },
+    onDependencyChange: (key) {
+      if (key == 'age-input') {
+        vipInput.value = ageInput.value >= 18;
+      }
+    },
+ );
+```
 
 ### Translation
 

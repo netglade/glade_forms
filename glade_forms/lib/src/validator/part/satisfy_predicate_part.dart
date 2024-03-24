@@ -1,15 +1,11 @@
-import 'package:glade_forms/src/core/core.dart';
 import 'package:glade_forms/src/validator/part/input_validator_part.dart';
 import 'package:glade_forms/src/validator/validator_error/validator_error.dart';
 
-typedef SatisfyPredicate<T> = bool Function(T value, Object? extra, InputDependencies dependencies);
+typedef SatisfyPredicate<T> = bool Function(T value);
 
 class SatisfyPredicatePart<T> extends InputValidatorPart<T> {
   // ignore: prefer-correct-callback-field-name, ok name
   final OnValidateError<T> devError;
-
-  // ignore: no-object-declaration, extra can be any object
-  final Object? extra;
 
   // ignore: prefer-correct-callback-field-name, ok name
   final SatisfyPredicate<T> predicate;
@@ -17,23 +13,16 @@ class SatisfyPredicatePart<T> extends InputValidatorPart<T> {
   const SatisfyPredicatePart({
     required this.predicate,
     required this.devError,
-    required super.dependencies,
-    this.extra,
     super.key,
   });
 
   @override
-  GladeValidatorError<T>? validate(
-    T value, {
-    required Object? extra,
-    InputDependencies dependencies = const [],
-  }) {
-    return predicate(value, extra, dependencies)
+  GladeValidatorError<T>? validate(T value) {
+    return predicate(value)
         ? null
         : ValueSatisfyPredicateError<T>(
             value: value,
             devError: devError,
-            extra: extra,
             key: key,
           );
   }

@@ -17,7 +17,8 @@ import 'package:meta/meta.dart';
 typedef ValueComparator<T> = bool Function(T? initial, T? value);
 typedef ValidatorFactory<T> = ValidatorInstance<T> Function(GladeValidator<T> v);
 typedef StringValidatorFactory = ValidatorInstance<String> Function(StringValidator validator);
-typedef OnChange<T> = void Function(ChangesInfo<T> info, InputDependencies dependencies);
+typedef OnChange<T> = void Function(ChangesInfo<T> info);
+typedef OnDependencyChange = void Function(String updateInputKey);
 typedef ValueTransform<T> = T Function(T input);
 
 typedef StringInput = GladeInput<String>;
@@ -51,7 +52,10 @@ class GladeInput<T> extends ChangeNotifier {
   final DefaultTranslations? defaultTranslations;
 
   /// Called when input's value changed.
-  OnChange<T>? onChange;
+  final OnChange<T>? onChange;
+
+  /// Called when one of dependencies changes.
+  final OnDependencyChange? onDependencyChange;
 
   /// Determines whether this input will be considered in isUnchanged on model.
   ///
@@ -99,7 +103,7 @@ class GladeInput<T> extends ChangeNotifier {
   /// Input's value was not changed.
   bool get isPure => _isPure;
 
-  ValidatorResult<T> get validatorResult => _validator(value);
+  ValidatorResult<T> get validatorResult => validatorInstance.validate(value);
 
   /// [value] is equal to [initialValue].
   ///
@@ -107,7 +111,7 @@ class GladeInput<T> extends ChangeNotifier {
   bool get isUnchanged => valueComparator?.call(initialValue, value) ?? _valueIsSameAsInitialValue;
 
   /// Input does not have conversion error nor validation error.
-  bool get isValid => !hasConversionError && _validator(value).isValid;
+  bool get isValid => !hasConversionError && validatorInstance.validate(value).isValid;
 
   bool get isNotValid => !isValid;
 
@@ -151,12 +155,17 @@ class GladeInput<T> extends ChangeNotifier {
     required InputDependenciesFactory? dependenciesFactory,
     required this.defaultTranslations,
     required this.onChange,
+    required this.onDependencyChange,
     required ValueTransform<T>? valueTransform,
     T? initialValue,
     TextEditingController? textEditingController,
     bool useTextEditingController = false,
     this.trackUnchanged = true,
-  })  : _isPure = isPure,
+  })  : assert(
+          dependenciesFactory == null || (onDependencyChange != null),
+          'When dependencies are provided, provide onDependencyChange as well',
+        ),
+        _isPure = isPure,
         _value = value,
         _initialValue = initialValue,
         dependenciesFactory = dependenciesFactory ?? (() => []),
@@ -178,6 +187,12 @@ class GladeInput<T> extends ChangeNotifier {
 
     if (_useTextEditingController) {
       _textEditingController?.addListener(_onTextControllerChange);
+    }
+
+    final dependencies = this.dependenciesFactory();
+
+    for (final dependency in dependencies) {
+      dependency.addListener(() => _onDependencyUpdate(dependency.inputKey));
     }
   }
 
@@ -201,6 +216,7 @@ class GladeInput<T> extends ChangeNotifier {
     StringToTypeConverter<T>? valueConverter,
     InputDependenciesFactory? dependencies,
     OnChange<T>? onChange,
+    OnDependencyChange? onDependencyChange,
     TextEditingController? textEditingController,
     bool useTextEditingController = false,
     ValueTransform<T>? valueTransform,
@@ -225,6 +241,7 @@ class GladeInput<T> extends ChangeNotifier {
       stringTovalueConverter: valueConverter,
       dependenciesFactory: dependencies,
       onChange: onChange,
+      onDependencyChange: onDependencyChange,
       textEditingController: textEditingController,
       useTextEditingController: useTextEditingController,
       valueTransform: valueTransform,
@@ -247,6 +264,7 @@ class GladeInput<T> extends ChangeNotifier {
     StringToTypeConverter<T>? valueConverter,
     InputDependenciesFactory? dependencies,
     OnChange<T>? onChange,
+    OnDependencyChange? onDependencyChange,
     TextEditingController? textEditingController,
     bool useTextEditingController = false,
     ValueTransform<T>? valueTransform,
@@ -263,6 +281,7 @@ class GladeInput<T> extends ChangeNotifier {
         pure: pure,
         dependencies: dependencies,
         onChange: onChange,
+        onDependencyChange: onDependencyChange,
         textEditingController: textEditingController,
         useTextEditingController: useTextEditingController,
         valueTransform: valueTransform,
@@ -282,6 +301,7 @@ class GladeInput<T> extends ChangeNotifier {
     StringToTypeConverter<T>? valueConverter,
     InputDependenciesFactory? dependencies,
     OnChange<T>? onChange,
+    OnDependencyChange? onDependencyChange,
     TextEditingController? textEditingController,
     bool useTextEditingController = false,
     ValueTransform<T>? valueTransform,
@@ -298,6 +318,7 @@ class GladeInput<T> extends ChangeNotifier {
         pure: pure,
         dependencies: dependencies,
         onChange: onChange,
+        onDependencyChange: onDependencyChange,
         textEditingController: textEditingController,
         useTextEditingController: useTextEditingController,
         valueTransform: valueTransform,
@@ -318,6 +339,7 @@ class GladeInput<T> extends ChangeNotifier {
     ValueComparator<int>? valueComparator,
     InputDependenciesFactory? dependencies,
     OnChange<int>? onChange,
+    OnDependencyChange? onDependencyChange,
     TextEditingController? textEditingController,
     bool useTextEditingController = false,
     ValueTransform<int>? valueTransform,
@@ -334,6 +356,7 @@ class GladeInput<T> extends ChangeNotifier {
         dependencies: dependencies,
         valueConverter: GladeTypeConverters.intConverter,
         onChange: onChange,
+        onDependencyChange: onDependencyChange,
         textEditingController: textEditingController,
         useTextEditingController: useTextEditingController,
         valueTransform: valueTransform,
@@ -350,6 +373,7 @@ class GladeInput<T> extends ChangeNotifier {
     ValueComparator<bool>? valueComparator,
     InputDependenciesFactory? dependencies,
     OnChange<bool>? onChange,
+    OnDependencyChange? onDependencyChange,
     TextEditingController? textEditingController,
     bool useTextEditingController = false,
     ValueTransform<bool>? valueTransform,
@@ -366,6 +390,7 @@ class GladeInput<T> extends ChangeNotifier {
         dependencies: dependencies,
         valueConverter: GladeTypeConverters.boolConverter,
         onChange: onChange,
+        onDependencyChange: onDependencyChange,
         textEditingController: textEditingController,
         useTextEditingController: useTextEditingController,
         valueTransform: valueTransform,
@@ -382,6 +407,7 @@ class GladeInput<T> extends ChangeNotifier {
     DefaultTranslations? defaultTranslations,
     InputDependenciesFactory? dependencies,
     OnChange<String>? onChange,
+    OnDependencyChange? onDependencyChange,
     TextEditingController? textEditingController,
     bool useTextEditingController = true,
     bool isRequired = true,
@@ -402,6 +428,7 @@ class GladeInput<T> extends ChangeNotifier {
       inputKey: inputKey,
       dependenciesFactory: dependencies,
       onChange: onChange,
+      onDependencyChange: onDependencyChange,
       textEditingController: textEditingController,
       useTextEditingController: useTextEditingController,
       valueComparator: valueComparator,
@@ -411,7 +438,11 @@ class GladeInput<T> extends ChangeNotifier {
     );
   }
 
-  ValidatorResult<T> validate() => _validator(value);
+  // *
+  // * Public methods
+  // *
+
+  ValidatorResult<T> validate() => validatorInstance.validate(value);
 
   String? translate({String delimiter = '.'}) => _translate(delimiter: delimiter, customError: validatorResult);
 
@@ -435,13 +466,11 @@ class GladeInput<T> extends ChangeNotifier {
 
     try {
       final convertedValue = converter.convert(value);
-      final convertedError = _validator(convertedValue);
+      final convertedError = validatorInstance.validate(convertedValue);
 
       return !convertedError.isValid ? _translate(delimiter: delimiter, customError: convertedError) : null;
     } on ConvertError<T> catch (e) {
-      return e.error != null
-          ? _translate(delimiter: delimiter, customError: e)
-          : e.devError(value, extra: validatorResult);
+      return e.error != null ? _translate(delimiter: delimiter, customError: e) : e.devError(value);
     }
   }
 
@@ -454,7 +483,7 @@ class GladeInput<T> extends ChangeNotifier {
   ///
   /// Returns translated validation message.
   String? formFieldValidator(T value) {
-    final convertedError = _validator(value);
+    final convertedError = validatorInstance.validate(value);
 
     return convertedError.isInvalid ? _translate(customError: convertedError) : null;
   }
@@ -539,6 +568,7 @@ class GladeInput<T> extends ChangeNotifier {
     bool? isPure,
     DefaultTranslations? defaultTranslations,
     OnChange<T>? onChange,
+    OnDependencyChange? onDependencyChange,
     TextEditingController? textEditingController,
     // ignore: avoid-unused-parameters, it is here just to be linter happy ¯\_(ツ)_/¯
     bool? useTextEditingController,
@@ -557,6 +587,7 @@ class GladeInput<T> extends ChangeNotifier {
       isPure: isPure ?? this.isPure,
       defaultTranslations: defaultTranslations ?? this.defaultTranslations,
       onChange: onChange ?? this.onChange,
+      onDependencyChange: onDependencyChange ?? this.onDependencyChange,
       textEditingController: textEditingController ?? this._textEditingController,
       valueTransform: valueTransform ?? this.valueTransform,
       trackUnchanged: trackUnchanged ?? this.trackUnchanged,
@@ -567,6 +598,12 @@ class GladeInput<T> extends ChangeNotifier {
   @override
   void dispose() {
     _textEditingController?.removeListener(_onTextControllerChange);
+
+    final dependencies = dependenciesFactory();
+
+    for (final dependency in dependencies) {
+      dependency.removeListener(() => _onDependencyUpdate(dependency.inputKey));
+    }
 
     super.dispose();
   }
@@ -612,12 +649,12 @@ class GladeInput<T> extends ChangeNotifier {
     if (shouldTriggerOnChange) {
       onChange?.call(
         ChangesInfo(
+          inputKey: inputKey,
           previousValue: _previousValue,
           value: value,
           initialValue: initialValue,
           validatorResult: validate(),
         ),
-        dependenciesFactory(),
       );
     }
 
@@ -625,6 +662,14 @@ class GladeInput<T> extends ChangeNotifier {
 
     notifyListeners();
   }
+
+  void _onDependencyUpdate(String inputKey) {
+    onDependencyChange?.call(inputKey);
+  }
+
+  // *
+  // * Translation methods
+  // *
 
   /// Translates input's errors (validation or conversion).
   String? _translate({String delimiter = '.', Object? customError}) {
@@ -660,10 +705,6 @@ class GladeInput<T> extends ChangeNotifier {
     }
 
     return err.devErrorMessage;
-  }
-
-  ValidatorResult<T> _validator(T value) {
-    return validatorInstance.validate(value);
   }
 
   String _translateGenericErrors(ValidatorResult<T> inputErrors, String delimiter) {

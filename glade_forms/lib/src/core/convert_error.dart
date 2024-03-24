@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:glade_forms/src/core/glade_input_error.dart';
 
 /// Before validation when converer from string to prpoer type failed.
-typedef OnConvertError = String Function(String? rawInput, {Object? extra, Object? key});
+typedef OnConvertError = String Function(String? rawInput, {Object? key});
 
 class ConvertError<T> extends GladeInputError<T> with EquatableMixin implements Exception {
   // ignore: prefer-correct-callback-field-name, more suitable name
@@ -20,7 +20,7 @@ class ConvertError<T> extends GladeInputError<T> with EquatableMixin implements 
 
   String get targetType => T.runtimeType.toString();
 
-  String get devErrorMessage => devError(input, extra: error, key: key);
+  String get devErrorMessage => devError(input, key: key);
 
   @override
   // ignore: no-object-declaration, error can be any object.
@@ -32,7 +32,7 @@ class ConvertError<T> extends GladeInputError<T> with EquatableMixin implements 
     super.key,
     OnConvertError? formatError,
   })  : _convertError = error,
-        devError = formatError ?? ((rawValue, {extra, key}) => 'Conversion error: $error');
+        devError = formatError ?? ((rawValue, {key}) => 'Conversion error: $error');
 
   @override
   String toString() => devError(input, key: key);
