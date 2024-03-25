@@ -48,7 +48,7 @@ class StringToTypeConverter<T> {
     }
   }
 
-  String? convertBack(T input) => _converterBack(input);
+  String convertBack(T input) => _converterBack(input) ?? input.toString();
 
   T _cantConvert(
     Object error, {

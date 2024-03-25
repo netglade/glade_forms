@@ -31,9 +31,7 @@ class AgeRestrictedModel extends GladeModel {
             ..notNull()
             ..satisfy(
               (value, extra, dependencies) {
-                final vipContentInput = dependencies.byKey<bool>('vip-input');
-
-                if (!vipContentInput.value) {
+                if (!vipInput.value) {
                   return true;
                 }
 
@@ -44,7 +42,6 @@ class AgeRestrictedModel extends GladeModel {
             ))
           .build(),
       value: 0,
-      dependencies: () => [vipInput],
       valueConverter: GladeTypeConverters.intConverter,
       inputKey: 'age-input',
       translateError: (error, key, devMessage, dependencies) {
@@ -90,13 +87,11 @@ If *VIP content* is checked, **age** must be over 18.
                 TextFormField(
                   controller: formModel.nameInput.controller,
                   decoration: const InputDecoration(labelText: 'Name'),
-                  onChanged: formModel.nameInput.updateValueWithString,
                   validator: formModel.nameInput.textFormFieldInputValidator,
                 ),
                 TextFormField(
                   controller: formModel.ageInput.controller,
                   decoration: const InputDecoration(labelText: 'Age'),
-                  onChanged: formModel.ageInput.updateValueWithString,
                   validator: (v) => formModel.ageInput.textFormFieldInputValidator(v),
                 ),
                 CheckboxListTile(

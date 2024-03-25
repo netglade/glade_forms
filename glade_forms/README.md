@@ -18,6 +18,7 @@ A universal way to define form validators with support of translations.
 - [🚀 Getting started](#-getting-started)
 - [✨ Features](#-features)
   - [GladeInput](#gladeinput)
+  - [String based input and TextEditingController](#string-based-input-and-texteditingcontroller)
     - [StringInput](#stringinput)
   - [Validation](#validation)
     - [Using validators without GladeInput](#using-validators-without-gladeinput)
@@ -63,7 +64,7 @@ class _Model extends GladeModel {
   @override
   void initialize() {
     name = GladeInput.stringInput();
-    age = GladeInput.intInput(value: 0);
+    age = GladeInput.intInput(value: 0, useTextEditingController: true);
     email = GladeInput.stringInput(validator: (validator) => (validator..isEmail()).build());
 
     super.initialize();
@@ -87,19 +88,15 @@ GladeFormBuilder(
           controller: model.name.controller,
           // connect a validator from glade input
           validator: model.name.textFormFieldInputValidator,
-          // connect an on change method
-          onChanged: model.name.updateValueWithString,
         ),
         TextFormField(
           controller: model.age.controller,
           validator: model.age.textFormFieldInputValidator,
-          onChanged: model.age.updateValueWithString,
           decoration: const InputDecoration(labelText: 'Age'),
         ),
         TextFormField(
           controller: model.email.controller,
           validator: model.email.textFormFieldInputValidator,
-          onChanged: model.email.updateValueWithString,
           decoration: const InputDecoration(labelText: 'Email'),
         ),
         const SizedBox(height: 10),
@@ -112,7 +109,7 @@ GladeFormBuilder(
 
 ![quick_start_example](https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/doc/quickstart.gif)
 
-See [📖 Glade Forms Widgetbook][storybook_demo_link], complex, examples.
+Interactive examples can be found in [📖 Glade Forms Widgetbook][storybook_demo_link].
 
 ## ✨ Features
 
@@ -124,18 +121,18 @@ For simplicity we will interchange `input` and `GladeInput<T>`.
 Every input is *dirty* or *pure* based on whether value was updated (or not, yet).
 
 On each input we can define
- - **value** - Current input's value
- - **initialValue** - Initial input's value. Used with valueComparator and computing `isUncahged`.
- - **validator** - Input's value must satisfy validation to be *valid* input.
- - **translateError** - If there are validation errors, function for error translations can be provided.
  - **inputKey** - Unique identification of each input. Used inside listeners or in dependencies.
- - **dependencies** - Each input can depend on another inputs for validation.
+ - **value** - Current input's value
+ - **initialValue** - Initial input's value. Used with valueComparator and for computing `isUnchanged`.
+ - **validator** - Input's value must satisfy validation to be *valid* input.
+ - **translateError** - If there are validation errors, this function is use to translate those errors.
+ - **dependencies** (WIP) - Each input can depend on another inputs for listening changes.
  - **stringTovalueConverter** - If input is used by TextField and `T` is not a `String`, value converter should be provided.
- - **valueComparator** - Sometimes it is handy to provide `initialValue` which will be never updated after input is mutated. `valueComparator` should be provided to compare `initialValue` and `value` if `T` is not comparable type by default. 
+ - **valueComparator** - Sometimes it is handy to provide `initialValue` which will be never updated after input is mutated. `valueComparator` should be provided to compare `initialValue` and `value` if `T` is not comparable type by default. Note that GladeForms handle deep equality of collections and assumes that complex types are comparable by values.
  - **valueTransform** - transform `T` value into different `T` value. An example of usage can be sanitazation of string input (trim(),...).
  - **defaultTranslation** - If error's translations are simple, the default translation settings can be set instead of custom `translateError` method.
  - **textEditingController** - It is possible to provide custom instance of controller instead of default one.
- - **trackUnchanged** - If false GladeModel will not account with input in `isUnchanged` property.
+ - **trackUnchanged** - Setting this to false means that `GladeModel` will not include input in the `isUnchanged` property evaluation.
 
 Most of the time, input is created with `.create()` factory with defined validation, translation and other properties.
 
@@ -143,9 +140,28 @@ An overview how each input's value is updated. If needed it is converted from `s
 
 ![input-flow-example](https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/doc/flow-input-chart.png)
 
+### String based input and TextEditingController
+
+NOTE: Prior to *GladeForms 2.0*, each input generated its own TextEditingController and updated this controller whenever the value changed. This approach led to inconsistencies and problems with text-to-speech features, text selection, and other functionalities.
+
+----
+
+With the introduction of *GladeForms 2.0*, inputs by default (excluding the StringInput variant), do not create a TextEditingController. As a result, developers are required to use `updateValue()`, `updateValueWithString()` or directly set the `value` (via setter) to update the input's value.
+
+If your implementation involves an input paired with a TextField (or any similar widget that utilizes a TextEditingController), you should set `useTextEditingController` to true.
+
+Activating the useTextEditingController mode for a GladeInput results in a few behavioral modifications:
+
+- The input automatically creates a TextEditingController and incorporates its own listener.
+- Whenever TextEditingController's text changes, input will automatically update its value. If StringConverter is needed it will use it.
+- Consequently, developers are advised to provide only the controller property and a validator to the widget. 
+- While the use of updateValue (or similar methods) and resetToPure remains possible, be aware that these actions will override the text in the controller and reset text selection and other keyboard-related features.
+
 #### StringInput
 
-StringInput is specialized variant of GladeInput<String> which has additional, string related, validations such as `isEmail`, `isUrl`, `maxLength` and more.
+StringInput is specialized variant of GladeInput<String> which has additional, string related, validations such as `isEmail`, `isUrl`, `maxLength` and more. 
+
+Moreover `StringInput` by default uses TextEditingController under the hood. 
 
 ### Validation
 
@@ -203,22 +219,23 @@ There are **several rules** how to define models
 - Each input has to be **mutable** and `late` field
 - Model has to override `initialize` method where each input field is created
 - In the end of `initialize` method, `super.initialize()` must be called to wire-up inputs with model.
-
-⚠️ Without wiring-up model, model will not be updated appropiately 
-and properties such as `isValid` or `formattedErrors` will not work. 
+  - super.initialize() iterates over all `allInputs` property  (see below) to wire-up inputs with model.
  
 For updating input call either `updateValueWithString(String?)` to update `T` value with string (will be converted if needed) or set `value` directly (via setter).
 
 #### Inputs
-Each GladeModel consists of several `inputs`. Sometimes it can be handy to dynamically include/exclude individual inputs from model, for example when some input is not always visible and therefore doesnt need validation. 
+Each GladeModel is comprised of a variety of inputs. There are situations where it's useful to dynamically include or exclude certain inputs from the model. This is especially relevant when an input isn't constantly visible, hence not requiring validation, and more importantly, when it shouldn't be factored into GladeModel's validation and other computational processes.
 
-In that case override `allInputs` getter to list all inputs within GladeModel. Use `inputs`  getter for dynamic behavior.
+In that case override `allInputs` getter to list all inputs within GladeModel. Use `inputs`  getter for dynamic behavior. By default `allInputs` equals to `inputs`.
 
-By default `allInputs` equals to `inputs`.
+⚠️ Without properly wiring-up model, model will not be updated appropiately 
+and properties such as `isValid` or `formattedErrors` will not work. 
 
 #### Flutter widgets
+GladeForms comes with set of predefined widget to help you build your forms.
 
-`GladeModelProvider` is predefined widget to provide `GladeModel` to widget's subtreee.
+
+`GladeModelProvider` provides `GladeModel` to widget's subtreee.
 
 `GladeFormBuilder` allows to listen to model's changes and rebuilts its child. 
 
@@ -314,10 +331,8 @@ An example could be automatically update `Age` value based on checked `VIP Conte
 ```dart
 // In vipContent input
 onChange: (info, dependencies) {
-  final age = dependencies.byKey<int>('age-input');
-
-  if (info.value && age.value < 18) {
-    age.value = 18;
+  if (info.value && ageInput.value < 18) {
+    ageInput.value = 18;
   }
 }
 ```
@@ -345,7 +360,7 @@ translateError: (error, key, devMessage, {required dependencies}) {
 }
 ```
 
-Predefined validators and GladeInput variants defines error keys. Those keys can be found in `GladeErrorKeys` as static constants. Use them within translation. 
+Predefined validators and GladeInput variants defines error keys. Those keys can be found in `GladeErrorKeys` as static constants. Use them within your translation function or in `defualtTranslation`. 
 
 #### Default translations
 Use `defaultTranslation` to provide default translations for common error such as `nullValue` or  `emptyValue`. 

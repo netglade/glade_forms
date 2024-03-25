@@ -36,19 +36,16 @@ class Example extends StatelessWidget {
               TextFormField(
                 controller: model.name.controller,
                 validator: model.name.textFormFieldInputValidator,
-                onChanged: model.name.updateValueWithString,
                 decoration: const InputDecoration(labelText: 'Name'),
               ),
               TextFormField(
                 controller: model.age.controller,
                 validator: model.age.textFormFieldInputValidator,
-                onChanged: model.age.updateValueWithString,
                 decoration: const InputDecoration(labelText: 'Age'),
               ),
               TextFormField(
                 controller: model.email.controller,
                 validator: model.email.textFormFieldInputValidator,
-                onChanged: model.email.updateValueWithString,
                 decoration: const InputDecoration(labelText: 'Email'),
               ),
               const SizedBox(height: 10),
