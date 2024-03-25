@@ -3,6 +3,7 @@
 - **[Breaking]**: GladeInput's controller is now private. Use factory constructors to create input.
 - **[Breaking]**: `Extra` parameter removed
 - **[Breaking]**: `dependencies` are no longer passed into `onChange` and in validator.
+- **[Breaking]**: GladeInput is no longer ChangeNotifier
 - **[Add]**: onDependencyChange - callback when dependency was udpated.
 - **Improvement**: GladeModelDebugInfo now colorize String values to visualize whitespace.
 
