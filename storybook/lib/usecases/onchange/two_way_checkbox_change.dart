@@ -86,7 +86,7 @@ If *age* is changed to value under 18, *vip content* is unchecked and vice-versa
     return UsecaseContainer(
       shortDescription: "Age input depends on checkbox's value automatically",
       description: markdownData,
-      className: 'two_way_checkbox_change.dart',
+      className: 'onchange/two_way_checkbox_change.dart',
       child: GladeFormBuilder.create(
         // ignore: avoid-undisposed-instances, handled by GladeFormBuilder
         create: (context) => AgeRestrictedModel(),

@@ -90,7 +90,7 @@ In this example both bussiness rules controll checkbox via onChange and onDepend
     return UsecaseContainer(
       shortDescription: "Age input depends on checkbox's value automatically",
       description: markdownData,
-      className: 'checkbox_dependency_change.dart',
+      className: 'dependencies/checkbox_dependency_change.dart',
       child: GladeFormBuilder.create(
         // ignore: avoid-undisposed-instances, handled by GladeFormBuilder
         create: (context) => AgeRestrictedModel(),

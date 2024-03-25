@@ -98,6 +98,7 @@ abstract class GladeModel extends ChangeNotifier {
       _lastUpdates.add(input);
     } else {
       _lastUpdates = [input];
+      notifyDependecies();
       notifyListeners();
     }
   }
@@ -110,6 +111,18 @@ abstract class GladeModel extends ChangeNotifier {
 
     _groupEdit = false;
 
+    notifyDependecies();
+
     notifyListeners();
+  }
+
+  void notifyDependecies() {
+    for (final updatedInput in _lastUpdates) {
+      for (final input in inputs) {
+        if (input.dependencies.any((i) => i.inputKey == updatedInput.inputKey)) {
+          input.onDependencyChange?.call(updatedInput.inputKey);
+        }
+      }
+    }
   }
 }

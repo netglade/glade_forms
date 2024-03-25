@@ -23,9 +23,7 @@ typedef ValueTransform<T> = T Function(T input);
 
 typedef StringInput = GladeInput<String>;
 
-T _defaultTransform<T>(T input) => input;
-
-class GladeInput<T> extends ChangeNotifier {
+class GladeInput<T> {
   /// Compares initial and current value.
   @protected
   // ignore: prefer-correct-callback-field-name, ok name
@@ -64,7 +62,7 @@ class GladeInput<T> extends ChangeNotifier {
 
   /// Transforms passed value before assigning it into input.
   // ignore: prefer-correct-callback-field-name, ok name
-  ValueTransform<T> valueTransform;
+  final ValueTransform<T>? _valueTransform;
 
   final bool _useTextEditingController;
 
@@ -91,6 +89,8 @@ class GladeInput<T> extends ChangeNotifier {
   ConvertError<T>? __conversionError;
 
   GladeModel? _bindedModel;
+
+  InputDependencies get dependencies => dependenciesFactory();
 
   T? get initialValue => _initialValue;
 
@@ -170,7 +170,7 @@ class GladeInput<T> extends ChangeNotifier {
         _initialValue = initialValue,
         dependenciesFactory = dependenciesFactory ?? (() => []),
         inputKey = inputKey ?? '__${T.runtimeType}__${Random().nextInt(100000000)}',
-        valueTransform = valueTransform ?? _defaultTransform,
+        _valueTransform = valueTransform,
         _textEditingController = textEditingController ??
             (useTextEditingController
                 ? TextEditingController(
@@ -187,12 +187,6 @@ class GladeInput<T> extends ChangeNotifier {
 
     if (_useTextEditingController) {
       _textEditingController?.addListener(_onTextControllerChange);
-    }
-
-    final dependencies = this.dependenciesFactory();
-
-    for (final dependency in dependencies) {
-      dependency.addListener(() => _onDependencyUpdate(dependency.inputKey));
     }
   }
 
@@ -589,23 +583,14 @@ class GladeInput<T> extends ChangeNotifier {
       onChange: onChange ?? this.onChange,
       onDependencyChange: onDependencyChange ?? this.onDependencyChange,
       textEditingController: textEditingController ?? this._textEditingController,
-      valueTransform: valueTransform ?? this.valueTransform,
+      valueTransform: valueTransform ?? this._valueTransform,
       trackUnchanged: trackUnchanged ?? this.trackUnchanged,
     );
   }
 
   @mustCallSuper
-  @override
   void dispose() {
     _textEditingController?.removeListener(_onTextControllerChange);
-
-    final dependencies = dependenciesFactory();
-
-    for (final dependency in dependencies) {
-      dependency.removeListener(() => _onDependencyUpdate(dependency.inputKey));
-    }
-
-    super.dispose();
   }
 
   void _syncValueWithController(T value, {required bool shouldTriggerOnChange}) {
@@ -639,8 +624,7 @@ class GladeInput<T> extends ChangeNotifier {
 
   void _setValue(T value, {required bool shouldTriggerOnChange}) {
     _previousValue = _value;
-
-    _value = valueTransform(value);
+    _value = _useTextEditingController ? value : (_valueTransform?.call(value) ?? value);
 
     _isPure = false;
     __conversionError = null;
@@ -659,12 +643,6 @@ class GladeInput<T> extends ChangeNotifier {
     }
 
     _bindedModel?.notifyInputUpdated(this);
-
-    notifyListeners();
-  }
-
-  void _onDependencyUpdate(String inputKey) {
-    onDependencyChange?.call(inputKey);
   }
 
   // *
