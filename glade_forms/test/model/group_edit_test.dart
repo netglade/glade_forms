@@ -1,4 +1,4 @@
-// ignore_for_file: avoid-duplicate-test-assertions
+// ignore_for_file: avoid-duplicate-test-assertions, prefer-correct-callback-field-name
 
 import 'package:glade_forms/glade_forms.dart';
 import 'package:test/test.dart';
