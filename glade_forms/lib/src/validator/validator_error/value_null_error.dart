@@ -4,7 +4,6 @@ class ValueNullError<T> extends GladeValidatorError<T> {
   ValueNullError({
     required super.value,
     OnValidateError<T>? devError,
-    super.extra,
     super.key,
-  }) : super(devError: devError ?? (_, __) => "Value can't be null");
+  }) : super(devError: devError ?? (_) => "Value can't be null");
 }

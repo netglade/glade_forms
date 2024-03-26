@@ -1,6 +1,11 @@
 ## 2.0.0
 - **[Breaking]**: TextEditingController is no more created automatically. When TextEditingController is used, input's behavior is slightly changed. See README.md for full info.
 - **[Breaking]**: GladeInput's controller is now private. Use factory constructors to create input.
+- **[Breaking]**: `Extra` parameter removed
+- **[Breaking]**: `dependencies` are no longer passed into `onChange` and in validator.
+- **[Breaking]**: GladeInput is no longer ChangeNotifier
+- **[Add]**: onDependencyChange - callback is called when any (or multiple with groupEdit()) dependency was udpated.
+- **Improvement**: GladeModelDebugInfo now colorize String values to visualize whitespace.
 
 ## 1.6.0
 - **Improvement**: GladeModelDebugInfo is more colorful and polished.

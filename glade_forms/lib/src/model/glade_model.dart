@@ -20,9 +20,12 @@ abstract class GladeModel extends ChangeNotifier {
   ///
   /// Be aware that on initialize() these input are binded to model. Later included inputs are not automatically binded.
   ///
-  /// Either use allInputs getter to list all possible model's input or use [bindToModel] method to manually bind input.
+  /// Either use [allInputs] getter to list all possible model's input or use [bindToModel] method to manually bind input.
   List<GladeInput<Object?>> get inputs;
 
+  /// All inputs registered in GladeModel.
+  ///
+  /// By default equals to [inputs].
   List<GladeInput<Object?>> get allInputs => inputs;
 
   List<String> get lastUpdatedInputKeys => _lastUpdates.map((e) => e.inputKey).toList();
@@ -98,6 +101,7 @@ abstract class GladeModel extends ChangeNotifier {
       _lastUpdates.add(input);
     } else {
       _lastUpdates = [input];
+      notifyDependecies();
       notifyListeners();
     }
   }
@@ -110,6 +114,17 @@ abstract class GladeModel extends ChangeNotifier {
 
     _groupEdit = false;
 
+    notifyDependecies();
+
     notifyListeners();
+  }
+
+  void notifyDependecies() {
+    final updatedKeys = _lastUpdates.map((e) => e.inputKey);
+    for (final input in inputs) {
+      final union = input.dependencies.map((e) => e.inputKey).toSet().union(updatedKeys.toSet());
+
+      if (union.isNotEmpty) input.onDependencyChange?.call(union.toList());
+    }
   }
 }

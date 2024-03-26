@@ -30,14 +30,14 @@ class AgeRestrictedModel extends GladeModel {
       validator: (v) => (v
             ..notNull()
             ..satisfy(
-              (value, extra, dependencies) {
+              (value) {
                 if (!vipInput.value) {
                   return true;
                 }
 
                 return value >= 18;
               },
-              devError: (_, __) => 'When VIP enabled you must be at least 18 years old.',
+              devError: (_) => 'When VIP enabled you must be at least 18 years old.',
               key: _ErrorKeys.ageRestriction,
             ))
           .build(),
@@ -51,7 +51,7 @@ class AgeRestrictedModel extends GladeModel {
 
         return devMessage;
       },
-      onChange: (info, dependencies) {
+      onChange: (info) {
         vipInput.value = info.value >= 18;
       },
       useTextEditingController: true,
@@ -61,7 +61,7 @@ class AgeRestrictedModel extends GladeModel {
       value: false,
       inputKey: 'vip-input',
       dependencies: () => [ageInput],
-      onChange: (info, dependencies) {
+      onChange: (info) {
         if (info.value && ageInput.value < 18) {
           ageInput.value = 18;
         }
@@ -86,7 +86,7 @@ If *age* is changed to value under 18, *vip content* is unchecked and vice-versa
     return UsecaseContainer(
       shortDescription: "Age input depends on checkbox's value automatically",
       description: markdownData,
-      className: 'two_way_checkbox_change.dart',
+      className: 'onchange/two_way_checkbox_change.dart',
       child: GladeFormBuilder.create(
         // ignore: avoid-undisposed-instances, handled by GladeFormBuilder
         create: (context) => AgeRestrictedModel(),

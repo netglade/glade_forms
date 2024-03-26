@@ -13,7 +13,7 @@ void main() {
       final dependentInput = GladeInput.intInput(value: -1);
       final input = GladeInput.intInput(
         value: 0,
-        onChange: (info, _) {
+        onChange: (info) {
           dependentInput.value = info.value;
         },
       );
@@ -31,7 +31,7 @@ void main() {
       final dependentInput = GladeInput.intInput(value: -1);
       final input = GladeInput.intInput(
         value: 0,
-        onChange: (info, _) {
+        onChange: (info) {
           dependentInput.value = info.value;
         },
       );
@@ -49,7 +49,7 @@ void main() {
       final dependentInput = GladeInput.intInput(value: -1);
       final input = GladeInput.intInput(
         value: 0,
-        onChange: (info, _) {
+        onChange: (info) {
           dependentInput.value = info.value;
         },
       );
@@ -71,7 +71,7 @@ void main() {
       final input = GladeInput.intInput(
         value: 0,
         useTextEditingController: true,
-        onChange: (info, _) {
+        onChange: (info) {
           dependentInput.value = info.value;
         },
       );
@@ -90,7 +90,7 @@ void main() {
       final input = GladeInput.intInput(
         value: 0,
         useTextEditingController: true,
-        onChange: (info, _) {
+        onChange: (info) {
           dependentInput.value = info.value;
         },
       );
@@ -109,7 +109,7 @@ void main() {
       final input = GladeInput.intInput(
         value: 0,
         useTextEditingController: true,
-        onChange: (info, _) {
+        onChange: (info) {
           dependentInput.value = info.value;
         },
       );
@@ -128,7 +128,7 @@ void main() {
       final input = GladeInput.intInput(
         value: 0,
         useTextEditingController: true,
-        onChange: (info, _) {
+        onChange: (info) {
           dependentInput.value = info.value;
         },
       );

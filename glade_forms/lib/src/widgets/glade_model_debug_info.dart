@@ -80,30 +80,40 @@ class GladeModelDebugInfo<M extends GladeModel> extends StatelessWidget {
                     onPressed: () {
                       final _ = showDialog<void>(
                         context: context,
-                        builder: (context) => const AlertDialog(
+                        builder: (context) => AlertDialog(
                           content: Column(
                             children: [
-                              Text("Each column's value has tooltip. Use it to display full value."),
-                              Text('Bool values with black color mark untracked values within model.'),
-                              Row(
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: IconButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  icon: const Icon(Icons.close),
+                                ),
+                              ),
+                              const Text("Each column's value has tooltip. Use it to display full value."),
+                              const Text('Bool values with black color mark untracked values within model.'),
+                              const Row(
                                 children: [
                                   Icon(Icons.check, color: Colors.green),
                                   Text('True value, tracked'),
                                 ],
                               ),
-                              Row(
+                              const Row(
                                 children: [
                                   Icon(Icons.close, color: Colors.red),
                                   Text('False value, tracked'),
                                 ],
                               ),
-                              Row(
+                              const Row(
                                 children: [
                                   Icon(Icons.check, color: Colors.black),
                                   Icon(Icons.close, color: Colors.black),
                                   Text('True/False untracked'),
                                 ],
                               ),
+                              const SizedBox(height: 20),
+                              const Text('String value is annotated with colored background such as'),
+                              const _StringValue(x: '    There is whitespace at the beginning.'),
                             ],
                           ),
                         ),
@@ -214,9 +224,9 @@ class _Table extends StatelessWidget {
               if (showIsValid) _RowValue(value: x.isValid),
               if (showValidationError) _RowValue(value: x.errorFormatted()),
               if (showConversionError) _RowValue(value: x.hasConversionError),
-              if (showValue) _RowValue(value: x.value),
-              if (showInitialValue) _RowValue(value: x.initialValue),
-              if (showControllerText) _RowValue(value: x.controller?.text),
+              if (showValue) _RowValue(value: x.value, colorizedValue: true),
+              if (showInitialValue) _RowValue(value: x.initialValue, colorizedValue: true),
+              if (showControllerText) _RowValue(value: x.controller?.text, colorizedValue: true),
             ],
           ),
         ),
@@ -242,8 +252,15 @@ class _RowValue extends StatelessWidget {
   final bool tracked;
   final bool wrap;
   final bool center;
+  final bool colorizedValue;
 
-  const _RowValue({required this.value, this.wrap = false, this.tracked = true, this.center = true});
+  const _RowValue({
+    required this.value,
+    this.wrap = false,
+    this.tracked = true,
+    this.center = true,
+    this.colorizedValue = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -251,6 +268,19 @@ class _RowValue extends StatelessWidget {
 
     if (value case final bool? x when x != null) {
       return _BoolIcon(value: x, colorize: tracked);
+    }
+
+    if (value case final String x when colorizedValue) {
+      return Align(
+        alignment: center ? Alignment.center : Alignment.centerLeft,
+        child: Tooltip(
+          message: x,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 200),
+            child: _StringValue(x: x),
+          ),
+        ),
+      );
     }
 
     return Align(
@@ -266,6 +296,21 @@ class _RowValue extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _StringValue extends StatelessWidget {
+  final String? x;
+
+  const _StringValue({required this.x});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      x ?? '',
+      style:
+          Theme.of(context).textTheme.bodyMedium?.copyWith(backgroundColor: const Color.fromARGB(255, 196, 222, 184)),
     );
   }
 }

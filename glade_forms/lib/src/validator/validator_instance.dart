@@ -19,11 +19,11 @@ class ValidatorInstance<T> {
   void bindInput(GladeInput<T> input) => _input = input;
 
   /// Performs validation on given [value].
-  ValidatorResult<T> validate(T value, {Object? extra}) {
+  ValidatorResult<T> validate(T value) {
     final errors = <GladeValidatorError<T>>[];
 
     for (final part in _parts) {
-      final error = part.validate(value, extra: extra, dependencies: _input?.dependenciesFactory() ?? []);
+      final error = part.validate(value);
 
       if (error != null) {
         errors.add(error);

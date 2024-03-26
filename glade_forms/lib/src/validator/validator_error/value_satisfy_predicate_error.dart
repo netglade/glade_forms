@@ -4,7 +4,6 @@ class ValueSatisfyPredicateError<T> extends GladeValidatorError<T> {
   ValueSatisfyPredicateError({
     required super.value,
     required super.devError,
-    super.extra,
     super.key,
   });
 }

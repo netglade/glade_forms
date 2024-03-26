@@ -30,14 +30,14 @@ class AgeRestrictedModel extends GladeModel {
       validator: (v) => (v
             ..notNull()
             ..satisfy(
-              (value, extra, dependencies) {
+              (value) {
                 if (!vipInput.value) {
                   return true;
                 }
 
                 return value >= 18;
               },
-              devError: (_, __) => 'When VIP enabled you must be at least 18 years old.',
+              devError: (_) => 'When VIP enabled you must be at least 18 years old.',
               key: _ErrorKeys.ageRestriction,
             ))
           .build(),
@@ -51,30 +51,46 @@ class AgeRestrictedModel extends GladeModel {
 
         return devMessage;
       },
+      useTextEditingController: true,
     );
     vipInput = GladeInput.create(
       validator: (v) => (v..notNull()).build(),
       value: false,
       inputKey: 'vip-input',
+      dependencies: () => [ageInput],
+      onChange: (info) {
+        if (info.value && ageInput.value < 18) {
+          ageInput.value = 18;
+        }
+      },
+      onDependencyChange: (keys) {
+        if (keys.contains('age-input')) {
+          vipInput.value = ageInput.value >= 18;
+        }
+      },
     );
 
     super.initialize();
   }
 }
 
-class OneCheckboxValidationDependencyExample extends StatelessWidget {
-  const OneCheckboxValidationDependencyExample({super.key});
+class CheckboxDependencyExample extends StatelessWidget {
+  const CheckboxDependencyExample({super.key});
 
   @override
   Widget build(BuildContext context) {
     const markdownData = '''
-If *VIP content* is checked, **age** must be over 18.
+If *VIP content* is checked, **age** must be over 18 or it is changed to 18.
+
+If *age* is changed to value under 18, *vip content* is unchecked and vice-versa.
+
+In this example both bussiness rules controll checkbox via onChange and onDependencyChage.
  ''';
 
     return UsecaseContainer(
-      shortDescription: "Age input validation depends on checkbox's value",
+      shortDescription: "Age input depends on checkbox's value automatically",
       description: markdownData,
-      className: 'one_checkbox_deps_validation.dart',
+      className: 'dependencies/checkbox_dependency_change.dart',
       child: GladeFormBuilder.create(
         // ignore: avoid-undisposed-instances, handled by GladeFormBuilder
         create: (context) => AgeRestrictedModel(),
@@ -87,11 +103,13 @@ If *VIP content* is checked, **age** must be over 18.
                 TextFormField(
                   controller: formModel.nameInput.controller,
                   decoration: const InputDecoration(labelText: 'Name'),
+                  // onChanged: formModel.nameInput.updateValueWithString,
                   validator: formModel.nameInput.textFormFieldInputValidator,
                 ),
                 TextFormField(
                   controller: formModel.ageInput.controller,
                   decoration: const InputDecoration(labelText: 'Age'),
+                  //  onChanged: formModel.ageInput.updateValueWithString,
                   validator: (v) => formModel.ageInput.textFormFieldInputValidator(v),
                 ),
                 CheckboxListTile(
@@ -107,7 +125,9 @@ If *VIP content* is checked, **age** must be over 18.
                     child: const Text('Save'),
                   ),
                 ),
-                const GladeModelDebugInfo<AgeRestrictedModel>(),
+                const GladeModelDebugInfo<AgeRestrictedModel>(
+                  showControllerText: true,
+                ),
               ],
             ),
           ),
