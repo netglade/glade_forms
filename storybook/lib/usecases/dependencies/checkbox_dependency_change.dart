@@ -63,8 +63,8 @@ class AgeRestrictedModel extends GladeModel {
           ageInput.value = 18;
         }
       },
-      onDependencyChange: (key) {
-        if (key == 'age-input') {
+      onDependencyChange: (keys) {
+        if (keys.contains('age-input')) {
           vipInput.value = ageInput.value >= 18;
         }
       },

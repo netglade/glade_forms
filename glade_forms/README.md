@@ -279,8 +279,8 @@ For instance, consider a scenario where we want the "VIP Content" option to be a
  vipInput = GladeInput.create(
     inputKey: 'vip-input',
     dependencies: () => [ageInput],
-    onDependencyChange: (key) {
-      if (key == 'age-input') {
+    onDependencyChange: (keys) {
+      if (keys.contains('age-input')) {
         vipInput.value = ageInput.value >= 18;
       }
     },
@@ -320,7 +320,7 @@ In this example, when age-input updats its value (dependency), checkbox's value 
       }
     },
     onDependencyChange: (key) {
-      if (key == 'age-input') {
+      if (key.contains('age-input')) {
         vipInput.value = ageInput.value >= 18;
       }
     },
