@@ -270,7 +270,7 @@ class _RowValue extends StatelessWidget {
       return _BoolIcon(value: x, colorize: tracked);
     }
 
-    if (value case final String? x when x != null && colorizedValue) {
+    if (value case final String x when colorizedValue) {
       return Align(
         alignment: center ? Alignment.center : Alignment.centerLeft,
         child: Tooltip(
