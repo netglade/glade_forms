@@ -306,9 +306,9 @@ onChange: (info, dependencies) {
 
 ![two-way-inputs-example](https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/doc/two-way-dependencies.gif)
 
-Second approach is to use `dependencies` and `onDependencyChange` callback and react when different input was changed.
+The second approach is to use `dependencies` and `onDependencyChange` callback and react when different dependencies are changed. Note that it works with groupEdit() as well. In that case, onDependencyChange is called once for every changed dependency.
 
-In this example, when age-input updats its value (dependency), checkbox's value (vipInput) is updated.
+In this example, when age-input update its value (dependency), checkbox's value (vipInput) is updated.
 
 ```dart
  vipInput = GladeInput.create(
