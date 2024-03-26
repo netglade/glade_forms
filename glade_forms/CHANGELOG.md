@@ -4,7 +4,7 @@
 - **[Breaking]**: `Extra` parameter removed
 - **[Breaking]**: `dependencies` are no longer passed into `onChange` and in validator.
 - **[Breaking]**: GladeInput is no longer ChangeNotifier
-- **[Add]**: onDependencyChange - callback when dependency was udpated.
+- **[Add]**: onDependencyChange - callback is called when any (or multiple with groupEdit()) dependency was udpated.
 - **Improvement**: GladeModelDebugInfo now colorize String values to visualize whitespace.
 
 ## 1.6.0

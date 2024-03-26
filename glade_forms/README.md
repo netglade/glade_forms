@@ -293,7 +293,7 @@ For instance, consider a scenario where we want the "VIP Content" option to be a
 
 Sometimes, it can be handy to update some input's value based on the changed value of another input. As developer you have two options.
 
-You can listen for `onChange()` callback and update other inputs based on input's changed value. An example could be automatically update `Age` value based on checked `VIP Content` input (checkbox).
+You can listen for `onChange()` callback and update other inputs based on input's changed value. An example could be automatically updating the `Age` value based on checked `VIP Content` input (checkbox).
 
 ```dart
 // In vipContent input
