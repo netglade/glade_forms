@@ -65,10 +65,14 @@ void main() {
     for (final testCase in [
       ('https://x.test.com', true, true),
       ('http://test.com/test', true, true),
-      ('file://sdsasa.asdas.com', false, true),
+      ('file://sdsasa.asdas.com', false, false),
+      ('file://sdsasa.asdas.com', true, false),
       ('test.com/asdsa?qqe=sa44%20sda', false, true),
+      ('www.domain.com/asdsa?qqe=sa44%20sda', false, true),
       ('@x.sada/https://file:sadad', true, false),
-      ('sadscom:/192.168.1.1', false, true),
+      ('sadscom:/192.168.1.1', false, false),
+      ('noturl', false, false),
+      ('noturl', false, false),
     ]) {
       test('When URL is ${testCase.$1}, isUrl(http: ${testCase.$2}) ${testCase.$3 ? 'pass' : 'fails'}', () {
         final validator = (StringValidator()..isUri(requiresScheme: testCase.$2)).build();

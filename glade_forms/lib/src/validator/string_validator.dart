@@ -38,28 +38,32 @@ class StringValidator extends GladeValidator<String> {
   /// Checks that value is valid URL address.
   ///
   /// [requiresScheme] - if true HTTP(S) is mandatory.
+  /// Default [key] is [ GladeErrorKeys.stringNotUrl].
   void isUri({
     OnValidateError<String>? devError,
     bool allowEmpty = false,
     bool requiresScheme = false,
-    Object? key,
+    Object key = GladeErrorKeys.stringNotUrl,
   }) =>
       satisfy(
-        (x) {
-          if (x.isEmpty) {
+        (value) {
+          if (value.isEmpty) {
             return allowEmpty;
           }
 
-          final uri = Uri.tryParse(x);
+          final quantifier = requiresScheme ? '{1}' : '?';
 
-          if (uri == null) return false;
+          final exp = RegExp(
+            // ignore: unnecessary_string_escapes, regex pattern.
+            r'^(?:https?:\/\/)' +
+                quantifier +
+                r'(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$',
+          );
 
-          if (requiresScheme) return uri.hasScheme;
-
-          return true;
+          return exp.hasMatch(value);
         },
         devError: devError ?? (value) => 'Value "${value ?? 'NULL'}" is not valid URL address',
-        key: key ?? GladeErrorKeys.stringNotUrl,
+        key: key,
       );
 
   /// Matches provided regex [pattern].
