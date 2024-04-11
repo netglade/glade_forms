@@ -39,7 +39,7 @@ class StringValidator extends GladeValidator<String> {
   ///
   /// [requiresScheme] - if true HTTP(S) is mandatory.
   /// Default [key] is [ GladeErrorKeys.stringNotUrl].
-  void isUri({
+  void isUrl({
     OnValidateError<String>? devError,
     bool allowEmpty = false,
     bool requiresScheme = false,

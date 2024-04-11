@@ -53,7 +53,7 @@ void main() {
 
   group('isUrl', () {
     test('When value is empty, isUrl() fails', () {
-      final validator = (StringValidator()..isUri()).build();
+      final validator = (StringValidator()..isUrl()).build();
 
       final result = validator.validate('');
 
@@ -75,7 +75,7 @@ void main() {
       ('noturl', false, false),
     ]) {
       test('When URL is ${testCase.$1}, isUrl(http: ${testCase.$2}) ${testCase.$3 ? 'pass' : 'fails'}', () {
-        final validator = (StringValidator()..isUri(requiresScheme: testCase.$2)).build();
+        final validator = (StringValidator()..isUrl(requiresScheme: testCase.$2)).build();
 
         final result = validator.validate(testCase.$1);
 
