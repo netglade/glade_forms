@@ -222,7 +222,7 @@ class GladeInput<T> {
       'If type is not nullable, at least one of value or initialValue must be set',
     );
 
-    final validatorInstance = validator?.call(GladeValidator<T>()) ?? GladeValidator<T>().build();
+    final validatorInstance = validator?.call(GladeValidator()) ?? GladeValidator<T>().build();
 
     return GladeInput._(
       value: (value ?? initialValue) as T,
