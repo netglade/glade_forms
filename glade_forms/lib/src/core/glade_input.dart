@@ -1,15 +1,14 @@
-import 'dart:math';
-
 import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart';
 import 'package:glade_forms/src/converters/glade_type_converters.dart';
 import 'package:glade_forms/src/core/changes_info.dart';
 import 'package:glade_forms/src/core/convert_error.dart';
 import 'package:glade_forms/src/core/error_translator.dart';
+import 'package:glade_forms/src/core/glade_input_base.dart';
 import 'package:glade_forms/src/core/input_dependencies.dart';
 import 'package:glade_forms/src/core/string_to_type_converter.dart';
 import 'package:glade_forms/src/core/type_helper.dart';
-import 'package:glade_forms/src/model/glade_model.dart';
+import 'package:glade_forms/src/model/glade_model_base.dart';
 import 'package:glade_forms/src/validator/validator.dart';
 import 'package:glade_forms/src/validator/validator_result.dart';
 import 'package:meta/meta.dart';
@@ -23,55 +22,13 @@ typedef ValueTransform<T> = T Function(T input);
 
 typedef StringInput = GladeInput<String>;
 
-class GladeInput<T> {
-  /// Compares initial and current value.
-  @protected
-  // ignore: prefer-correct-callback-field-name, ok name
-  final ValueComparator<T>? valueComparator;
-
-  @protected
-  final ValidatorInstance<T> validatorInstance;
-
-  @protected
-  final StringToTypeConverter<T>? stringTovalueConverter;
-
-  // ignore: prefer-correct-callback-field-name, ok name
-  final InputDependenciesFactory dependenciesFactory;
-
-  /// An input's identification.
-  ///
-  /// Used within listener changes and dependency related funcions such as validation.
-  final String inputKey;
-
-  // ignore: prefer-correct-callback-field-name, ok name
-  final ErrorTranslator<T>? translateError;
-
-  /// Validation message for conversion error.
-  final DefaultTranslations? defaultTranslations;
-
-  /// Called when input's value changed.
-  final OnChange<T>? onChange;
-
-  /// Called when one of dependencies changes.
-  final OnDependencyChange? onDependencyChange;
-
-  /// Determines whether this input will be considered in isUnchanged on model.
-  ///
-  /// That means, when the value is false, it will opt-out this input from the computation.
-  bool trackUnchanged;
-
-  /// Transforms passed value before assigning it into input.
-  // ignore: prefer-correct-callback-field-name, ok name
-  final ValueTransform<T>? _valueTransform;
-
+class GladeInput<T> extends GladeInputBase<T> {
   final bool _useTextEditingController;
 
   /// Initial value - does not change after creating.
   T? _initialValue;
 
   TextEditingController? _textEditingController;
-
-  final StringToTypeConverter<T> _defaultConverter = StringToTypeConverter<T>(converter: (x, _) => x as T);
 
   /// Current input's value.
   T _value;
@@ -88,37 +45,60 @@ class GladeInput<T> {
   /// Input is in invalid state when there was conversion error.
   ConvertError<T>? __conversionError;
 
-  GladeModel? _bindedModel;
+  bool _isChanging = false;
 
-  InputDependencies get dependencies => dependenciesFactory();
+  GladeModelBase? _bindedModel;
 
-  T? get initialValue => _initialValue;
-
+  @override
   TextEditingController? get controller => _textEditingController;
 
+  @override
   T get value => _value;
 
+  @override
+  T? get initialValue => _initialValue;
+
+  @override
   T? get previousValue => _previousValue;
 
-  /// Input's value was not changed.
-  bool get isPure => _isPure;
+  /// String representattion of [value].
+  @override
+  String get stringValue => stringTovalueConverter?.convertBack(value) ?? value.toString();
 
-  ValidatorResult<T> get validatorResult => validatorInstance.validate(value);
+  @override
+  InputDependencies get dependencies => dependenciesFactory();
+
+  @override
+  ValidatorResult<T> get validation => validatorInstance.validate(value);
+
+  @override
+  Future<ValidatorResult<T>> get validationAsync => Future.value(validation);
+
+  /// Input's value was not changed.
+  @override
+  bool get isPure => _isPure;
 
   /// [value] is equal to [initialValue].
   ///
   /// Can be dirty or pure.
+  @override
   bool get isUnchanged => valueComparator?.call(initialValue, value) ?? _valueIsSameAsInitialValue;
 
-  /// Input does not have conversion error nor validation error.
-  bool get isValid => !hasConversionError && validatorInstance.validate(value).isValid;
+  @override
+  bool get isChanging => _isChanging;
 
+  /// Input does not have conversion error nor validation error.
+  @override
+  bool get isValid => !hasConversionError && validation.isValid;
+
+  @override
+  Future<bool> get isValidAsync => Future.value(isValid);
+
+  @override
   bool get isNotValid => !isValid;
 
+  @override
   bool get hasConversionError => __conversionError != null;
-
-  /// String representattion of [value].
-  String get stringValue => stringTovalueConverter?.convertBack(value) ?? value.toString();
 
   bool get _valueIsSameAsInitialValue {
     if (identical(value, initialValue)) return true;
@@ -146,21 +126,21 @@ class GladeInput<T> {
 
   GladeInput._({
     required T value,
-    required this.validatorInstance,
+    required super.validatorInstance,
     required bool isPure,
-    required this.valueComparator,
-    required String? inputKey,
-    required this.translateError,
-    required this.stringTovalueConverter,
+    required super.valueComparator,
+    required super.inputKey,
+    required super.translateError,
+    required super.stringTovalueConverter,
     required InputDependenciesFactory? dependenciesFactory,
-    required this.defaultTranslations,
-    required this.onChange,
-    required this.onDependencyChange,
-    required ValueTransform<T>? valueTransform,
+    required super.defaultTranslations,
+    required super.onChange,
+    required super.onDependencyChange,
+    required super.valueTransform,
     T? initialValue,
     TextEditingController? textEditingController,
     bool useTextEditingController = false,
-    this.trackUnchanged = true,
+    super.trackUnchanged = true,
   })  : assert(
           dependenciesFactory == null || (onDependencyChange != null),
           'When dependencies are provided, provide onDependencyChange as well',
@@ -168,9 +148,8 @@ class GladeInput<T> {
         _isPure = isPure,
         _value = value,
         _initialValue = initialValue,
-        dependenciesFactory = dependenciesFactory ?? (() => []),
-        inputKey = inputKey ?? '__${T.runtimeType}__${Random().nextInt(100000000)}',
-        _valueTransform = valueTransform,
+        //       super.dependenciesFactory = dependenciesFactory ?? (() => []),
+        // _valueTransform = valueTransform,
         _textEditingController = textEditingController ??
             (useTextEditingController
                 ? TextEditingController(
@@ -182,7 +161,8 @@ class GladeInput<T> {
                   )
                 : null),
         // ignore: avoid_bool_literals_in_conditional_expressions, cant be simplified.
-        _useTextEditingController = textEditingController != null ? true : useTextEditingController {
+        _useTextEditingController = textEditingController != null ? true : useTextEditingController,
+        super(dependenciesFactory: dependenciesFactory ?? (() => [])) {
     validatorInstance.bindInput(this);
 
     if (_useTextEditingController) {
@@ -319,9 +299,10 @@ class GladeInput<T> {
         trackUnchanged: trackUnchanged,
       );
 
+  @override
   @internal
   // ignore: use_setters_to_change_properties, as method.
-  void bindToModel(GladeModel model) => _bindedModel = model;
+  void bindToModel(GladeModelBase model) => _bindedModel = model;
 
   static GladeInput<int> intInput({
     required int value,
@@ -436,59 +417,82 @@ class GladeInput<T> {
   // * Public methods
   // *
 
-  ValidatorResult<T> validate() => validatorInstance.validate(value);
+  //@Deprecated('Use validatorResult')
+  //ValidatorResult<T> validate() => validatorInstance.validate(value);
 
-  String? translate({String delimiter = '.'}) => _translate(delimiter: delimiter, customError: validatorResult);
-
-  String errorFormatted() {
+  //String? translate({String delimiter = '.'}) => _translate(delimiter: delimiter, customError: validation);
+  //todo: maybe into base class?
+  @override
+  String errorFormatted({String delimiter = '|'}) {
     // ignore: avoid-non-null-assertion, it is not null
-    if (hasConversionError) return _translateConversionError(__conversionError!);
+    if (hasConversionError) return translateConversionError(__conversionError!);
 
-    return validatorResult.isInvalid ? _translate() ?? '' : '';
+    return validation.isInvalid ? translate() ?? '' : '';
   }
 
-  /// Shorthand validator for TextFieldForm inputs.
+  @override
+  Future<String> errorFormattedAsync({String delimiter = '|'}) => Future.value(errorFormatted(delimiter: delimiter));
+
+  // /// Shorthand validator for TextFieldForm inputs.
+  // ///
+  // /// Returns translated validation message.
+  // /// If there are multiple errors they are concenated into one string with [delimiter].
+  // String? textFormFieldInputValidatorCustom(String? value, {String delimiter = '.'}) {
+  //   assert(
+  //     TypeHelper.typesEqual<T, String>() || TypeHelper.typesEqual<T, String?>() || stringTovalueConverter != null,
+  //     'For non-string values [converter] must be provided. TInput type: $T',
+  //   );
+  //   final converter = stringTovalueConverter ?? _defaultConverter;
+
+  //   try {
+  //     final convertedValue = converter.convert(value);
+  //     final convertedError = validatorInstance.validate(convertedValue);
+
+  //     return !convertedError.isValid ? _translate(delimiter: delimiter, customError: convertedError) : null;
+  //   } on ConvertError<T> catch (e) {
+  //     return e.error != null ? _translate(delimiter: delimiter, customError: e) : e.devError(value);
+  //   }
+  // }
+
+  // /// Shorthand validator for TextFieldForm inputs.
+  // ///
+  // /// Returns translated validation message.
+  // String? textFormFieldInputValidator(String? value) => textFormFieldInputValidatorCustom(value);
+
+  // /// Shorthand validator for Form field input.
+  // ///
+  // /// Returns translated validation message.
+  // String? formFieldValidator() {
+  //   final convertedError = validation;
+
+  //   return convertedError.isInvalid ? _translate(customError: convertedError) : null;
+  // }
+
+  /// Used as shorthand for field setter.
   ///
-  /// Returns translated validation message.
-  /// If there are multiple errors they are concenated into one string with [delimiter].
-  String? textFormFieldInputValidatorCustom(String? value, {String delimiter = '.'}) {
-    assert(
-      TypeHelper.typesEqual<T, String>() || TypeHelper.typesEqual<T, String?>() || stringTovalueConverter != null,
-      'For non-string values [converter] must be provided. TInput type: $T',
-    );
-    final converter = stringTovalueConverter ?? _defaultConverter;
-
-    try {
-      final convertedValue = converter.convert(value);
-      final convertedError = validatorInstance.validate(convertedValue);
-
-      return !convertedError.isValid ? _translate(delimiter: delimiter, customError: convertedError) : null;
-    } on ConvertError<T> catch (e) {
-      return e.error != null ? _translate(delimiter: delimiter, customError: e) : e.devError(value);
+  /// When `useTextEditingController` true, method will sync controller with provided value.
+  /// When [shouldTriggerOnChange] is set to false, the `onChange` callback will not be called.
+  @override
+  void updateValue(T value, {bool shouldTriggerOnChange = true}) {
+    if (_useTextEditingController) {
+      _syncValueWithController(value, shouldTriggerOnChange: shouldTriggerOnChange);
+    } else {
+      _setValue(value, shouldTriggerOnChange: shouldTriggerOnChange);
     }
   }
 
-  /// Shorthand validator for TextFieldForm inputs.
-  ///
-  /// Returns translated validation message.
-  String? textFormFieldInputValidator(String? value) => textFormFieldInputValidatorCustom(value);
+  @override
+  Future<void> updateValueAsync(T value, {bool shouldTriggerOnChange = true}) async =>
+      updateValue(value, shouldTriggerOnChange: shouldTriggerOnChange);
 
-  /// Shorthand validator for Form field input.
-  ///
-  /// Returns translated validation message.
-  String? formFieldValidator(T value) {
-    final convertedError = validatorInstance.validate(value);
-
-    return convertedError.isInvalid ? _translate(customError: convertedError) : null;
-  }
-
+  @override
   void updateValueWithString(String? strValue, {bool shouldTriggerOnChange = true}) {
     assert(
       TypeHelper.typesEqual<T, String>() || TypeHelper.typesEqual<T, String?>() || stringTovalueConverter != null,
       'For non-string values [converter] must be provided. TInput type: ${T.runtimeType}',
     );
 
-    final converter = stringTovalueConverter ?? _defaultConverter;
+    final converter = stringTovalueConverter ?? defaultConverter;
 
     try {
       if (_useTextEditingController) {
@@ -502,28 +506,9 @@ class GladeInput<T> {
     }
   }
 
-  /// Used as shorthand for field setter.
-  ///
-  /// When `useTextEditingController` true, method will sync controller with provided value.
-  /// When [shouldTriggerOnChange] is set to false, the `onChange` callback will not be called.
-  void updateValue(T value, {bool shouldTriggerOnChange = true}) {
-    if (_useTextEditingController) {
-      _syncValueWithController(value, shouldTriggerOnChange: shouldTriggerOnChange);
-    } else {
-      _setValue(value, shouldTriggerOnChange: shouldTriggerOnChange);
-    }
-  }
-
-  /// Used as shorthand for field setter.
-  ///
-  /// If `T` is non-nullable type and provided value is `null`, update is **not invoked**.
-  ///
-  /// When [shouldTriggerOnChange] is set to false, the `onChange` callback will not be called.
-  void updateValueWhenNotNull(T? value, {bool shouldTriggerOnChange = true}) {
-    if (value == null) return;
-
-    return updateValue(value, shouldTriggerOnChange: shouldTriggerOnChange);
-  }
+  @override
+  Future<void> updateValueWithStringAsync(String? strValue, {bool shouldTriggerOnChange = true}) async =>
+      updateValueWithString(strValue, shouldTriggerOnChange: shouldTriggerOnChange);
 
   /// Resets input into pure state.
   ///
@@ -583,7 +568,7 @@ class GladeInput<T> {
       onChange: onChange ?? this.onChange,
       onDependencyChange: onDependencyChange ?? this.onDependencyChange,
       textEditingController: textEditingController ?? this._textEditingController,
-      valueTransform: valueTransform ?? this._valueTransform,
+      valueTransform: valueTransform ?? this.valueTransform,
       trackUnchanged: trackUnchanged ?? this.trackUnchanged,
     );
   }
@@ -594,7 +579,7 @@ class GladeInput<T> {
   }
 
   void _syncValueWithController(T value, {required bool shouldTriggerOnChange}) {
-    final converter = stringTovalueConverter ?? _defaultConverter;
+    final converter = stringTovalueConverter ?? defaultConverter;
     try {
       _controllerTriggersOnChange = shouldTriggerOnChange;
 
@@ -612,7 +597,7 @@ class GladeInput<T> {
 
   // If using text controller - sync its value
   void _onTextControllerChange() {
-    final converter = stringTovalueConverter ?? _defaultConverter;
+    final converter = stringTovalueConverter ?? defaultConverter;
 
     try {
       final convertedValue = converter.convert(controller?.text);
@@ -623,8 +608,9 @@ class GladeInput<T> {
   }
 
   void _setValue(T value, {required bool shouldTriggerOnChange}) {
+    _isChanging = true;
     _previousValue = _value;
-    _value = _useTextEditingController ? value : (_valueTransform?.call(value) ?? value);
+    _value = _useTextEditingController ? value : (valueTransform?.call(value) ?? value);
 
     _isPure = false;
     __conversionError = null;
@@ -637,71 +623,71 @@ class GladeInput<T> {
           previousValue: _previousValue,
           value: value,
           initialValue: initialValue,
-          validatorResult: validate(),
+          validatorResult: validation,
         ),
       );
     }
-
+    _isChanging = false;
     _bindedModel?.notifyInputUpdated(this);
   }
 
-  // *
-  // * Translation methods
-  // *
+  // // *
+  // // * Translation methods
+  // // *
 
-  /// Translates input's errors (validation or conversion).
-  String? _translate({String delimiter = '.', Object? customError}) {
-    final err = customError ?? validatorResult;
+  // /// Translates input's errors (validation or conversion).
+  // String? _translate({String delimiter = '.', Object? customError}) {
+  //   final err = customError ?? validation;
 
-    if (err is ValidatorResult<T> && err.isValid) return null;
+  //   if (err is ValidatorResult<T> && err.isValid) return null;
 
-    if (err is ValidatorResult<T>) {
-      return _translateGenericErrors(err, delimiter);
-    }
+  //   if (err is ValidatorResult<T>) {
+  //     return _translateGenericErrors(err, delimiter);
+  //   }
 
-    if (err is ConvertError<T>) {
-      return _translateConversionError(err);
-    }
+  //   if (err is ConvertError<T>) {
+  //     return _translateConversionError(err);
+  //   }
 
-    //ignore: avoid-dynamic, ok for now
-    if (err is List<dynamic>) {
-      return err.map((x) => x.toString()).join('.');
-    }
+  //   //ignore: avoid-dynamic, ok for now
+  //   if (err is List<dynamic>) {
+  //     return err.map((x) => x.toString()).join('.');
+  //   }
 
-    return err.toString();
-  }
+  //   return err.toString();
+  // }
 
-  String _translateConversionError(ConvertError<T> err) {
-    final defaultTranslationsTmp = this.defaultTranslations;
-    final translateErrorTmp = translateError;
-    final defaultConversionMessage = defaultTranslationsTmp?.defaultConversionMessage;
+  // String _translateConversionError(ConvertError<T> err) {
+  //   final defaultTranslationsTmp = this.defaultTranslations;
+  //   final translateErrorTmp = translateError;
+  //   final defaultConversionMessage = defaultTranslationsTmp?.defaultConversionMessage;
 
-    if (translateErrorTmp != null) {
-      return translateErrorTmp(err, err.key, err.devErrorMessage, dependenciesFactory());
-    } else if (defaultConversionMessage != null) {
-      return defaultConversionMessage;
-    }
+  //   if (translateErrorTmp != null) {
+  //     return translateErrorTmp(err, err.key, err.devErrorMessage, dependenciesFactory());
+  //   } else if (defaultConversionMessage != null) {
+  //     return defaultConversionMessage;
+  //   }
 
-    return err.devErrorMessage;
-  }
+  //   return err.devErrorMessage;
+  // }
 
-  String _translateGenericErrors(ValidatorResult<T> inputErrors, String delimiter) {
-    final translateErrorTmp = translateError;
+  // String _translateGenericErrors(ValidatorResult<T> inputErrors, String delimiter) {
+  //   final translateErrorTmp = translateError;
 
-    final defaultTranslationsTmp = this.defaultTranslations;
-    if (translateErrorTmp != null) {
-      return inputErrors.errors
-          .map((e) => translateErrorTmp(e, e.key, e.devErrorMessage, dependenciesFactory()))
-          .join(delimiter);
-    }
+  //   final defaultTranslationsTmp = this.defaultTranslations;
+  //   if (translateErrorTmp != null) {
+  //     return inputErrors.errors
+  //         .map((e) => translateErrorTmp(e, e.key, e.devErrorMessage, dependenciesFactory()))
+  //         .join(delimiter);
+  //   }
 
-    return inputErrors.errors.map((e) {
-      if (defaultTranslationsTmp != null &&
-          (e.isNullError || e.hasStringEmptyOrNullErrorKey || e.hasNullValueOrEmptyValueKey)) {
-        return defaultTranslationsTmp.defaultValueIsNullOrEmptyMessage ?? e.toString();
-      }
+  //   return inputErrors.errors.map((e) {
+  //     if (defaultTranslationsTmp != null &&
+  //         (e.isNullError || e.hasStringEmptyOrNullErrorKey || e.hasNullValueOrEmptyValueKey)) {
+  //       return defaultTranslationsTmp.defaultValueIsNullOrEmptyMessage ?? e.toString();
+  //     }
 
-      return e.toString();
-    }).join(delimiter);
-  }
+  //     return e.toString();
+  //   }).join(delimiter);
+  // }
 }

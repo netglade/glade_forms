@@ -7,4 +7,6 @@ abstract class InputValidatorPart<T> {
   const InputValidatorPart({this.key});
 
   GladeValidatorError<T>? validate(T value);
+
+  Future<GladeValidatorError<T>?> validateAsync(T value);
 }

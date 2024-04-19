@@ -6,6 +6,7 @@ import 'package:glade_forms/src/validator/validator_error/validator_error.dart';
 import 'package:glade_forms/src/validator/validator_instance.dart';
 
 typedef ValidateFunction<T> = GladeValidatorError<T>? Function(T value);
+typedef ValidateFunctionAsync<T> = Future<GladeValidatorError<T>?> Function(T value);
 
 class GladeValidator<T> {
   List<InputValidatorPart<T>> parts = [];
@@ -23,6 +24,10 @@ class GladeValidator<T> {
   /// Checks value with custom validation function.
   void custom(ValidateFunction<T> onValidate, {Object? key}) =>
       parts.add(CustomValidationPart(customValidator: onValidate, key: key));
+
+  /// Checks value with custom validation function.
+  void customAsync(ValidateFunctionAsync<T> onValidate, {Object? key}) =>
+      parts.add(CustomValidationPartAsync(customValidator: onValidate, key: key));
 
   /// Checks value through custom validator [part].
   void customPart(InputValidatorPart<T> part) => parts.add(part);
@@ -46,6 +51,20 @@ class GladeValidator<T> {
   }) =>
       parts.add(
         SatisfyPredicatePart(
+          predicate: predicate,
+          devError: devError ?? (value) => 'Value ${value ?? 'NULL'} does not satisfy given predicate.',
+          key: key,
+        ),
+      );
+
+  /// Value must satisfy given [predicate]. Returns [ValueSatisfyPredicateError].
+  void satisfyAsync(
+    SatisfyPredicateAsync<T> predicate, {
+    OnValidateError<T>? devError,
+    Object? key,
+  }) =>
+      parts.add(
+        SatisfyPredicatePartAsync(
           predicate: predicate,
           devError: devError ?? (value) => 'Value ${value ?? 'NULL'} does not satisfy given predicate.',
           key: key,

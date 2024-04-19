@@ -2,6 +2,7 @@ import 'package:glade_forms/src/validator/part/input_validator_part.dart';
 import 'package:glade_forms/src/validator/validator_error/validator_error.dart';
 
 typedef SatisfyPredicate<T> = bool Function(T value);
+typedef SatisfyPredicateAsync<T> = Future<bool> Function(T value);
 
 class SatisfyPredicatePart<T> extends InputValidatorPart<T> {
   // ignore: prefer-correct-callback-field-name, ok name
@@ -19,6 +20,37 @@ class SatisfyPredicatePart<T> extends InputValidatorPart<T> {
   @override
   GladeValidatorError<T>? validate(T value) {
     return predicate(value)
+        ? null
+        : ValueSatisfyPredicateError<T>(
+            value: value,
+            devError: devError,
+            key: key,
+          );
+  }
+
+  @override
+  Future<GladeValidatorError<T>?> validateAsync(T value) => Future.value(validate(value));
+}
+
+class SatisfyPredicatePartAsync<T> extends InputValidatorPart<T> {
+  final OnValidateError<T> devError;
+
+  final SatisfyPredicateAsync<T> predicate;
+
+  const SatisfyPredicatePartAsync({
+    required this.predicate,
+    required this.devError,
+    super.key,
+  });
+
+  @override
+  GladeValidatorError<T> validate(T value) {
+    throw UnsupportedError('Use [validateAsync] in SatisfyPredicatePartAsync');
+  }
+
+  @override
+  Future<GladeValidatorError<T>?> validateAsync(T value) async {
+    return (await predicate(value))
         ? null
         : ValueSatisfyPredicateError<T>(
             value: value,
