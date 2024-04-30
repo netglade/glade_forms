@@ -254,6 +254,7 @@ class GladeInput<T> {
     String? inputKey,
     bool pure = true,
     ErrorTranslator<T>? translateError,
+    DefaultTranslations? defaultTranslations,
     ValueComparator<T>? valueComparator,
     StringToTypeConverter<T>? valueConverter,
     InputDependenciesFactory? dependencies,
@@ -269,6 +270,7 @@ class GladeInput<T> {
         value: value ?? initialValue,
         initialValue: initialValue,
         translateError: translateError,
+        defaultTranslations: defaultTranslations,
         valueComparator: valueComparator,
         valueConverter: valueConverter,
         inputKey: inputKey,
@@ -291,6 +293,7 @@ class GladeInput<T> {
     String? inputKey,
     bool pure = true,
     ErrorTranslator<T>? translateError,
+    DefaultTranslations? defaultTranslations,
     ValueComparator<T>? valueComparator,
     StringToTypeConverter<T>? valueConverter,
     InputDependenciesFactory? dependencies,
@@ -306,6 +309,7 @@ class GladeInput<T> {
         value: value,
         initialValue: initialValue,
         translateError: translateError,
+        defaultTranslations: defaultTranslations,
         valueComparator: valueComparator,
         valueConverter: valueConverter,
         inputKey: inputKey,
@@ -330,6 +334,7 @@ class GladeInput<T> {
     ValidatorFactory<int>? validator,
     bool pure = true,
     ErrorTranslator<int>? translateError,
+    DefaultTranslations? defaultTranslations,
     ValueComparator<int>? valueComparator,
     InputDependenciesFactory? dependencies,
     OnChange<int>? onChange,
@@ -345,6 +350,7 @@ class GladeInput<T> {
         validator: validator,
         pure: pure,
         translateError: translateError,
+        defaultTranslations: defaultTranslations,
         valueComparator: valueComparator,
         inputKey: inputKey,
         dependencies: dependencies,
@@ -364,6 +370,7 @@ class GladeInput<T> {
     ValidatorFactory<bool>? validator,
     bool pure = true,
     ErrorTranslator<bool>? translateError,
+    DefaultTranslations? defaultTranslations,
     ValueComparator<bool>? valueComparator,
     InputDependenciesFactory? dependencies,
     OnChange<bool>? onChange,
@@ -379,6 +386,7 @@ class GladeInput<T> {
         validator: validator,
         pure: pure,
         translateError: translateError,
+        defaultTranslations: defaultTranslations,
         valueComparator: valueComparator,
         inputKey: inputKey,
         dependencies: dependencies,
@@ -522,7 +530,7 @@ class GladeInput<T> {
   void updateValueWhenNotNull(T? value, {bool shouldTriggerOnChange = true}) {
     if (value == null) return;
 
-    return updateValue(value, shouldTriggerOnChange: shouldTriggerOnChange);
+    updateValue(value, shouldTriggerOnChange: shouldTriggerOnChange);
   }
 
   /// Resets input into pure state.
@@ -680,6 +688,8 @@ class GladeInput<T> {
       return translateErrorTmp(err, err.key, err.devErrorMessage, dependenciesFactory());
     } else if (defaultConversionMessage != null) {
       return defaultConversionMessage;
+    } else if (this._bindedModel case final model?) {
+      return model.defaultErrorTranslate(err, err.key, err.devErrorMessage, dependenciesFactory());
     }
 
     return err.devErrorMessage;
@@ -699,6 +709,8 @@ class GladeInput<T> {
       if (defaultTranslationsTmp != null &&
           (e.isNullError || e.hasStringEmptyOrNullErrorKey || e.hasNullValueOrEmptyValueKey)) {
         return defaultTranslationsTmp.defaultValueIsNullOrEmptyMessage ?? e.toString();
+      } else if (this._bindedModel case final model?) {
+        return model.defaultErrorTranslate(e, e.key, e.devErrorMessage, dependenciesFactory());
       }
 
       return e.toString();

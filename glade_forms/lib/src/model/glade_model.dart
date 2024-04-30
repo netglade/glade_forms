@@ -16,6 +16,8 @@ abstract class GladeModel extends ChangeNotifier {
 
   bool get isDirty => !isPure;
 
+  ErrorTranslator<Object?> get defaultErrorTranslate => (error, key, devMessage, dependencies) => devMessage;
+
   /// Currently tracked inputs by GladeModel.
   ///
   /// Be aware that on initialize() these input are binded to model. Later included inputs are not automatically binded.
