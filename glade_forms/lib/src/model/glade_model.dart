@@ -129,4 +129,13 @@ abstract class GladeModel extends ChangeNotifier {
       if (union.isNotEmpty) input.onDependencyChange?.call(union.toList());
     }
   }
+
+  /// Resets all inputs to pure state.
+  ///
+  /// When [copyValueToInitialValue] is true, input's initialValue is overriden by current value.
+  void resetToPure({bool copyValueToInitialValue = false}) {
+    for (final input in inputs) {
+      input.resetToPure(copyValueToInitialValue: copyValueToInitialValue);
+    }
+  }
 }
