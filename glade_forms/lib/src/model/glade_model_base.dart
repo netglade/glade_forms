@@ -8,9 +8,8 @@ typedef OnEdit = void Function();
 abstract class GladeModelBase<TINPUT extends GladeInputBase<Object?>> extends ChangeNotifier {
   List<TINPUT> _lastUpdates = [];
   bool _groupEdit = false;
-  bool _isInitialized = false;
 
-  bool get isInitialized => _isInitialized;
+  bool get isInitialized;
 
   bool get isValid => inputs.every((input) => input.isValid) && isInitialized;
 
@@ -71,19 +70,7 @@ abstract class GladeModelBase<TINPUT extends GladeInputBase<Object?>> extends Ch
   /// `super.initialize()` must be called in the end.
   @mustCallSuper
   @protected
-  void initialize() {
-    assert(
-      inputs.map((e) => e.inputKey).length == inputs.map((e) => e.inputKey).toSet().length,
-      'Model contains inputs with duplicated key!',
-    );
-
-    for (final input in inputs) {
-      input.bindToModel(this);
-    }
-
-    _isInitialized = true;
-    notifyListeners();
-  }
+  void initialize();
 
   /// Updates model's input with String? value using its converter.
   void stringFieldUpdateInput<INPUT extends GladeInput<Object?>>(INPUT input, String? value) {

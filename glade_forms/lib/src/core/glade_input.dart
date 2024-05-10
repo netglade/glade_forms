@@ -13,13 +13,6 @@ import 'package:glade_forms/src/validator/validator.dart';
 import 'package:glade_forms/src/validator/validator_result.dart';
 import 'package:meta/meta.dart';
 
-typedef ValueComparator<T> = bool Function(T? initial, T? value);
-typedef ValidatorFactory<T> = ValidatorInstance<T> Function(GladeValidator<T> v);
-typedef StringValidatorFactory = ValidatorInstance<String> Function(StringValidator validator);
-typedef OnChange<T> = void Function(ChangesInfo<T> info);
-typedef OnDependencyChange = void Function(List<String> updateInputKeys);
-typedef ValueTransform<T> = T Function(T input);
-
 typedef StringInput = GladeInput<String>;
 
 class GladeInput<T> extends GladeInputBase<T> {

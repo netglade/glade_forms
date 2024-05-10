@@ -1,15 +1,16 @@
-import 'package:flutter/foundation.dart';
-import 'package:glade_forms/src/core/glade_input.dart';
 import 'package:glade_forms/src/model/glade_model_base.dart';
 import 'package:meta/meta.dart';
 
-abstract class GladeModel extends GladeModelBase<GladeInput<Object?>> {
+abstract class AsyncGladeModel extends GladeModelBase {
   bool _isInitialized = false;
+
+  @override
+  String get formattedValidationErrors => throw UnsupportedError('Use [formattedValidationErrorsAsync] version');
 
   @override
   bool get isInitialized => _isInitialized;
 
-  GladeModel() {
+  AsyncGladeModel() {
     initialize();
   }
 
@@ -17,6 +18,12 @@ abstract class GladeModel extends GladeModelBase<GladeInput<Object?>> {
   @protected
   @mustCallSuper
   void initialize() {
+    throw UnsupportedError('Use [initializeAsync]');
+  }
+
+  @protected
+  @mustCallSuper
+  Future<void> initializeAsync() {
     assert(
       inputs.map((e) => e.inputKey).length == inputs.map((e) => e.inputKey).toSet().length,
       'Model contains inputs with duplicated key!',
@@ -28,5 +35,7 @@ abstract class GladeModel extends GladeModelBase<GladeInput<Object?>> {
 
     _isInitialized = true;
     notifyListeners();
+
+    return Future.value();
   }
 }

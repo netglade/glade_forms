@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:glade_forms_storybook/generated/locale_loader.g.dart';
 import 'package:glade_forms_storybook/localization_addon_custom.dart';
+import 'package:glade_forms_storybook/usecases/async/async_example.dart';
 import 'package:glade_forms_storybook/usecases/complex_object_mapping_example.dart';
 import 'package:glade_forms_storybook/usecases/dependencies/checkbox_dependency_change.dart';
 import 'package:glade_forms_storybook/usecases/onchange/one_checkbox_deps_validation.dart';
@@ -99,6 +100,15 @@ class App extends StatelessWidget {
             WidgetbookUseCase(
               name: 'TextEditingController issue',
               builder: (context) => const Issue48TextControllerExample(),
+            ),
+          ],
+        ),
+        WidgetbookCategory(
+          name: 'Async',
+          children: [
+            WidgetbookUseCase(
+              name: 'Async',
+              builder: (context) => const AsyncExample(),
             ),
           ],
         ),

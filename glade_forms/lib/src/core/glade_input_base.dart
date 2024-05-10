@@ -25,7 +25,7 @@ import 'package:meta/meta.dart';
 
 typedef ValueComparator<T> = bool Function(T? initial, T? value);
 typedef ValidatorFactory<T> = ValidatorInstance<T> Function(GladeValidator<T> v);
-typedef StringValidatorFactory = ValidatorInstance<String?> Function(StringValidator validator);
+typedef StringValidatorFactory = ValidatorInstance<String> Function(StringValidator validator);
 typedef OnChange<T> = void Function(ChangesInfo<T> info);
 typedef OnDependencyChange = void Function(List<String> updateInputKeys);
 typedef ValueTransform<T> = T Function(T input);
