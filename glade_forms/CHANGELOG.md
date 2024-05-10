@@ -1,3 +1,6 @@
+## 2.2.0
+- **[Add]**: Add `resetToPure` on model level.
+
 ## 2.1.0
 - **[Add]**: Add `defaultTranslateError` on model level.
 

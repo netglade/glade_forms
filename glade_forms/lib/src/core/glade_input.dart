@@ -537,7 +537,12 @@ class GladeInput<T> {
   ///
   /// Allows to sets new initialValue and value if needed.
   /// By default ([invokeUpdate]=`true`) setting value will trigger  listeners.
-  void resetToPure({ValueGetter<T>? value, ValueGetter<T>? initialValue, bool invokeUpdate = true}) {
+  void resetToPure({
+    ValueGetter<T>? value,
+    ValueGetter<T>? initialValue,
+    bool invokeUpdate = true,
+    bool copyValueToInitialValue = false,
+  }) {
     this._isPure = true;
 
     if (value != null) {
@@ -554,6 +559,14 @@ class GladeInput<T> {
 
     if (initialValue != null) {
       this._initialValue = initialValue();
+
+      if (invokeUpdate) _bindedModel?.notifyInputUpdated(this);
+    }
+
+    if (copyValueToInitialValue) {
+      this._initialValue = this.value;
+
+      if (invokeUpdate) _bindedModel?.notifyInputUpdated(this);
     }
   }
 
