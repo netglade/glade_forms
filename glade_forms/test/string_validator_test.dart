@@ -1,4 +1,4 @@
-// ignore_for_file: avoid-positional-record-field-access
+// ignore_for_file: avoid-positional-record-field-access, avoid-unsafe-collection-methods
 
 import 'package:glade_forms/glade_forms.dart';
 import 'package:test/test.dart';
@@ -164,6 +164,51 @@ void main() {
 
       expect(result.isValid, isFalse);
       expect(result.errors.firstOrNull?.key, equals(GladeErrorKeys.stringMinLength));
+    });
+  });
+
+  group('conditional validation', () {
+    test('no validator is skipped', () {
+      final validator = (StringValidator()
+            ..minLength(length: 2)
+            ..maxLength(length: 6))
+          .build();
+
+      final result = validator.validate('a');
+
+      expect(result.isValid, isFalse);
+      expect(
+        result.errors.first,
+        isA<ValueSatisfyPredicateError<String>>()
+            .having((x) => x.key, 'Has proper key', equals(GladeErrorKeys.stringMinLength)),
+      );
+    });
+
+    test('Min length is skipped', () {
+      final validator = (StringValidator()
+            ..minLength(length: 2, shouldValidate: (_) => false)
+            ..maxLength(length: 6))
+          .build();
+
+      final result = validator.validate('This string is too long');
+
+      expect(result.isValid, isFalse);
+      expect(
+        result.errors.first,
+        isA<ValueSatisfyPredicateError<String>>()
+            .having((x) => x.key, 'Has proper key', equals(GladeErrorKeys.stringMaxLength)),
+      );
+    });
+
+    test('Max length is skipped', () {
+      final validator = (StringValidator()
+            ..minLength(length: 2)
+            ..maxLength(length: 6, shouldValidate: (_) => false))
+          .build();
+
+      final result = validator.validate('This string is too long, but it will pass');
+
+      expect(result.isValid, isTrue);
     });
   });
 }

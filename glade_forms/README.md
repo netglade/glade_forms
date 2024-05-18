@@ -21,6 +21,7 @@ A universal way to define form validators with support of translations.
   - [String based input and TextEditingController](#string-based-input-and-texteditingcontroller)
     - [StringInput](#stringinput)
   - [Validation](#validation)
+  - [Skipping Specific Validation](#skipping-specific-validation)
     - [Using validators without GladeInput](#using-validators-without-gladeinput)
   - [GladeModel](#glademodel)
     - [Inputs](#inputs)
@@ -192,6 +193,22 @@ ageInput = GladeInput.create(
 The order of each validation part matters. By default, the first failing part stops validation. Pass `stopOnFirstError: false` on `.build()` to validate all parts simultaneously.
 
 Fields connected with `textFormFieldInputValidator` will automatically call validator and validation error (if any) is passed down to fields. By default devError is used unless translation is specified. See below. 
+
+### Skipping Specific Validation
+To conditionally skip specific validations, use the `shouldValidate` callback. If an input should be entirely excluded from validation, consider using conditional logic in the `inputs` getter.
+
+```dart
+(v
+  ..minLength(length: 2, shouldValidate: (_) => false)
+  ..maxLength(length: 6))
+  .build();
+
+// Omit input from validation if the condition applies
+get inputs => [if (condition) input];
+```
+
+This ensures that the `minLength` validation is always skipped, while the `maxLength` validation is applied. 
+If the condition is met, the input is included in the validation process.
 
 #### Using validators without GladeInput
 
