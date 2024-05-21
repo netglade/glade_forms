@@ -25,7 +25,9 @@ class ValidatorInstance<T> {
     for (final part in _parts) {
       final shouldValidate = part.shouldValidate?.call(value) ?? true;
 
-      final error = shouldValidate ? part.validate(value) : null;
+      if (!shouldValidate) continue;
+
+      final error = part.validate(value);
 
       if (error != null) {
         errors.add(error);
