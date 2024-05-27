@@ -13,9 +13,9 @@ import 'package:glade_forms/src/validator/validator.dart';
 import 'package:glade_forms/src/validator/validator_result.dart';
 import 'package:meta/meta.dart';
 
-typedef StringInput = GladeInput<String>;
+typedef StringInput = AsyncGladeInput<String>;
 
-class GladeInput<T> extends GladeInputBase<T> {
+class AsyncGladeInput<T> extends GladeInputBase<T> {
   final bool _useTextEditingController;
 
   /// Initial value - does not change after creating.
@@ -117,7 +117,7 @@ class GladeInput<T> extends GladeInputBase<T> {
     _bindedModel?.notifyInputUpdated(this);
   }
 
-  GladeInput._({
+  AsyncGladeInput._({
     required T value,
     required super.validatorInstance,
     required bool isPure,
@@ -164,7 +164,7 @@ class GladeInput<T> extends GladeInputBase<T> {
   }
 
   /// At least one of [value] or [initialValue] MUST be set.
-  factory GladeInput.create({
+  factory AsyncGladeInput.create({
     String? inputKey,
 
     /// Sets current value of input.
@@ -197,7 +197,7 @@ class GladeInput<T> extends GladeInputBase<T> {
 
     final validatorInstance = validator?.call(GladeValidator()) ?? GladeValidator<T>().build();
 
-    return GladeInput._(
+    return AsyncGladeInput._(
       value: (value ?? initialValue) as T,
       isPure: pure,
       validatorInstance: validatorInstance,
@@ -221,7 +221,7 @@ class GladeInput<T> extends GladeInputBase<T> {
   /// Useful for input which allows null value without additional validations.
   ///
   /// In case of need of any validation use [GladeInput.create] directly.
-  factory GladeInput.optional({
+  factory AsyncGladeInput.optional({
     T? value,
     T? initialValue,
     String? inputKey,
@@ -238,7 +238,7 @@ class GladeInput<T> extends GladeInputBase<T> {
     ValueTransform<T>? valueTransform,
     bool trackUnchanged = true,
   }) =>
-      GladeInput.create(
+      AsyncGladeInput.create(
         validator: (v) => v.build(),
         value: value ?? initialValue,
         initialValue: initialValue,
@@ -260,7 +260,7 @@ class GladeInput<T> extends GladeInputBase<T> {
   /// Predefined GenericInput with predefined `notNull` validation.
   ///
   /// In case of need of any aditional validation use [GladeInput.create] directly.
-  factory GladeInput.required({
+  factory AsyncGladeInput.required({
     required T value,
     T? initialValue,
     String? inputKey,
@@ -277,7 +277,7 @@ class GladeInput<T> extends GladeInputBase<T> {
     ValueTransform<T>? valueTransform,
     bool trackUnchanged = true,
   }) =>
-      GladeInput.create(
+      AsyncGladeInput.create(
         validator: (v) => (v..notNull()).build(),
         value: value,
         initialValue: initialValue,
@@ -301,7 +301,7 @@ class GladeInput<T> extends GladeInputBase<T> {
   // ignore: use_setters_to_change_properties, as method.
   void bindToModel(GladeModelBase model) => _bindedModel = model;
 
-  static GladeInput<int> intInput({
+  static AsyncGladeInput<int> intInput({
     required int value,
     String? inputKey,
     int? initialValue,
@@ -318,7 +318,7 @@ class GladeInput<T> extends GladeInputBase<T> {
     ValueTransform<int>? valueTransform,
     bool trackUnchanged = true,
   }) =>
-      GladeInput.create(
+      AsyncGladeInput.create(
         value: value,
         initialValue: initialValue ?? value,
         validator: validator,
@@ -337,7 +337,7 @@ class GladeInput<T> extends GladeInputBase<T> {
         trackUnchanged: trackUnchanged,
       );
 
-  static GladeInput<bool> boolInput({
+  static AsyncGladeInput<bool> boolInput({
     required bool value,
     String? inputKey,
     bool? initialValue,
@@ -354,7 +354,7 @@ class GladeInput<T> extends GladeInputBase<T> {
     ValueTransform<bool>? valueTransform,
     bool trackUnchanged = true,
   }) =>
-      GladeInput.create(
+      AsyncGladeInput.create(
         value: value,
         initialValue: initialValue ?? value,
         validator: validator,
@@ -373,7 +373,7 @@ class GladeInput<T> extends GladeInputBase<T> {
         trackUnchanged: trackUnchanged,
       );
 
-  static GladeInput<String> stringInput({
+  static AsyncGladeInput<String> stringInput({
     String? inputKey,
     String? value,
     String? initialValue,
@@ -394,7 +394,7 @@ class GladeInput<T> extends GladeInputBase<T> {
     final requiredInstance = validator?.call(StringValidator()..notEmpty()) ?? (StringValidator()..notEmpty()).build();
     final optionalInstance = validator?.call(StringValidator()) ?? StringValidator().build();
 
-    return GladeInput._(
+    return AsyncGladeInput._(
       value: value ?? initialValue ?? '',
       isPure: pure,
       initialValue: initialValue ?? '',
@@ -433,41 +433,6 @@ class GladeInput<T> extends GladeInputBase<T> {
 
   @override
   Future<String> errorFormattedAsync({String delimiter = '|'}) => Future.value(errorFormatted(delimiter: delimiter));
-
-  // /// Shorthand validator for TextFieldForm inputs.
-  // ///
-  // /// Returns translated validation message.
-  // /// If there are multiple errors they are concenated into one string with [delimiter].
-  // String? textFormFieldInputValidatorCustom(String? value, {String delimiter = '.'}) {
-  //   assert(
-  //     TypeHelper.typesEqual<T, String>() || TypeHelper.typesEqual<T, String?>() || stringTovalueConverter != null,
-  //     'For non-string values [converter] must be provided. TInput type: $T',
-  //   );
-  //   final converter = stringTovalueConverter ?? _defaultConverter;
-
-  //   try {
-  //     final convertedValue = converter.convert(value);
-  //     final convertedError = validatorInstance.validate(convertedValue);
-
-  //     return !convertedError.isValid ? _translate(delimiter: delimiter, customError: convertedError) : null;
-  //   } on ConvertError<T> catch (e) {
-  //     return e.error != null ? _translate(delimiter: delimiter, customError: e) : e.devError(value);
-  //   }
-  // }
-
-  // /// Shorthand validator for TextFieldForm inputs.
-  // ///
-  // /// Returns translated validation message.
-  // String? textFormFieldInputValidator(String? value) => textFormFieldInputValidatorCustom(value);
-
-  // /// Shorthand validator for Form field input.
-  // ///
-  // /// Returns translated validation message.
-  // String? formFieldValidator() {
-  //   final convertedError = validation;
-
-  //   return convertedError.isInvalid ? _translate(customError: convertedError) : null;
-  // }
 
   /// Used as shorthand for field setter.
   ///
@@ -560,7 +525,7 @@ class GladeInput<T> extends GladeInputBase<T> {
   }
 
   @protected
-  GladeInput<T> copyWith({
+  AsyncGladeInput<T> copyWith({
     String? inputKey,
     ValueComparator<T>? valueComparator,
     ValidatorInstance<T>? validatorInstance,
@@ -579,7 +544,7 @@ class GladeInput<T> extends GladeInputBase<T> {
     ValueTransform<T>? valueTransform,
     bool? trackUnchanged,
   }) {
-    return GladeInput._(
+    return AsyncGladeInput._(
       value: value ?? this.value,
       valueComparator: valueComparator ?? this.valueComparator,
       validatorInstance: validatorInstance ?? this.validatorInstance,
@@ -656,68 +621,3 @@ class GladeInput<T> extends GladeInputBase<T> {
     _bindedModel?.notifyInputUpdated(this);
   }
 }
-
-  // // *
-  // // * Translation methods
-  // // *
-
-  // /// Translates input's errors (validation or conversion).
-  // String? _translate({String delimiter = '.', Object? customError}) {
-  //   final err = customError ?? validation;
-
-  //   if (err is ValidatorResult<T> && err.isValid) return null;
-
-  //   if (err is ValidatorResult<T>) {
-  //     return _translateGenericErrors(err, delimiter);
-  //   }
-
-  //   if (err is ConvertError<T>) {
-  //     return _translateConversionError(err);
-  //   }
-
-  //   //ignore: avoid-dynamic, ok for now
-  //   if (err is List<dynamic>) {
-  //     return err.map((x) => x.toString()).join('.');
-  //   }
-
-  //   return err.toString();
-  // }
-
-  // String _translateConversionError(ConvertError<T> err) {
-  //   final defaultTranslationsTmp = this.defaultTranslations;
-  //   final translateErrorTmp = translateError;
-  //   final defaultConversionMessage = defaultTranslationsTmp?.defaultConversionMessage;
-
-    // if (translateErrorTmp != null) {
-    //   return translateErrorTmp(err, err.key, err.devErrorMessage, dependenciesFactory());
-    // } else if (defaultConversionMessage != null) {
-    //   return defaultConversionMessage;
-    // } else if (this._bindedModel case final model?) {
-    //   return model.defaultErrorTranslate(err, err.key, err.devErrorMessage, dependenciesFactory());
-    // }
-
-  //   return err.devErrorMessage;
-  // }
-
-  // String _translateGenericErrors(ValidatorResult<T> inputErrors, String delimiter) {
-  //   final translateErrorTmp = translateError;
-
-  //   final defaultTranslationsTmp = this.defaultTranslations;
-  //   if (translateErrorTmp != null) {
-  //     return inputErrors.errors
-  //         .map((e) => translateErrorTmp(e, e.key, e.devErrorMessage, dependenciesFactory()))
-  //         .join(delimiter);
-  //   }
-
-    // return inputErrors.errors.map((e) {
-    //   if (defaultTranslationsTmp != null &&
-    //       (e.isNullError || e.hasStringEmptyOrNullErrorKey || e.hasNullValueOrEmptyValueKey)) {
-    //     return defaultTranslationsTmp.defaultValueIsNullOrEmptyMessage ?? e.toString();
-    //   } else if (this._bindedModel case final model?) {
-    //     return model.defaultErrorTranslate(e, e.key, e.devErrorMessage, dependenciesFactory());
-    //   }
-
-  //     return e.toString();
-  //   }).join(delimiter);
-  // }
-// }

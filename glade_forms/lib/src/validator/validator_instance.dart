@@ -1,13 +1,14 @@
-import 'package:glade_forms/src/core/core.dart';
 import 'package:glade_forms/src/validator/part/input_validator_part.dart';
 import 'package:glade_forms/src/validator/validator_error/glade_validator_error.dart';
 import 'package:glade_forms/src/validator/validator_result.dart';
+
+import '../core/glade_input_base.dart';
 
 class ValidatorInstance<T> {
   /// Stops validation on first error.
   final bool stopOnFirstError;
 
-  GladeInput<T>? _input;
+  GladeInputBase<T>? _input;
   final List<InputValidatorPart<T>> _parts;
 
   ValidatorInstance({
@@ -16,7 +17,7 @@ class ValidatorInstance<T> {
   }) : _parts = parts;
 
   // ignore: use_setters_to_change_properties, this is ok
-  void bindInput(GladeInput<T> input) => _input = input;
+  void bindInput(GladeInputBase<T> input) => _input = input;
 
   /// Performs validation on given [value].
   ValidatorResult<T> validate(T value) {

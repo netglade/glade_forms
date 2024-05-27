@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class AsyncTextField<T> extends StatefulWidget {
-  const AsyncTextField({super.key});
+  final Future<String?> Function(String? value)? validator;
+
+  const AsyncTextField({super.key, this.validator});
 
   @override
   State<AsyncTextField<T>> createState() => _AsyncTextFieldState<T>();
@@ -36,10 +38,10 @@ class _AsyncTextFieldState<T> extends State<AsyncTextField<T>> {
                       isValidating = true;
                     });
 
-                    await Future.delayed(const Duration(milliseconds: 1000));
+                    final result = await widget.validator?.call(value);
 
                     setState(() {
-                      validationMessage = 'Error';
+                      validationMessage = result;
                       isValidating = false;
                       // _formKey.currentState?.validate();
                     });
