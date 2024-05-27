@@ -23,6 +23,10 @@ class ValidatorInstance<T> {
     final errors = <GladeValidatorError<T>>[];
 
     for (final part in _parts) {
+      final shouldValidate = part.shouldValidate?.call(value) ?? true;
+
+      if (!shouldValidate) continue;
+
       final error = part.validate(value);
 
       if (error != null) {

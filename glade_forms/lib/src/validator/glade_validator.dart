@@ -6,6 +6,7 @@ import 'package:glade_forms/src/validator/validator_error/validator_error.dart';
 import 'package:glade_forms/src/validator/validator_instance.dart';
 
 typedef ValidateFunction<T> = GladeValidatorError<T>? Function(T value);
+typedef ValidateFunctionWithKey<T> = GladeValidatorError<T>? Function(T value, Object? key);
 
 class GladeValidator<T> {
   List<InputValidatorPart<T>> parts = [];
@@ -21,14 +22,22 @@ class GladeValidator<T> {
   void clear() => parts = [];
 
   /// Checks value with custom validation function.
-  void custom(ValidateFunction<T> onValidate, {Object? key}) =>
-      parts.add(CustomValidationPart(customValidator: onValidate, key: key));
+  void custom(ValidateFunctionWithKey<T> onValidate, {Object? key, ShouldValidateCallback<T>? shouldValidate}) {
+    parts.add(
+      CustomValidationPart(
+        customValidator: (v) => onValidate(v, key),
+        key: key,
+        shouldValidate: shouldValidate,
+      ),
+    );
+  }
 
   /// Checks value through custom validator [part].
   void customPart(InputValidatorPart<T> part) => parts.add(part);
 
   /// Checks that value is not null. Returns [ValueNullError] error.
-  void notNull({OnValidateError<T>? devError, Object? key}) => custom(
+  void notNull({OnValidateError<T>? devError, Object? key, ShouldValidateCallback<T>? shouldValidate}) =>
+      _customInternal(
         (value) => value == null
             ? ValueNullError<T>(
                 value: value,
@@ -36,6 +45,7 @@ class GladeValidator<T> {
                 key: key ?? GladeErrorKeys.valueIsNull,
               )
             : null,
+        shouldValidate: shouldValidate,
       );
 
   /// Value must satisfy given [predicate]. Returns [ValueSatisfyPredicateError].
@@ -43,12 +53,18 @@ class GladeValidator<T> {
     SatisfyPredicate<T> predicate, {
     OnValidateError<T>? devError,
     Object? key,
+    ShouldValidateCallback<T>? shouldValidate,
   }) =>
       parts.add(
         SatisfyPredicatePart(
           predicate: predicate,
           devError: devError ?? (value) => 'Value ${value ?? 'NULL'} does not satisfy given predicate.',
           key: key,
+          shouldValidate: shouldValidate,
         ),
       );
+
+  /// Checks value with custom validation function.
+  void _customInternal(ValidateFunction<T> onValidate, {Object? key, ShouldValidateCallback<T>? shouldValidate}) =>
+      parts.add(CustomValidationPart(customValidator: onValidate, key: key, shouldValidate: shouldValidate));
 }

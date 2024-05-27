@@ -1,3 +1,6 @@
+## DEV:
+- **[Add]**: Support skipping particular validation with `shouldValidate` callback.
+
 ## 2.2.0
 - **[Add]**: Add `resetToPure` on model level.
 
