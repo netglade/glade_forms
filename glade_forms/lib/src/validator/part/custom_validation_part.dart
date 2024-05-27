@@ -6,7 +6,7 @@ class CustomValidationPart<T> extends InputValidatorPart<T> {
   // ignore: prefer-correct-callback-field-name, ok name
   final ValidateFunction<T> customValidator;
 
-  const CustomValidationPart({required this.customValidator, super.key});
+  const CustomValidationPart({required this.customValidator, super.key, super.shouldValidate});
 
   @override
   GladeValidatorError<T>? validate(T value) => customValidator(value);

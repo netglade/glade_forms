@@ -15,6 +15,7 @@ class SatisfyPredicatePart<T> extends InputValidatorPart<T> {
     required this.predicate,
     required this.devError,
     super.key,
+    super.shouldValidate,
   });
 
   @override
