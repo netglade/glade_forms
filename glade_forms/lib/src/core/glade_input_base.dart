@@ -126,7 +126,7 @@ abstract class GladeInputBase<T> {
   /// When [shouldTriggerOnChange] is set to false, the `onChange` callback will not be called.
   void updateValue(T value, {bool shouldTriggerOnChange = true});
 
-  Future<void> updateValueAsync(T value, {bool shouldTriggerOnChange = true});
+  // Future<void> updateValueAsync(T value, {bool shouldTriggerOnChange = true});
 
   /// Used as shorthand for field setter.
   ///
@@ -139,15 +139,15 @@ abstract class GladeInputBase<T> {
     updateValue(value, shouldTriggerOnChange: shouldTriggerOnChange);
   }
 
-  Future<void> updateValueWhenNotNullAsync(T? value, {bool shouldTriggerOnChange = true}) async {
-    if (value == null) return;
+  // Future<void> updateValueWhenNotNullAsync(T? value, {bool shouldTriggerOnChange = true}) async {
+  //   if (value == null) return;
 
-    return updateValueAsync(value, shouldTriggerOnChange: shouldTriggerOnChange);
-  }
+  //   return updateValueAsync(value, shouldTriggerOnChange: shouldTriggerOnChange);
+  // }
 
   void updateValueWithString(String? strValue, {bool shouldTriggerOnChange = true});
 
-  Future<void> updateValueWithStringAsync(String? strValue, {bool shouldTriggerOnChange = true});
+  // Future<void> updateValueWithStringAsync(String? strValue, {bool shouldTriggerOnChange = true});
 
   void bindToModel(GladeModelBase model);
 
@@ -179,7 +179,30 @@ abstract class GladeInputBase<T> {
   /// Shorthand validator for TextFieldForm inputs.
   ///
   /// Returns translated validation message.
+  /// If there are multiple errors they are concenated into one string with [delimiter].
+  Future<String?> textFormFieldInputValidatorCustomAsync(String? value, {String delimiter = '.'}) async {
+    assert(
+      TypeHelper.typesEqual<T, String>() || TypeHelper.typesEqual<T, String?>() || stringTovalueConverter != null,
+      'For non-string values [converter] must be provided. TInput type: $T',
+    );
+    final converter = stringTovalueConverter ?? defaultConverter;
+
+    try {
+      final convertedValue = converter.convert(value);
+      final convertedError = await validatorInstance.validateAsync(convertedValue);
+
+      return !convertedError.isValid ? translateInternal(delimiter: delimiter, customError: convertedError) : null;
+    } on ConvertError<T> catch (e) {
+      return e.error != null ? translateInternal(delimiter: delimiter, customError: e) : e.devError(value);
+    }
+  }
+
+  /// Shorthand validator for TextFieldForm inputs.
+  ///
+  /// Returns translated validation message.
   String? textFormFieldInputValidator(String? value) => textFormFieldInputValidatorCustom(value);
+
+  Future<String?> textFormFieldInputValidatorAsync(String? value) => textFormFieldInputValidatorCustomAsync(value);
 
   /// Shorthand validator for Form field input.
   ///
@@ -194,7 +217,9 @@ abstract class GladeInputBase<T> {
   // * Translation methods
   // *
 
-  String? translate({String delimiter = '.'}) => translateInternal(delimiter: delimiter, customError: validation);
+  String? translate({String delimiter = '.'});
+
+  Future<String?> translateAsync({String delimiter = '.'});
 
   /// Translates input's errors (validation or conversion).
   @internal

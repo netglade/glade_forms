@@ -69,9 +69,6 @@ class GladeValidator<T> {
         ),
       );
 
-  /// Checks value with custom validation function.
-  void _customInternal(ValidateFunction<T> onValidate, {Object? key, ShouldValidateCallback<T>? shouldValidate}) =>
-      parts.add(CustomValidationPart(customValidator: onValidate, key: key, shouldValidate: shouldValidate));
   /// Value must satisfy given [predicate]. Returns [ValueSatisfyPredicateError].
   void satisfyAsync(
     SatisfyPredicateAsync<T> predicate, {
@@ -85,4 +82,8 @@ class GladeValidator<T> {
           key: key,
         ),
       );
+
+  /// Checks value with custom validation function.
+  void _customInternal(ValidateFunction<T> onValidate, {Object? key, ShouldValidateCallback<T>? shouldValidate}) =>
+      parts.add(CustomValidationPart(customValidator: onValidate, key: key, shouldValidate: shouldValidate));
 }

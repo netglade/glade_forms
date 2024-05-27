@@ -17,13 +17,11 @@ class _Model extends GladeModel {
   _Model();
 
   @override
-  void initialize() {
+  void initializeInputs() {
     nameWithController = GladeInput.stringInput(inputKey: 'name');
     nameWrong = GladeInput.stringInput(inputKey: 'wrong_name');
     age = GladeInput.intInput(value: 0, inputKey: 'age');
     email = GladeInput.stringInput(validator: (validator) => (validator..isEmail()).build(), inputKey: 'email');
-
-    super.initialize();
   }
 }
 
@@ -32,12 +30,6 @@ class Issue48TextControllerExample extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    // return Scaffold(
-    //   body: Center(
-    //     child: TextField(controller: wrongField),
-    //   ),
-    // );
-
     return UsecaseContainer(
       shortDescription: 'Issue 48',
       description: 'https://github.com/netglade/glade_forms/issues/48',

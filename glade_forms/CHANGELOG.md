@@ -1,5 +1,6 @@
-## DEV:
+## DEV 3.0.0:
 - **[Add]**: Support skipping particular validation with `shouldValidate` callback.
+- **[Breaking]**: Each Model has to implement `initializeInputs()` method instead of overriding `initialize()`.
 
 ## 2.2.0
 - **[Add]**: Add `resetToPure` on model level.

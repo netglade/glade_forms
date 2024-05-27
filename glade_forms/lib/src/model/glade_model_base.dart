@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:glade_forms/src/core/core.dart';
-import 'package:glade_forms/src/core/glade_input_base.dart';
 import 'package:meta/meta.dart';
+
+import '../validator/validator_result.dart';
 
 typedef OnEdit = void Function();
 
@@ -51,6 +52,19 @@ abstract class GladeModelBase<TINPUT extends GladeInputBase<Object?>> extends Ch
       .where((element) => element.isNotEmpty)
       .join('\n');
 
+  /// Formats errors from `inputs`.
+  Future<String> get formattedValidationErrorsAsync async {
+    final results = await inputs.map((e) async {
+      if (e.validation.isInvalid) {
+        return e.errorFormattedAsync();
+      }
+
+      return '';
+    }).wait;
+
+    return results.where((element) => element.isNotEmpty).join('\n');
+  }
+
   String get debugFormattedValidationErrors => inputs.map((e) {
         if (e.hasConversionError) return '${e.inputKey} - CONVERSION ERROR';
 
@@ -61,7 +75,29 @@ abstract class GladeModelBase<TINPUT extends GladeInputBase<Object?>> extends Ch
         return '${e.inputKey} - VALID';
       }).join('\n');
 
-  List<Object?> get errors => inputs.map((e) => e.validation).toList();
+  Future<String> get debugFormattedValidationErrorsAsync async {
+    final results = await inputs.map((e) async {
+      if (e.hasConversionError) return '${e.inputKey} - CONVERSION ERROR';
+
+      final validation = await e.validationAsync;
+
+      if (validation.isInvalid) {
+        return '${e.inputKey} - ${e.errorFormatted()}';
+      }
+
+      return '${e.inputKey} - VALID';
+    });
+
+    return results.join('\n');
+  }
+
+  List<ValidatorResult<Object?>> get errors => inputs.map((e) => e.validation).toList();
+
+  Future<List<ValidatorResult<Object?>>> get errorsAsync async {
+    final result = await inputs.map((e) => e.validationAsync).wait;
+
+    return result.toList();
+  }
 
   void bindToModel(GladeInput<Object?> input) => input.bindToModel(this);
 

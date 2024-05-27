@@ -482,9 +482,9 @@ class GladeInput<T> extends GladeInputBase<T> {
     }
   }
 
-  @override
-  Future<void> updateValueAsync(T value, {bool shouldTriggerOnChange = true}) async =>
-      updateValue(value, shouldTriggerOnChange: shouldTriggerOnChange);
+  // @override
+  // Future<void> updateValueAsync(T value, {bool shouldTriggerOnChange = true}) async =>
+  //     updateValue(value, shouldTriggerOnChange: shouldTriggerOnChange);
 
   @override
   void updateValueWithString(String? strValue, {bool shouldTriggerOnChange = true}) {
@@ -518,9 +518,9 @@ class GladeInput<T> extends GladeInputBase<T> {
     updateValue(value, shouldTriggerOnChange: shouldTriggerOnChange);
   }
 
-  @override
-  Future<void> updateValueWithStringAsync(String? strValue, {bool shouldTriggerOnChange = true}) async =>
-      updateValueWithString(strValue, shouldTriggerOnChange: shouldTriggerOnChange);
+  // @override
+  // Future<void> updateValueWithStringAsync(String? strValue, {bool shouldTriggerOnChange = true}) async =>
+  //     updateValueWithString(strValue, shouldTriggerOnChange: shouldTriggerOnChange);
 
   /// Resets input into pure state.
   ///
@@ -559,49 +559,55 @@ class GladeInput<T> extends GladeInputBase<T> {
     }
   }
 
-  @protected
-  GladeInput<T> copyWith({
-    String? inputKey,
-    ValueComparator<T>? valueComparator,
-    ValidatorInstance<T>? validatorInstance,
-    StringToTypeConverter<T>? stringTovalueConverter,
-    InputDependenciesFactory? dependenciesFactory,
-    T? initialValue,
-    ErrorTranslator<T>? translateError,
-    T? value,
-    bool? isPure,
-    DefaultTranslations? defaultTranslations,
-    OnChange<T>? onChange,
-    OnDependencyChange? onDependencyChange,
-    TextEditingController? textEditingController,
-    // ignore: avoid-unused-parameters, it is here just to be linter happy ¯\_(ツ)_/¯
-    bool? useTextEditingController,
-    ValueTransform<T>? valueTransform,
-    bool? trackUnchanged,
-  }) {
-    return GladeInput._(
-      value: value ?? this.value,
-      valueComparator: valueComparator ?? this.valueComparator,
-      validatorInstance: validatorInstance ?? this.validatorInstance,
-      stringTovalueConverter: stringTovalueConverter ?? this.stringTovalueConverter,
-      dependenciesFactory: dependenciesFactory ?? this.dependenciesFactory,
-      inputKey: inputKey ?? this.inputKey,
-      initialValue: initialValue ?? this.initialValue,
-      translateError: translateError ?? this.translateError,
-      isPure: isPure ?? this.isPure,
-      defaultTranslations: defaultTranslations ?? this.defaultTranslations,
-      onChange: onChange ?? this.onChange,
-      onDependencyChange: onDependencyChange ?? this.onDependencyChange,
-      textEditingController: textEditingController ?? this._textEditingController,
-      valueTransform: valueTransform ?? this.valueTransform,
-      trackUnchanged: trackUnchanged ?? this.trackUnchanged,
-    );
-  }
+  // @protected
+  // GladeInput<T> copyWith({
+  //   String? inputKey,
+  //   ValueComparator<T>? valueComparator,
+  //   ValidatorInstance<T>? validatorInstance,
+  //   StringToTypeConverter<T>? stringTovalueConverter,
+  //   InputDependenciesFactory? dependenciesFactory,
+  //   T? initialValue,
+  //   ErrorTranslator<T>? translateError,
+  //   T? value,
+  //   bool? isPure,
+  //   DefaultTranslations? defaultTranslations,
+  //   OnChange<T>? onChange,
+  //   OnDependencyChange? onDependencyChange,
+  //   TextEditingController? textEditingController,
+  //   // ignore: avoid-unused-parameters, it is here just to be linter happy ¯\_(ツ)_/¯
+  //   bool? useTextEditingController,
+  //   ValueTransform<T>? valueTransform,
+  //   bool? trackUnchanged,
+  // }) {
+  //   return GladeInput._(
+  //     value: value ?? this.value,
+  //     valueComparator: valueComparator ?? this.valueComparator,
+  //     validatorInstance: validatorInstance ?? this.validatorInstance,
+  //     stringTovalueConverter: stringTovalueConverter ?? this.stringTovalueConverter,
+  //     dependenciesFactory: dependenciesFactory ?? this.dependenciesFactory,
+  //     inputKey: inputKey ?? this.inputKey,
+  //     initialValue: initialValue ?? this.initialValue,
+  //     translateError: translateError ?? this.translateError,
+  //     isPure: isPure ?? this.isPure,
+  //     defaultTranslations: defaultTranslations ?? this.defaultTranslations,
+  //     onChange: onChange ?? this.onChange,
+  //     onDependencyChange: onDependencyChange ?? this.onDependencyChange,
+  //     textEditingController: textEditingController ?? this._textEditingController,
+  //     valueTransform: valueTransform ?? this.valueTransform,
+  //     trackUnchanged: trackUnchanged ?? this.trackUnchanged,
+  //   );
+  // }
 
   @mustCallSuper
   void dispose() {
     _textEditingController?.removeListener(_onTextControllerChange);
   }
+
+  String? translate({String delimiter = '.'}) => translateInternal(delimiter: delimiter, customError: validation);
+
+  @override
+  Future<String?> translateAsync({String delimiter = '.'}) async =>
+      translateInternal(delimiter: delimiter, customError: validation);
 
   void _syncValueWithController(T value, {required bool shouldTriggerOnChange}) {
     final converter = stringTovalueConverter ?? defaultConverter;
@@ -656,68 +662,3 @@ class GladeInput<T> extends GladeInputBase<T> {
     _bindedModel?.notifyInputUpdated(this);
   }
 }
-
-  // // *
-  // // * Translation methods
-  // // *
-
-  // /// Translates input's errors (validation or conversion).
-  // String? _translate({String delimiter = '.', Object? customError}) {
-  //   final err = customError ?? validation;
-
-  //   if (err is ValidatorResult<T> && err.isValid) return null;
-
-  //   if (err is ValidatorResult<T>) {
-  //     return _translateGenericErrors(err, delimiter);
-  //   }
-
-  //   if (err is ConvertError<T>) {
-  //     return _translateConversionError(err);
-  //   }
-
-  //   //ignore: avoid-dynamic, ok for now
-  //   if (err is List<dynamic>) {
-  //     return err.map((x) => x.toString()).join('.');
-  //   }
-
-  //   return err.toString();
-  // }
-
-  // String _translateConversionError(ConvertError<T> err) {
-  //   final defaultTranslationsTmp = this.defaultTranslations;
-  //   final translateErrorTmp = translateError;
-  //   final defaultConversionMessage = defaultTranslationsTmp?.defaultConversionMessage;
-
-    // if (translateErrorTmp != null) {
-    //   return translateErrorTmp(err, err.key, err.devErrorMessage, dependenciesFactory());
-    // } else if (defaultConversionMessage != null) {
-    //   return defaultConversionMessage;
-    // } else if (this._bindedModel case final model?) {
-    //   return model.defaultErrorTranslate(err, err.key, err.devErrorMessage, dependenciesFactory());
-    // }
-
-  //   return err.devErrorMessage;
-  // }
-
-  // String _translateGenericErrors(ValidatorResult<T> inputErrors, String delimiter) {
-  //   final translateErrorTmp = translateError;
-
-  //   final defaultTranslationsTmp = this.defaultTranslations;
-  //   if (translateErrorTmp != null) {
-  //     return inputErrors.errors
-  //         .map((e) => translateErrorTmp(e, e.key, e.devErrorMessage, dependenciesFactory()))
-  //         .join(delimiter);
-  //   }
-
-    // return inputErrors.errors.map((e) {
-    //   if (defaultTranslationsTmp != null &&
-    //       (e.isNullError || e.hasStringEmptyOrNullErrorKey || e.hasNullValueOrEmptyValueKey)) {
-    //     return defaultTranslationsTmp.defaultValueIsNullOrEmptyMessage ?? e.toString();
-    //   } else if (this._bindedModel case final model?) {
-    //     return model.defaultErrorTranslate(e, e.key, e.devErrorMessage, dependenciesFactory());
-    //   }
-
-  //     return e.toString();
-  //   }).join(delimiter);
-  // }
-// }

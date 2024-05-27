@@ -13,7 +13,7 @@ import 'package:glade_forms/src/validator/validator.dart';
 import 'package:glade_forms/src/validator/validator_result.dart';
 import 'package:meta/meta.dart';
 
-typedef StringInput = AsyncGladeInput<String>;
+typedef AsyncStringInput = AsyncGladeInput<String>;
 
 class AsyncGladeInput<T> extends GladeInputBase<T> {
   final bool _useTextEditingController;
@@ -61,11 +61,15 @@ class AsyncGladeInput<T> extends GladeInputBase<T> {
   @override
   InputDependencies get dependencies => dependenciesFactory();
 
+  // @override
+  // ValidatorResult<T> get validation => validatorInstance.validate(value);
+
+  //todo is this wanted?
   @override
-  ValidatorResult<T> get validation => validatorInstance.validate(value);
+  ValidatorResult<T> get validation => throw 'Use validationAsync instead';
 
   @override
-  Future<ValidatorResult<T>> get validationAsync => Future.value(validation);
+  Future<ValidatorResult<T>> get validationAsync => validatorInstance.validateAsync(value);
 
   /// Input's value was not changed.
   @override
@@ -82,10 +86,14 @@ class AsyncGladeInput<T> extends GladeInputBase<T> {
 
   /// Input does not have conversion error nor validation error.
   @override
-  bool get isValid => !hasConversionError && validation.isValid;
+  bool get isValid => throw 'Use isValidAsync';
 
   @override
-  Future<bool> get isValidAsync => Future.value(isValid);
+  Future<bool> get isValidAsync async {
+    if (hasConversionError) return false;
+
+    return (await validationAsync).isValid;
+  }
 
   @override
   bool get isNotValid => !isValid;
@@ -425,14 +433,18 @@ class AsyncGladeInput<T> extends GladeInputBase<T> {
   //todo: maybe into base class?
   @override
   String errorFormatted({String delimiter = '|'}) {
-    // ignore: avoid-non-null-assertion, it is not null
-    if (hasConversionError) return translateConversionError(__conversionError!);
-
-    return validation.isInvalid ? translate() ?? '' : '';
+    throw 'Use errorFormattedAsync';
   }
 
   @override
-  Future<String> errorFormattedAsync({String delimiter = '|'}) => Future.value(errorFormatted(delimiter: delimiter));
+  Future<String> errorFormattedAsync({String delimiter = '|'}) async {
+    // ignore: avoid-non-null-assertion, it is not null
+    if (hasConversionError) return translateConversionError(__conversionError!);
+
+    final result = await validationAsync;
+
+    return result.isInvalid ? translateInternal(delimiter: delimiter, customError: result) ?? '' : '';
+  }
 
   /// Used as shorthand for field setter.
   ///
@@ -448,8 +460,13 @@ class AsyncGladeInput<T> extends GladeInputBase<T> {
   }
 
   @override
-  Future<void> updateValueAsync(T value, {bool shouldTriggerOnChange = true}) async =>
-      updateValue(value, shouldTriggerOnChange: shouldTriggerOnChange);
+  String textFormFieldInputValidator(String? value) {
+    throw UnsupportedError('Use textFormFieldInputValidatorAsync');
+  }
+
+  // @override
+  // Future<void> updateValueAsync(T value, {bool shouldTriggerOnChange = true}) async =>
+  //     updateValue(value, shouldTriggerOnChange: shouldTriggerOnChange);
 
   @override
   void updateValueWithString(String? strValue, {bool shouldTriggerOnChange = true}) {
@@ -482,10 +499,6 @@ class AsyncGladeInput<T> extends GladeInputBase<T> {
 
     updateValue(value, shouldTriggerOnChange: shouldTriggerOnChange);
   }
-
-  @override
-  Future<void> updateValueWithStringAsync(String? strValue, {bool shouldTriggerOnChange = true}) async =>
-      updateValueWithString(strValue, shouldTriggerOnChange: shouldTriggerOnChange);
 
   /// Resets input into pure state.
   ///
@@ -524,49 +537,56 @@ class AsyncGladeInput<T> extends GladeInputBase<T> {
     }
   }
 
-  @protected
-  AsyncGladeInput<T> copyWith({
-    String? inputKey,
-    ValueComparator<T>? valueComparator,
-    ValidatorInstance<T>? validatorInstance,
-    StringToTypeConverter<T>? stringTovalueConverter,
-    InputDependenciesFactory? dependenciesFactory,
-    T? initialValue,
-    ErrorTranslator<T>? translateError,
-    T? value,
-    bool? isPure,
-    DefaultTranslations? defaultTranslations,
-    OnChange<T>? onChange,
-    OnDependencyChange? onDependencyChange,
-    TextEditingController? textEditingController,
-    // ignore: avoid-unused-parameters, it is here just to be linter happy ¯\_(ツ)_/¯
-    bool? useTextEditingController,
-    ValueTransform<T>? valueTransform,
-    bool? trackUnchanged,
-  }) {
-    return AsyncGladeInput._(
-      value: value ?? this.value,
-      valueComparator: valueComparator ?? this.valueComparator,
-      validatorInstance: validatorInstance ?? this.validatorInstance,
-      stringTovalueConverter: stringTovalueConverter ?? this.stringTovalueConverter,
-      dependenciesFactory: dependenciesFactory ?? this.dependenciesFactory,
-      inputKey: inputKey ?? this.inputKey,
-      initialValue: initialValue ?? this.initialValue,
-      translateError: translateError ?? this.translateError,
-      isPure: isPure ?? this.isPure,
-      defaultTranslations: defaultTranslations ?? this.defaultTranslations,
-      onChange: onChange ?? this.onChange,
-      onDependencyChange: onDependencyChange ?? this.onDependencyChange,
-      textEditingController: textEditingController ?? this._textEditingController,
-      valueTransform: valueTransform ?? this.valueTransform,
-      trackUnchanged: trackUnchanged ?? this.trackUnchanged,
-    );
-  }
+  // @protected
+  // AsyncGladeInput<T> copyWith({
+  //   String? inputKey,
+  //   ValueComparator<T>? valueComparator,
+  //   ValidatorInstance<T>? validatorInstance,
+  //   StringToTypeConverter<T>? stringTovalueConverter,
+  //   InputDependenciesFactory? dependenciesFactory,
+  //   T? initialValue,
+  //   ErrorTranslator<T>? translateError,
+  //   T? value,
+  //   bool? isPure,
+  //   DefaultTranslations? defaultTranslations,
+  //   OnChange<T>? onChange,
+  //   OnDependencyChange? onDependencyChange,
+  //   TextEditingController? textEditingController,
+  //   // ignore: avoid-unused-parameters, it is here just to be linter happy ¯\_(ツ)_/¯
+  //   bool? useTextEditingController,
+  //   ValueTransform<T>? valueTransform,
+  //   bool? trackUnchanged,
+  // }) {
+  //   return AsyncGladeInput._(
+  //     value: value ?? this.value,
+  //     valueComparator: valueComparator ?? this.valueComparator,
+  //     validatorInstance: validatorInstance ?? this.validatorInstance,
+  //     stringTovalueConverter: stringTovalueConverter ?? this.stringTovalueConverter,
+  //     dependenciesFactory: dependenciesFactory ?? this.dependenciesFactory,
+  //     inputKey: inputKey ?? this.inputKey,
+  //     initialValue: initialValue ?? this.initialValue,
+  //     translateError: translateError ?? this.translateError,
+  //     isPure: isPure ?? this.isPure,
+  //     defaultTranslations: defaultTranslations ?? this.defaultTranslations,
+  //     onChange: onChange ?? this.onChange,
+  //     onDependencyChange: onDependencyChange ?? this.onDependencyChange,
+  //     textEditingController: textEditingController ?? this._textEditingController,
+  //     valueTransform: valueTransform ?? this.valueTransform,
+  //     trackUnchanged: trackUnchanged ?? this.trackUnchanged,
+  //   );
+  // }
 
   @mustCallSuper
   void dispose() {
     _textEditingController?.removeListener(_onTextControllerChange);
   }
+
+  @override
+  String translate({String delimiter = '.'}) => throw 'Use translateAsync';
+
+  @override
+  Future<String?> translateAsync({String delimiter = '.'}) async =>
+      translateInternal(delimiter: delimiter, customError: (await validationAsync));
 
   void _syncValueWithController(T value, {required bool shouldTriggerOnChange}) {
     final converter = stringTovalueConverter ?? defaultConverter;

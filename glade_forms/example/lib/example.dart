@@ -11,12 +11,10 @@ class _Model extends GladeModel {
   List<GladeInput<Object?>> get inputs => [name, age, email];
 
   @override
-  void initialize() {
+  void initializeInputs() {
     name = GladeInput.stringInput(inputKey: 'name');
     age = GladeInput.intInput(value: 0, inputKey: 'age');
     email = GladeInput.stringInput(validator: (validator) => (validator..isEmail()).build(), inputKey: 'email');
-
-    super.initialize();
   }
 }
 

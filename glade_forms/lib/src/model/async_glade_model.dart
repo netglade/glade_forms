@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:glade_forms/src/model/glade_model_base.dart';
+import 'package:glade_forms/src/validator/validator_result.dart';
 import 'package:meta/meta.dart';
 
 abstract class AsyncGladeModel extends GladeModelBase {
@@ -8,10 +11,16 @@ abstract class AsyncGladeModel extends GladeModelBase {
   String get formattedValidationErrors => throw UnsupportedError('Use [formattedValidationErrorsAsync] version');
 
   @override
+  List<ValidatorResult<Object?>> get errors => throw UnsupportedError('Use [errorsAsync]');
+
+  @override
+  String get debugFormattedValidationErrors => throw UnsupportedError('Use [debugFormattedValidationErrorsAsync]');
+
+  @override
   bool get isInitialized => _isInitialized;
 
   AsyncGladeModel() {
-    initialize();
+    initializeAsync().ignore();
   }
 
   @override
@@ -23,7 +32,9 @@ abstract class AsyncGladeModel extends GladeModelBase {
 
   @protected
   @mustCallSuper
-  Future<void> initializeAsync() {
+  Future<void> initializeAsync() async {
+    await initializeInputs();
+
     assert(
       inputs.map((e) => e.inputKey).length == inputs.map((e) => e.inputKey).toSet().length,
       'Model contains inputs with duplicated key!',
@@ -38,4 +49,6 @@ abstract class AsyncGladeModel extends GladeModelBase {
 
     return Future.value();
   }
+
+  Future<void> initializeInputs();
 }

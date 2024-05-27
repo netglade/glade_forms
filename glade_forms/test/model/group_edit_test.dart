@@ -11,11 +11,9 @@ class _Model extends GladeModel {
   List<GladeInput<Object?>> get inputs => [a, b];
 
   @override
-  void initialize() {
+  void initializeInputs() {
     a = GladeInput.intInput(value: 0, inputKey: 'a');
     b = GladeInput.intInput(value: 1, inputKey: 'b');
-
-    super.initialize();
   }
 }
 
@@ -34,7 +32,7 @@ class _ModeWithDependencies extends GladeModel {
   List<GladeInput<Object?>> get inputs => [a, b, c];
 
   @override
-  void initialize() {
+  void initializeInputs() {
     a = GladeInput.intInput(value: 0, inputKey: 'a');
     b = GladeInput.intInput(value: 1, inputKey: 'b');
     c = GladeInput.intInput(
@@ -47,8 +45,6 @@ class _ModeWithDependencies extends GladeModel {
         onDepenencyCalledCount++;
       },
     );
-
-    super.initialize();
   }
 }
 

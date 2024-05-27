@@ -13,12 +13,10 @@ class _Model extends GladeModel {
   _Model();
 
   @override
-  void initialize() {
+  void initializeInputs() {
     name = GladeInput.stringInput(inputKey: 'name');
     age = GladeInput.intInput(value: 0, inputKey: 'age', useTextEditingController: true);
     email = GladeInput.stringInput(validator: (validator) => (validator..isEmail()).build(), inputKey: 'email');
-
-    super.initialize();
   }
 }
 

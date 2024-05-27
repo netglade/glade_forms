@@ -39,4 +39,25 @@ class ValidatorInstance<T> {
 
     return ValidatorResult(errors: errors, associatedInput: _input);
   }
+
+  /// Performs validation on given [value].
+  Future<ValidatorResult<T>> validateAsync(T value) async {
+    final errors = <GladeValidatorError<T>>[];
+
+    for (final part in _parts) {
+      final shouldValidate = part.shouldValidate?.call(value) ?? true;
+
+      if (!shouldValidate) continue;
+
+      final error = await part.validateAsync(value);
+
+      if (error != null) {
+        errors.add(error);
+
+        if (stopOnFirstError) return ValidatorResult(errors: errors, associatedInput: _input);
+      }
+    }
+
+    return ValidatorResult(errors: errors, associatedInput: _input);
+  }
 }

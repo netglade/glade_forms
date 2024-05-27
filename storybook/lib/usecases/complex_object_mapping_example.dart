@@ -24,7 +24,7 @@ class _Model extends GladeModel {
   List<GladeInput<Object?>> get inputs => [selectedItem, availableStats];
 
   @override
-  void initialize() {
+  void initializeInputs() {
     selectedItem = GladeInput.create(
       validator: (v) => (v..notNull()).build(),
       inputKey: 'selectedItem',
@@ -54,8 +54,6 @@ class _Model extends GladeModel {
       ),
       useTextEditingController: true,
     );
-
-    super.initialize();
   }
 }
 

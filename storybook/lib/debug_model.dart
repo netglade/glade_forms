@@ -20,7 +20,7 @@ class AgeRestrictedModel extends GladeModel {
   List<GladeInput<Object?>> get inputs => [nameInput, fooInput, ageInput, vipInput];
 
   @override
-  void initialize() {
+  void initializeInputs() {
     nameInput = GladeInput.stringInput(
       inputKey: 'name-input',
       defaultTranslations: DefaultTranslations(
@@ -77,8 +77,6 @@ class AgeRestrictedModel extends GladeModel {
         }
       },
     );
-
-    super.initialize();
   }
 }
 

@@ -17,6 +17,8 @@ abstract class GladeModel extends GladeModelBase<GladeInput<Object?>> {
   @protected
   @mustCallSuper
   void initialize() {
+    initializeInputs();
+
     assert(
       inputs.map((e) => e.inputKey).length == inputs.map((e) => e.inputKey).toSet().length,
       'Model contains inputs with duplicated key!',
@@ -29,4 +31,6 @@ abstract class GladeModel extends GladeModelBase<GladeInput<Object?>> {
     _isInitialized = true;
     notifyListeners();
   }
+
+  void initializeInputs();
 }
