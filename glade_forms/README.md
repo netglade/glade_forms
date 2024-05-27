@@ -355,6 +355,14 @@ Use `defaultTranslation` to provide default translations for common error such a
 
 ![translation-example](https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/doc/translation.gif)
 
+Or use `defaultErrorTranslate` on model's level.
+
+Order of translation is as follows:
+
+```dart
+translateError -> defaultTranslation -> `Model.defaultErrorTranslate` -> `error.devMessage` 
+```
+
 ### Converters
 
 As noted before, if `T` is not a String, a converter from String to `T` has to be provided. 

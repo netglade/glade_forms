@@ -227,6 +227,7 @@ class GladeInput<T> extends GladeInputBase<T> {
     String? inputKey,
     bool pure = true,
     ErrorTranslator<T>? translateError,
+    DefaultTranslations? defaultTranslations,
     ValueComparator<T>? valueComparator,
     StringToTypeConverter<T>? valueConverter,
     InputDependenciesFactory? dependencies,
@@ -242,6 +243,7 @@ class GladeInput<T> extends GladeInputBase<T> {
         value: value ?? initialValue,
         initialValue: initialValue,
         translateError: translateError,
+        defaultTranslations: defaultTranslations,
         valueComparator: valueComparator,
         valueConverter: valueConverter,
         inputKey: inputKey,
@@ -264,6 +266,7 @@ class GladeInput<T> extends GladeInputBase<T> {
     String? inputKey,
     bool pure = true,
     ErrorTranslator<T>? translateError,
+    DefaultTranslations? defaultTranslations,
     ValueComparator<T>? valueComparator,
     StringToTypeConverter<T>? valueConverter,
     InputDependenciesFactory? dependencies,
@@ -279,6 +282,7 @@ class GladeInput<T> extends GladeInputBase<T> {
         value: value,
         initialValue: initialValue,
         translateError: translateError,
+        defaultTranslations: defaultTranslations,
         valueComparator: valueComparator,
         valueConverter: valueConverter,
         inputKey: inputKey,
@@ -304,6 +308,7 @@ class GladeInput<T> extends GladeInputBase<T> {
     ValidatorFactory<int>? validator,
     bool pure = true,
     ErrorTranslator<int>? translateError,
+    DefaultTranslations? defaultTranslations,
     ValueComparator<int>? valueComparator,
     InputDependenciesFactory? dependencies,
     OnChange<int>? onChange,
@@ -319,6 +324,7 @@ class GladeInput<T> extends GladeInputBase<T> {
         validator: validator,
         pure: pure,
         translateError: translateError,
+        defaultTranslations: defaultTranslations,
         valueComparator: valueComparator,
         inputKey: inputKey,
         dependencies: dependencies,
@@ -338,6 +344,7 @@ class GladeInput<T> extends GladeInputBase<T> {
     ValidatorFactory<bool>? validator,
     bool pure = true,
     ErrorTranslator<bool>? translateError,
+    DefaultTranslations? defaultTranslations,
     ValueComparator<bool>? valueComparator,
     InputDependenciesFactory? dependencies,
     OnChange<bool>? onChange,
@@ -353,6 +360,7 @@ class GladeInput<T> extends GladeInputBase<T> {
         validator: validator,
         pure: pure,
         translateError: translateError,
+        defaultTranslations: defaultTranslations,
         valueComparator: valueComparator,
         inputKey: inputKey,
         dependencies: dependencies,
@@ -499,6 +507,28 @@ class GladeInput<T> extends GladeInputBase<T> {
     }
   }
 
+  /// Used as shorthand for field setter.
+  ///
+  /// When `useTextEditingController` true, method will sync controller with provided value.
+  /// When [shouldTriggerOnChange] is set to false, the `onChange` callback will not be called.
+  void updateValue(T value, {bool shouldTriggerOnChange = true}) {
+    if (_useTextEditingController) {
+      _syncValueWithController(value, shouldTriggerOnChange: shouldTriggerOnChange);
+    } else {
+      _setValue(value, shouldTriggerOnChange: shouldTriggerOnChange);
+    }
+  }
+
+  /// Used as shorthand for field setter.
+  ///
+  /// If `T` is non-nullable type and provided value is `null`, update is **not invoked**.
+  ///
+  /// When [shouldTriggerOnChange] is set to false, the `onChange` callback will not be called.
+  void updateValueWhenNotNull(T? value, {bool shouldTriggerOnChange = true}) {
+    if (value == null) return;
+
+    updateValue(value, shouldTriggerOnChange: shouldTriggerOnChange);
+  }
   @override
   Future<void> updateValueWithStringAsync(String? strValue, {bool shouldTriggerOnChange = true}) async =>
       updateValueWithString(strValue, shouldTriggerOnChange: shouldTriggerOnChange);
@@ -507,7 +537,12 @@ class GladeInput<T> extends GladeInputBase<T> {
   ///
   /// Allows to sets new initialValue and value if needed.
   /// By default ([invokeUpdate]=`true`) setting value will trigger  listeners.
-  void resetToPure({ValueGetter<T>? value, ValueGetter<T>? initialValue, bool invokeUpdate = true}) {
+  void resetToPure({
+    ValueGetter<T>? value,
+    ValueGetter<T>? initialValue,
+    bool invokeUpdate = true,
+    bool copyValueToInitialValue = false,
+  }) {
     this._isPure = true;
 
     if (value != null) {
@@ -524,6 +559,14 @@ class GladeInput<T> extends GladeInputBase<T> {
 
     if (initialValue != null) {
       this._initialValue = initialValue();
+
+      if (invokeUpdate) _bindedModel?.notifyInputUpdated(this);
+    }
+
+    if (copyValueToInitialValue) {
+      this._initialValue = this.value;
+
+      if (invokeUpdate) _bindedModel?.notifyInputUpdated(this);
     }
   }
 
@@ -655,11 +698,13 @@ class GladeInput<T> extends GladeInputBase<T> {
   //   final translateErrorTmp = translateError;
   //   final defaultConversionMessage = defaultTranslationsTmp?.defaultConversionMessage;
 
-  //   if (translateErrorTmp != null) {
-  //     return translateErrorTmp(err, err.key, err.devErrorMessage, dependenciesFactory());
-  //   } else if (defaultConversionMessage != null) {
-  //     return defaultConversionMessage;
-  //   }
+    if (translateErrorTmp != null) {
+      return translateErrorTmp(err, err.key, err.devErrorMessage, dependenciesFactory());
+    } else if (defaultConversionMessage != null) {
+      return defaultConversionMessage;
+    } else if (this._bindedModel case final model?) {
+      return model.defaultErrorTranslate(err, err.key, err.devErrorMessage, dependenciesFactory());
+    }
 
   //   return err.devErrorMessage;
   // }
@@ -674,11 +719,13 @@ class GladeInput<T> extends GladeInputBase<T> {
   //         .join(delimiter);
   //   }
 
-  //   return inputErrors.errors.map((e) {
-  //     if (defaultTranslationsTmp != null &&
-  //         (e.isNullError || e.hasStringEmptyOrNullErrorKey || e.hasNullValueOrEmptyValueKey)) {
-  //       return defaultTranslationsTmp.defaultValueIsNullOrEmptyMessage ?? e.toString();
-  //     }
+    return inputErrors.errors.map((e) {
+      if (defaultTranslationsTmp != null &&
+          (e.isNullError || e.hasStringEmptyOrNullErrorKey || e.hasNullValueOrEmptyValueKey)) {
+        return defaultTranslationsTmp.defaultValueIsNullOrEmptyMessage ?? e.toString();
+      } else if (this._bindedModel case final model?) {
+        return model.defaultErrorTranslate(e, e.key, e.devErrorMessage, dependenciesFactory());
+      }
 
   //     return e.toString();
   //   }).join(delimiter);
