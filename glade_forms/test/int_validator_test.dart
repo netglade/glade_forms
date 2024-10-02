@@ -5,8 +5,8 @@ import 'package:test/test.dart';
 
 void main() {
   group('inBetween', () {
-    test('success a<b', () {
-      final validator = (IntValidator()..isBetween(a: 5, b: 10)).build();
+    test('success', () {
+      final validator = (IntValidator()..isBetween(min: 5, max: 10)).build();
 
       final result = validator.validate(6);
 
@@ -14,26 +14,26 @@ void main() {
       expect(result.isInvalid, isFalse);
     });
 
-    test('success a>b', () {
-      final validator = (IntValidator()..isBetween(a: 10, b: 5)).build();
+    test('success inclusive max', () {
+      final validator = (IntValidator()..isBetween(min: 5, max: 10)).build();
 
-      final result = validator.validate(6);
+      final result = validator.validate(10);
 
       expect(result.isValid, isTrue);
       expect(result.isInvalid, isFalse);
     });
 
-    test('fails a<b', () {
-      final validator = (IntValidator()..isBetween(a: 5, b: 10)).build();
+    test('success inclusive min', () {
+      final validator = (IntValidator()..isBetween(min: 5, max: 10)).build();
 
-      final result = validator.validate(1);
+      final result = validator.validate(5);
 
-      expect(result.isValid, isFalse);
-      expect(result.isInvalid, isTrue);
+      expect(result.isValid, isTrue);
+      expect(result.isInvalid, isFalse);
     });
 
-    test('fails a>b', () {
-      final validator = (IntValidator()..isBetween(a: 10, b: 5)).build();
+    test('fails', () {
+      final validator = (IntValidator()..isBetween(min: 5, max: 10)).build();
 
       final result = validator.validate(1);
 

@@ -3,17 +3,17 @@ import 'package:glade_forms/src/src.dart';
 class IntValidator extends GladeValidator<int> {
   IntValidator();
 
-  /// Compares given value with [a] and [b] values.
+  /// Compares given value with [min] and [max] values.
   void isBetween({
-    required int a,
-    required int b,
+    required int min,
+    required int max,
     OnValidateError<int>? devError,
     Object? key,
     ShouldValidateCallback<int>? shouldValidate,
   }) =>
       satisfy(
-        (value) => a < b ? value >= a && value <= b : value >= b && value <= a,
-        devError: devError ?? (value) => 'Value ${value ?? 'NULL'} in not in between $a and $b.',
+        (value) => value >= min && value <= max,
+        devError: devError ?? (value) => 'Value ${value ?? 'NULL'} in not in between $min and $max.',
         key: key ?? GladeErrorKeys.intCompareError,
         shouldValidate: shouldValidate,
       );
