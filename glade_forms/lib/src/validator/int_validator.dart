@@ -13,7 +13,7 @@ class IntValidator extends GladeValidator<int> {
   }) =>
       satisfy(
         (value) => a < b ? value >= a && value <= b : value >= b && value <= a,
-        devError: devError ?? (value) => 'Value "${value ?? 'NULL'}" isBetween cannot be determined.',
+        devError: devError ?? (value) => 'Value ${value ?? 'NULL'} in not in between $a and $b.',
         key: key ?? GladeErrorKeys.intCompareError,
         shouldValidate: shouldValidate,
       );
@@ -27,7 +27,7 @@ class IntValidator extends GladeValidator<int> {
   }) =>
       satisfy(
         (value) => value >= min,
-        devError: devError ?? (value) => 'Value "${value ?? 'NULL'}" isMin cannot be determined.',
+        devError: devError ?? (value) => 'Value ${value ?? 'NULL'} is less than $min.',
         key: key ?? GladeErrorKeys.intCompareError,
         shouldValidate: shouldValidate,
       );
@@ -41,7 +41,7 @@ class IntValidator extends GladeValidator<int> {
   }) =>
       satisfy(
         (value) => value <= max,
-        devError: devError ?? (value) => 'Value "${value ?? 'NULL'}" isMax cannot be determined.',
+        devError: devError ?? (value) => 'Value ${value ?? 'NULL'} is bigger than $max.',
         key: key ?? GladeErrorKeys.intCompareError,
         shouldValidate: shouldValidate,
       );

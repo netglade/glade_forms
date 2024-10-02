@@ -164,6 +164,17 @@ StringInput is specialized variant of GladeInput<String> which has additional, s
 
 Moreover `StringInput` by default uses TextEditingController under the hood. 
 
+#### IntInput
+
+IntInput is specialized variant of GladeInput<int> which has additional, int related, validations such as `isBetween`, `isMin`, `isMax` and more.
+
+Moreover `IntInput` by default uses TextEditingController under the hood.
+
+```dart
+final validator = (IntValidator()..isMax(max: 10)).build();
+final result = validator.validate(5); // valid
+```
+
 ### Validation
 
 Validation is defined through part methods on ValidatorFactory such as `notNull()`, `satisfy()` and other parts. 
