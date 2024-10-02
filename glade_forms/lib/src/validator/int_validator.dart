@@ -1,4 +1,4 @@
-import 'package:glade_forms/glade_forms.dart';
+import 'package:glade_forms/src/src.dart';
 
 class IntValidator extends GladeValidator<int> {
   IntValidator();
