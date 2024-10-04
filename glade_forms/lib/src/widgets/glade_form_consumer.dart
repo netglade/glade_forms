@@ -4,7 +4,6 @@ import 'package:glade_forms/src/widgets/glade_form_builder.dart';
 import 'package:glade_forms/src/widgets/glade_form_listener.dart';
 
 class GladeFormConsumer<M extends GladeModel> extends StatelessWidget {
-  // ignore: prefer-correct-callback-field-name, ok name
   final GladeFormWidgetBuilder<M> builder;
   // ignore: prefer-correct-callback-field-name, ok name
   final GladeFormListenerFn<M>? listener;
