@@ -1,6 +1,9 @@
 ## DEV:
 - **[Add]**: Support skipping particular validation with `shouldValidate` callback.
 
+## 2.3.0
+- **[Add]**: Add `IntInput` as a specialized variant of GladeInput<int> which has additional, int related, validations such as `isBetween`, `isMin`, `isMax`
+
 ## 2.2.0
 - **[Add]**: Add `resetToPure` on model level.
 
