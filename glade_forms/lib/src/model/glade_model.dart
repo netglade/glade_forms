@@ -130,12 +130,27 @@ abstract class GladeModel extends ChangeNotifier {
     }
   }
 
-  /// Resets all inputs to pure state.
-  ///
-  /// When [copyValueToInitialValue] is true, input's initialValue is overriden by current value.
-  void resetToPure({bool copyValueToInitialValue = false}) {
+  /// Sets a new pure state for all inputs in the model.
+  void setAsNewPure({
+    bool invokeUpdate = true,
+    bool copyValueToInitialValue = false,
+  }) {
     for (final input in inputs) {
-      input.resetToPure(copyValueToInitialValue: copyValueToInitialValue);
+      input.setAsNewPure(
+        invokeUpdate: invokeUpdate,
+        copyValueToInitialValue: copyValueToInitialValue,
+      );
     }
+    if (invokeUpdate) {
+      notifyListeners();
+    }
+  }
+
+  /// Resets all inputs in the model to their initial values and sets them as pure.
+  void resetToPure() {
+    for (final input in inputs) {
+      input.resetToPure();
+    }
+    notifyListeners();
   }
 }
