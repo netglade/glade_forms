@@ -32,6 +32,24 @@ void main() {
       expect(result.isInvalid, isFalse);
     });
 
+    test('fails non-inclusive max', () {
+      final validator = (IntValidator()..isBetween(min: 5, max: 10, inclusiveInterval: false)).build();
+
+      final result = validator.validate(10);
+
+      expect(result.isValid, isFalse);
+      expect(result.isInvalid, isTrue);
+    });
+
+    test('fails non-inclusive min', () {
+      final validator = (IntValidator()..isBetween(min: 5, max: 10, inclusiveInterval: false)).build();
+
+      final result = validator.validate(5);
+
+      expect(result.isValid, isFalse);
+      expect(result.isInvalid, isTrue);
+    });
+
     test('fails', () {
       final validator = (IntValidator()..isBetween(min: 5, max: 10)).build();
 
