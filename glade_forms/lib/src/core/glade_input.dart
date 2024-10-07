@@ -548,8 +548,6 @@ class GladeInput<T> {
     bool invokeUpdate = true,
     bool copyValueToInitialValue = false,
   }) {
-    this._isPure = true;
-
     if (value != null) {
       if (_useTextEditingController) {
         _syncValueWithController(value(), shouldTriggerOnChange: invokeUpdate);
@@ -561,7 +559,7 @@ class GladeInput<T> {
         }
       }
     }
-
+    this._isPure = true;
     if (initialValue != null) {
       this._initialValue = initialValue();
 
@@ -577,12 +575,12 @@ class GladeInput<T> {
 
   /// Resets the input value to its initial value and sets it as pure.
   void resetToPure() {
-    this._isPure = true;
     if (_useTextEditingController) {
       _syncValueWithController(_initialValue as T, shouldTriggerOnChange: true);
     } else {
       _value = _initialValue as T;
     }
+    this._isPure = true;
     _bindedModel?.notifyInputUpdated(this);
   }
 
