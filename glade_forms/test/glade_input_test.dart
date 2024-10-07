@@ -143,4 +143,60 @@ void main() {
       expect(input.value, equals(100));
     });
   });
+
+  group('Pure test', () {
+    test('ResetToPure', () {
+      final dependentInput = GladeInput.intInput(value: -1);
+      final input = GladeInput.intInput(
+        value: 100,
+        useTextEditingController: true,
+        onChange: (info) {
+          dependentInput.value = info.value;
+        },
+      );
+      expect(dependentInput.value, equals(-1));
+      expect(input.value, equals(100));
+
+      input.updateValue(0, shouldTriggerOnChange: true);
+      expect(input.value, equals(0));
+      input.resetToPure();
+
+      expect(input.isPure, isTrue);
+      expect(dependentInput.value, equals(100));
+      // ignore: avoid-duplicate-test-assertions, its not the same as before, its after resetToPure, to test if the initial value is back in.
+      expect(input.value, equals(100));
+    });
+
+    test('SetAsNewPure', () {
+      final dependentInput = GladeInput.intInput(value: -1);
+      final input = GladeInput.intInput(
+        value: 100,
+        useTextEditingController: true,
+        onChange: (info) {
+          dependentInput.value = info.value;
+        },
+      );
+
+      // Initial state
+      expect(dependentInput.value, equals(-1));
+      expect(input.value, equals(100));
+      expect(input.initialValue, equals(100));
+      expect(input.isPure, isTrue);
+
+      // Change the value to make it impure
+      input.updateValue(50);
+      expect(input.value, equals(50));
+      expect(input.isPure, isFalse);
+
+      // Set as new pure with a new value
+      input.setAsNewPure(value: () => 200, initialValue: () => 200, invokeUpdate: true, copyValueToInitialValue: true);
+
+      // Check the new state
+      expect(input.value, equals(200));
+      expect(input.initialValue, equals(200));
+      // ignore: avoid-duplicate-test-assertions, the state changed, its not the same as before, its after setAsNewPure, to test if the new value is set.
+      expect(input.isPure, isTrue);
+      expect(dependentInput.value, equals(200)); // Because onChange was triggered
+    });
+  });
 }
