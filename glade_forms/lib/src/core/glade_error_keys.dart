@@ -9,4 +9,5 @@ class GladeErrorKeys {
   static const String stringExactLength = 'string-exact-length';
   static const String valueIsNull = 'value-is-null';
   static const String valueIsEmpty = 'value-is-empty';
+  static const String intCompareError = 'int-compare-error';
 }

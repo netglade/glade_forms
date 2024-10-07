@@ -17,11 +17,13 @@ import 'package:meta/meta.dart';
 typedef ValueComparator<T> = bool Function(T? initial, T? value);
 typedef ValidatorFactory<T> = ValidatorInstance<T> Function(GladeValidator<T> v);
 typedef StringValidatorFactory = ValidatorInstance<String> Function(StringValidator validator);
+typedef IntValidatorFactory = ValidatorInstance<int> Function(IntValidator validator);
 typedef OnChange<T> = void Function(ChangesInfo<T> info);
 typedef OnDependencyChange = void Function(List<String> updateInputKeys);
 typedef ValueTransform<T> = T Function(T input);
 
 typedef StringInput = GladeInput<String>;
+typedef IntInput = GladeInput<int>;
 
 class GladeInput<T> {
   /// Compares initial and current value.
@@ -331,7 +333,7 @@ class GladeInput<T> {
     required int value,
     String? inputKey,
     int? initialValue,
-    ValidatorFactory<int>? validator,
+    IntValidatorFactory? validator,
     bool pure = true,
     ErrorTranslator<int>? translateError,
     DefaultTranslations? defaultTranslations,
@@ -343,25 +345,28 @@ class GladeInput<T> {
     bool useTextEditingController = false,
     ValueTransform<int>? valueTransform,
     bool trackUnchanged = true,
-  }) =>
-      GladeInput.create(
-        value: value,
-        initialValue: initialValue ?? value,
-        validator: validator,
-        pure: pure,
-        translateError: translateError,
-        defaultTranslations: defaultTranslations,
-        valueComparator: valueComparator,
-        inputKey: inputKey,
-        dependencies: dependencies,
-        valueConverter: GladeTypeConverters.intConverter,
-        onChange: onChange,
-        onDependencyChange: onDependencyChange,
-        textEditingController: textEditingController,
-        useTextEditingController: useTextEditingController,
-        valueTransform: valueTransform,
-        trackUnchanged: trackUnchanged,
-      );
+  }) {
+    final validatorInstance = validator?.call(IntValidator()) ?? IntValidator().build();
+
+    return GladeInput._(
+      value: value,
+      initialValue: initialValue ?? value,
+      validatorInstance: validatorInstance,
+      isPure: pure,
+      translateError: translateError,
+      defaultTranslations: defaultTranslations,
+      valueComparator: valueComparator,
+      inputKey: inputKey,
+      dependenciesFactory: dependencies,
+      stringTovalueConverter: GladeTypeConverters.intConverter,
+      onChange: onChange,
+      onDependencyChange: onDependencyChange,
+      textEditingController: textEditingController,
+      useTextEditingController: useTextEditingController,
+      valueTransform: valueTransform,
+      trackUnchanged: trackUnchanged,
+    );
+  }
 
   static GladeInput<bool> boolInput({
     required bool value,
