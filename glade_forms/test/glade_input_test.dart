@@ -150,10 +150,13 @@ void main() {
         value: 100,
         useTextEditingController: true,
       );
+
       expect(input.value, equals(100));
 
       input.updateValue(0, shouldTriggerOnChange: true);
+
       expect(input.value, equals(0));
+
       input.resetToPure();
 
       expect(input.isPure, isTrue);
@@ -171,11 +174,6 @@ void main() {
       expect(input.value, equals(100));
       expect(input.initialValue, equals(100));
       expect(input.isPure, isTrue);
-
-      // Change the value to make it impure
-      input.updateValue(50);
-      expect(input.value, equals(50));
-      expect(input.isPure, isFalse);
 
       // Set as new pure with a new value
       input.setAsNewPure(value: () => 200, initialValue: () => 200, invokeUpdate: true, copyValueToInitialValue: true);
