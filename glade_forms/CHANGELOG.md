@@ -1,5 +1,7 @@
 ## DEV:
 - **[Add]**: Support skipping particular validation with `shouldValidate` callback.
+- **[Breaking]**: The `resetToPure` method on both GladeInput and GladeModel has been renamed to `setAsNewPure`. This change better reflects the method's behavior of setting a new pure state rather than resetting to the original state.
+- **[Add]**: New `resetToPure` method added to both GladeInput and GladeModel. This method truly resets the input(s) to their initial value(s) and marks them as pure.
 
 ## 2.2.0
 - **[Add]**: Add `resetToPure` on model level.

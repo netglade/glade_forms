@@ -103,7 +103,7 @@ abstract class GladeModel extends ChangeNotifier {
       _lastUpdates.add(input);
     } else {
       _lastUpdates = [input];
-      notifyDependecies();
+      notifyDependencies();
       notifyListeners();
     }
   }
@@ -116,12 +116,12 @@ abstract class GladeModel extends ChangeNotifier {
 
     _groupEdit = false;
 
-    notifyDependecies();
+    notifyDependencies();
 
     notifyListeners();
   }
 
-  void notifyDependecies() {
+  void notifyDependencies() {
     final updatedKeys = _lastUpdates.map((e) => e.inputKey);
     for (final input in inputs) {
       final union = input.dependencies.map((e) => e.inputKey).toSet().union(updatedKeys.toSet());
@@ -130,12 +130,29 @@ abstract class GladeModel extends ChangeNotifier {
     }
   }
 
-  /// Resets all inputs to pure state.
+  /// Sets a new pure state for all inputs in the model.
   ///
   /// When [copyValueToInitialValue] is true, input's initialValue is overriden by current value.
-  void resetToPure({bool copyValueToInitialValue = false}) {
+  void setAsNewPure({
+    bool invokeUpdate = true,
+    bool copyValueToInitialValue = false,
+  }) {
     for (final input in inputs) {
-      input.resetToPure(copyValueToInitialValue: copyValueToInitialValue);
+      input.setAsNewPure(
+        invokeUpdate: invokeUpdate,
+        copyValueToInitialValue: copyValueToInitialValue,
+      );
     }
+    if (invokeUpdate) {
+      notifyListeners();
+    }
+  }
+
+  /// Resets all inputs in the model to their initial values and sets them as pure.
+  void resetToPure() {
+    for (final input in inputs) {
+      input.resetToPure();
+    }
+    notifyListeners();
   }
 }

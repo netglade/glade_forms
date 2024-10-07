@@ -533,11 +533,11 @@ class GladeInput<T> {
     updateValue(value, shouldTriggerOnChange: shouldTriggerOnChange);
   }
 
-  /// Resets input into pure state.
+  /// Sets a new pure state for the input.
   ///
-  /// Allows to sets new initialValue and value if needed.
-  /// By default ([invokeUpdate]=`true`) setting value will trigger  listeners.
-  void resetToPure({
+  /// Allows to set new initialValue and value if needed.
+  /// By default ([invokeUpdate]=`true`) setting value will trigger listeners.
+  void setAsNewPure({
     ValueGetter<T>? value,
     ValueGetter<T>? initialValue,
     bool invokeUpdate = true,
@@ -568,6 +568,17 @@ class GladeInput<T> {
 
       if (invokeUpdate) _bindedModel?.notifyInputUpdated(this);
     }
+  }
+
+  /// Resets the input value to its initial value and sets it as pure.
+  void resetToPure() {
+    this._isPure = true;
+    if (_useTextEditingController) {
+      _syncValueWithController(_initialValue as T, shouldTriggerOnChange: true);
+    } else {
+      _value = _initialValue as T;
+    }
+    _bindedModel?.notifyInputUpdated(this);
   }
 
   @protected
