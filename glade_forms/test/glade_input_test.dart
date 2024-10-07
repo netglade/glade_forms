@@ -148,10 +148,12 @@ void main() {
     test('ResetToPure', () {
       final input = GladeInput.intInput(
         value: 100,
+        initialValue: 10,
         useTextEditingController: true,
       );
 
       expect(input.value, equals(100));
+      expect(input.initialValue, equals(10));
 
       input.updateValue(0, shouldTriggerOnChange: true);
 
@@ -160,27 +162,27 @@ void main() {
       input.resetToPure();
 
       expect(input.isPure, isTrue);
-      // ignore: avoid-duplicate-test-assertions, its not the same as before, its after resetToPure, to test if the initial value is back in.
-      expect(input.value, equals(100));
+      expect(input.value, equals(input.initialValue));
     });
 
     test('SetAsNewPure', () {
       final input = GladeInput.intInput(
+        initialValue: 20,
         value: 100,
         useTextEditingController: true,
       );
 
       // Initial state
       expect(input.value, equals(100));
-      expect(input.initialValue, equals(100));
+      expect(input.initialValue, equals(20));
       expect(input.isPure, isTrue);
 
       // Set as new pure with a new value
-      input.setAsNewPure(value: () => 200, initialValue: () => 200, invokeUpdate: true, copyValueToInitialValue: true);
+      input.setAsNewPure(value: () => 200, initialValue: () => 10, invokeUpdate: true, copyValueToInitialValue: false);
 
       // Check the new state
       expect(input.value, equals(200));
-      expect(input.initialValue, equals(200));
+      expect(input.initialValue, equals(10));
       // ignore: avoid-duplicate-test-assertions, the state changed, its not the same as before, its after setAsNewPure, to test if the new value is set.
       expect(input.isPure, isTrue);
     });
