@@ -17,6 +17,19 @@ class StringValidator extends GladeValidator<String> {
         shouldValidate: shouldValidate,
       );
 
+  /// Given value can't be blank.
+  void notBlank({
+    OnValidateError<String>? devError,
+    Object? key,
+    ShouldValidateCallback<String>? shouldValidate,
+  }) =>
+      satisfy(
+        (input) => input.trim().isNotEmpty,
+        devError: devError ?? (_) => "Value can't be empty",
+        key: key ?? GladeErrorKeys.stringEmpty,
+        shouldValidate: shouldValidate,
+      );
+
   /// Checks that value is valid email address.
   ///
   /// Used Regex expression `^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$`.
