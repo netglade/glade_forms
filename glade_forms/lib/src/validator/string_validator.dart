@@ -9,22 +9,10 @@ class StringValidator extends GladeValidator<String> {
     OnValidateError<String>? devError,
     Object? key,
     ShouldValidateCallback<String>? shouldValidate,
+    bool allowBlank = true,
   }) =>
       satisfy(
-        (input) => input.isNotEmpty,
-        devError: devError ?? (_) => "Value can't be empty",
-        key: key ?? GladeErrorKeys.stringEmpty,
-        shouldValidate: shouldValidate,
-      );
-
-  /// Given value can't be blank.
-  void notBlank({
-    OnValidateError<String>? devError,
-    Object? key,
-    ShouldValidateCallback<String>? shouldValidate,
-  }) =>
-      satisfy(
-        (input) => input.trim().isNotEmpty,
+        (input) => allowBlank ? input.isNotEmpty : input.trim().isNotEmpty,
         devError: devError ?? (_) => "Value can't be empty",
         key: key ?? GladeErrorKeys.stringEmpty,
         shouldValidate: shouldValidate,
