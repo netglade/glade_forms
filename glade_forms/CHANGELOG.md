@@ -1,3 +1,7 @@
+
+## 3.0.0
+- Breaking release
+
 ## 2.3.0:
 - **[Add]**: Add `allowBlank` parameter to `isEmpty` string validator.
 - **[Add]**: Add `IntInput` as a specialized variant of GladeInput<int> which has additional, int related, validations such as `isBetween`, `isMin`, `isMax`
