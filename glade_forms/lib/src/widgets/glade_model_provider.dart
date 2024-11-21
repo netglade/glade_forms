@@ -10,8 +10,8 @@ class GladeModelProvider<M extends GladeModel> extends StatelessWidget {
   final M? value;
   final Widget child;
 
-  factory GladeModelProvider({required CreateModelFunction<M> create, required Widget child}) =>
-      GladeModelProvider._(create: create, child: child);
+  factory GladeModelProvider({required CreateModelFunction<M> create, required Widget child, Key? key}) =>
+      GladeModelProvider._(create: create, key: key, child: child);
 
   const GladeModelProvider._({
     required this.child,
@@ -20,8 +20,8 @@ class GladeModelProvider<M extends GladeModel> extends StatelessWidget {
     super.key,
   });
 
-  factory GladeModelProvider.value({required M value, required Widget child}) =>
-      GladeModelProvider._(value: value, child: child);
+  factory GladeModelProvider.value({required M value, required Widget child, Key? key}) =>
+      GladeModelProvider._(value: value, key: key, child: child);
 
   @override
   Widget build(BuildContext context) {
