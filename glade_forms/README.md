@@ -128,7 +128,7 @@ On each input we can define
  - **validator** - Input's value must satisfy validation to be *valid* input.
  - **translateError** - If there are validation errors, this function is use to translate those errors.
  - **dependencies** (WIP) - Each input can depend on another inputs for listening changes.
- - **stringTovalueConverter** - If input is used by TextField and `T` is not a `String`, value converter should be provided.
+ - **stringToValueConverter** - If input is used by TextField and `T` is not a `String`, value converter should be provided.
  - **valueComparator** - Sometimes it is handy to provide `initialValue` which will be never updated after input is mutated. `valueComparator` should be provided to compare `initialValue` and `value` if `T` is not comparable type by default. Note that GladeForms handle deep equality of collections and assumes that complex types are comparable by values.
  - **valueTransform** - transform `T` value into different `T` value. An example of usage can be sanitazation of string input (trim(),...).
  - **defaultTranslation** - If error's translations are simple, the default translation settings can be set instead of custom `translateError` method.

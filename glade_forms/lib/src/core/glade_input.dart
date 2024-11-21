@@ -35,14 +35,14 @@ class GladeInput<T> {
   final ValidatorInstance<T> validatorInstance;
 
   @protected
-  final StringToTypeConverter<T>? stringTovalueConverter;
+  final StringToTypeConverter<T>? stringToValueConverter;
 
   // ignore: prefer-correct-callback-field-name, ok name
   final InputDependenciesFactory dependenciesFactory;
 
   /// An input's identification.
   ///
-  /// Used within listener changes and dependency related funcions such as validation.
+  /// Used within listener changes and dependency related functions such as validation.
   final String inputKey;
 
   // ignore: prefer-correct-callback-field-name, ok name
@@ -120,7 +120,7 @@ class GladeInput<T> {
   bool get hasConversionError => __conversionError != null;
 
   /// String representattion of [value].
-  String get stringValue => stringTovalueConverter?.convertBack(value) ?? value.toString();
+  String get stringValue => stringToValueConverter?.convertBack(value) ?? value.toString();
 
   bool get _valueIsSameAsInitialValue {
     if (identical(value, initialValue)) return true;
@@ -153,7 +153,7 @@ class GladeInput<T> {
     required this.valueComparator,
     required String? inputKey,
     required this.translateError,
-    required this.stringTovalueConverter,
+    required this.stringToValueConverter,
     required InputDependenciesFactory? dependenciesFactory,
     required this.defaultTranslations,
     required this.onChange,
@@ -178,7 +178,7 @@ class GladeInput<T> {
                 ? TextEditingController(
                     text: switch (value) {
                       final String? x => x,
-                      != null => stringTovalueConverter?.convertBack(value),
+                      != null => stringToValueConverter?.convertBack(value),
                       _ => null,
                     },
                   )
@@ -234,7 +234,7 @@ class GladeInput<T> {
       translateError: translateError,
       valueComparator: valueComparator,
       inputKey: inputKey,
-      stringTovalueConverter: valueConverter,
+      stringToValueConverter: valueConverter,
       dependenciesFactory: dependencies,
       onChange: onChange,
       onDependencyChange: onDependencyChange,
@@ -358,7 +358,7 @@ class GladeInput<T> {
       valueComparator: valueComparator,
       inputKey: inputKey,
       dependenciesFactory: dependencies,
-      stringTovalueConverter: GladeTypeConverters.intConverter,
+      stringToValueConverter: GladeTypeConverters.intConverter,
       onChange: onChange,
       onDependencyChange: onDependencyChange,
       textEditingController: textEditingController,
@@ -439,7 +439,7 @@ class GladeInput<T> {
       textEditingController: textEditingController,
       useTextEditingController: useTextEditingController,
       valueComparator: valueComparator,
-      stringTovalueConverter: null,
+      stringToValueConverter: null,
       valueTransform: valueTransform,
       trackUnchanged: trackUnchanged,
     );
@@ -457,7 +457,7 @@ class GladeInput<T> {
     // ignore: avoid-non-null-assertion, it is not null
     if (hasConversionError) return _translateConversionError(__conversionError!);
 
-    return validatorResult.isInvalid ? _translate() ?? '' : '';
+    return validatorResult.isInvalid ? (_translate() ?? '') : '';
   }
 
   /// Shorthand validator for TextFieldForm inputs.
@@ -466,10 +466,10 @@ class GladeInput<T> {
   /// If there are multiple errors they are concenated into one string with [delimiter].
   String? textFormFieldInputValidatorCustom(String? value, {String delimiter = '.'}) {
     assert(
-      TypeHelper.typesEqual<T, String>() || TypeHelper.typesEqual<T, String?>() || stringTovalueConverter != null,
+      TypeHelper.typesEqual<T, String>() || TypeHelper.typesEqual<T, String?>() || stringToValueConverter != null,
       'For non-string values [converter] must be provided. TInput type: $T',
     );
-    final converter = stringTovalueConverter ?? _defaultConverter;
+    final converter = stringToValueConverter ?? _defaultConverter;
 
     try {
       final convertedValue = converter.convert(value);
@@ -497,11 +497,11 @@ class GladeInput<T> {
 
   void updateValueWithString(String? strValue, {bool shouldTriggerOnChange = true}) {
     assert(
-      TypeHelper.typesEqual<T, String>() || TypeHelper.typesEqual<T, String?>() || stringTovalueConverter != null,
+      TypeHelper.typesEqual<T, String>() || TypeHelper.typesEqual<T, String?>() || stringToValueConverter != null,
       'For non-string values [converter] must be provided. TInput type: ${T.runtimeType}',
     );
 
-    final converter = stringTovalueConverter ?? _defaultConverter;
+    final converter = stringToValueConverter ?? _defaultConverter;
 
     try {
       if (_useTextEditingController) {
@@ -589,7 +589,7 @@ class GladeInput<T> {
     String? inputKey,
     ValueComparator<T>? valueComparator,
     ValidatorInstance<T>? validatorInstance,
-    StringToTypeConverter<T>? stringTovalueConverter,
+    StringToTypeConverter<T>? stringToValueConverter,
     InputDependenciesFactory? dependenciesFactory,
     T? initialValue,
     ErrorTranslator<T>? translateError,
@@ -608,7 +608,7 @@ class GladeInput<T> {
       value: value ?? this.value,
       valueComparator: valueComparator ?? this.valueComparator,
       validatorInstance: validatorInstance ?? this.validatorInstance,
-      stringTovalueConverter: stringTovalueConverter ?? this.stringTovalueConverter,
+      stringToValueConverter: stringToValueConverter ?? this.stringToValueConverter,
       dependenciesFactory: dependenciesFactory ?? this.dependenciesFactory,
       inputKey: inputKey ?? this.inputKey,
       initialValue: initialValue ?? this.initialValue,
@@ -629,7 +629,7 @@ class GladeInput<T> {
   }
 
   void _syncValueWithController(T value, {required bool shouldTriggerOnChange}) {
-    final converter = stringTovalueConverter ?? _defaultConverter;
+    final converter = stringToValueConverter ?? _defaultConverter;
     try {
       _controllerTriggersOnChange = shouldTriggerOnChange;
 
@@ -647,7 +647,7 @@ class GladeInput<T> {
 
   // If using text controller - sync its value
   void _onTextControllerChange() {
-    final converter = stringTovalueConverter ?? _defaultConverter;
+    final converter = stringToValueConverter ?? _defaultConverter;
 
     try {
       final convertedValue = converter.convert(controller?.text);
