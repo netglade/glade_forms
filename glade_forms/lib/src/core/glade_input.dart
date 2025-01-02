@@ -628,6 +628,11 @@ class GladeInput<T> {
     _textEditingController?.removeListener(_onTextControllerChange);
   }
 
+  @override
+  String toString() {
+    return '$inputKey ($value)';
+  }
+
   void _syncValueWithController(T value, {required bool shouldTriggerOnChange}) {
     final converter = stringToValueConverter ?? _defaultConverter;
     try {
