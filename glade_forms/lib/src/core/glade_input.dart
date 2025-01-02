@@ -659,7 +659,7 @@ class GladeInput<T> {
 
   void _setValue(T value, {required bool shouldTriggerOnChange}) {
     _previousValue = _value;
-    _value = _useTextEditingController ? value : (_valueTransform?.call(value) ?? value);
+    _value = _valueTransform?.call(value) ?? value;
 
     _isPure = false;
     __conversionError = null;
