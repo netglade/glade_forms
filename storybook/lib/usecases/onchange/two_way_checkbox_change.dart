@@ -51,9 +51,11 @@ class AgeRestrictedModel extends GladeModel {
 
         return devMessage;
       },
-      onChange: (info) {
-        vipInput.value = info.value >= 18;
-      },
+      // * cyclic dependency between ageInput and vipInput
+      // Better to use onDependencyChange inside vipInput
+      // onChange: (info) {
+      //   vipInput.value = info.value >= 18;
+      // },
       useTextEditingController: true,
     );
     vipInput = GladeInput.create(
@@ -61,9 +63,15 @@ class AgeRestrictedModel extends GladeModel {
       value: false,
       inputKey: 'vip-input',
       dependencies: () => [ageInput],
+      onDependencyChange: (updateInputKeys) {
+        print('onDependencyChange: $updateInputKeys');
+        if (updateInputKeys.contains('age-input')) {
+          vipInput.updateValue(ageInput.value >= 18, shouldTriggerOnChange: false);
+        }
+      },
       onChange: (info) {
         if (info.value && ageInput.value < 18) {
-          ageInput.value = 18;
+          ageInput.updateValue(18, shouldTriggerOnChange: false);
         }
       },
     );
