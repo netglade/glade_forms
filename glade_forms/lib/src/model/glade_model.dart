@@ -124,7 +124,7 @@ abstract class GladeModel extends ChangeNotifier {
   void notifyDependencies() {
     final updatedKeys = _lastUpdates.map((e) => e.inputKey).toSet();
     for (final input in inputs) {
-      final updatedKeysExceptInputItself = updatedKeys.toSet().difference({input.inputKey});
+      final updatedKeysExceptInputItself = updatedKeys.difference({input.inputKey});
       final union = input.dependencies.map((e) => e.inputKey).toSet().intersection(updatedKeysExceptInputItself);
 
       if (union.isNotEmpty) input.onDependencyChange?.call(union.toList());
