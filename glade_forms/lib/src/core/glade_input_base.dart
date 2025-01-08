@@ -29,6 +29,7 @@ typedef StringValidatorFactory = ValidatorInstance<String> Function(StringValida
 typedef OnChange<T> = void Function(ChangesInfo<T> info);
 typedef OnDependencyChange = void Function(List<String> updateInputKeys);
 typedef ValueTransform<T> = T Function(T input);
+typedef AsyncTextInputStringValidator = Future<String?> Function(String? value);
 
 abstract class GladeInputBase<T> {
   @protected
