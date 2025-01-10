@@ -40,9 +40,11 @@ class _ModeWithDependencies extends GladeModel {
     c = GladeInput.intInput(
       value: 1,
       inputKey: 'c',
+      dependencies: () => [a, b],
       onDependencyChange: (keys) {
         if (keys.contains('a')) aUpdated++;
         if (keys.contains('b')) bUpdated++;
+        if (keys.contains('c')) cUpdated++;
 
         onDepenencyCalledCount++;
       },
