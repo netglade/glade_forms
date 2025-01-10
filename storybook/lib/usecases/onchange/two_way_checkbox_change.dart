@@ -64,7 +64,6 @@ class AgeRestrictedModel extends GladeModel {
       inputKey: 'vip-input',
       dependencies: () => [ageInput],
       onDependencyChange: (updateInputKeys) {
-        print('onDependencyChange: $updateInputKeys');
         if (updateInputKeys.contains('age-input')) {
           vipInput.updateValue(ageInput.value >= 18, shouldTriggerOnChange: false);
         }
