@@ -1,5 +1,11 @@
+# 3.0.1
+- **[Fix]**: GladeFormProvider is missing key property [Fix 73](https://github.com/netglade/glade_forms/issues/73)
+- **[Fix]**: enable value transform with text editing controller [Fix 72](https://github.com/netglade/glade_forms/issues/72)
+- **[Fix]**: Input subscribed to its own changes in onDependencyChange [Fix 76](https://github.com/netglade/glade_forms/issues/76)
+
 
 ## 3.0.0
+
 **Breaking release**
 
 - **[Add]**: Add `allowBlank` parameter to `isEmpty` string validator.
