@@ -1,3 +1,6 @@
+## 3.1.0
+- updated dependencies
+
 # 3.0.1
 - **[Fix]**: GladeFormProvider is missing key property [Fix 73](https://github.com/netglade/glade_forms/issues/73)
 - **[Fix]**: enable value transform with text editing controller [Fix 72](https://github.com/netglade/glade_forms/issues/72)
