@@ -5,6 +5,7 @@ import 'package:glade_forms/src/widgets/glade_model_provider.dart';
 
 class GladeModelDebugInfoModal {
   const GladeModelDebugInfoModal();
+  
   static void showDebugInfoModel<M extends GladeModel>(BuildContext context, M model) {
     final _ = showModalBottomSheet<void>(
       context: context,

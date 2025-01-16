@@ -22,7 +22,7 @@ void main() async {
   const debugModel = String.fromEnvironment('DEBUG_MODEL', defaultValue: 'false') == 'true';
 
   if (debugModel) {
-    return runApp(const _DebugModelApp());
+    runApp(const _DebugModelApp());
   }
 
   runApp(

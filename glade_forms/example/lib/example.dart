@@ -17,7 +17,10 @@ class _Model extends GladeModel {
     age = GladeInput.intInput(value: 0, inputKey: 'age');
     email = GladeInput.stringInput(validator: (validator) => (validator..isEmail()).build(), inputKey: 'email');
     income = GladeInput.intInput(
-        value: 10000, validator: (validator) => (validator..isMin(min: 1000)).build(), inputKey: 'income');
+      value: 10000,
+      validator: (validator) => (validator..isMin(min: 1000)).build(),
+      inputKey: 'income',
+    );
 
     super.initialize();
   }
@@ -58,6 +61,7 @@ class Example extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               ElevatedButton(
+                // ignore: no-empty-block, empty function, just for example
                 onPressed: model.isValid ? () {} : null,
                 child: const Text('Save'),
               ),

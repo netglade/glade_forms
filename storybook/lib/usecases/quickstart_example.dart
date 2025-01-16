@@ -11,8 +11,6 @@ class _Model extends GladeModel {
   @override
   List<GladeInput<Object?>> get inputs => [name, age, email, income];
 
-  _Model();
-
   @override
   void initialize() {
     name = GladeInput.stringInput(inputKey: 'name');

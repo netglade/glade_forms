@@ -196,7 +196,7 @@ class _Table extends StatelessWidget {
 
     return Table(
       defaultColumnWidth: scrollable ? const IntrinsicColumnWidth() : const FlexColumnWidth(),
-      border: TableBorder.symmetric(outside: const BorderSide()),
+      border: const TableBorder.symmetric(outside: BorderSide()),
       children: [
         // Columns header.
         TableRow(
@@ -212,6 +212,7 @@ class _Table extends StatelessWidget {
             if (showControllerText) const _ColumnHeader('controller.text'),
           ],
         ),
+        // ignore: avoid-slow-collection-methods, necessary for now
         ...inputs.mapIndexed(
           (index, x) => TableRow(
             decoration: BoxDecoration(color: index.isEven ? Colors.white : const Color.fromARGB(255, 235, 234, 234)),
@@ -365,6 +366,19 @@ class _DangerStrips extends StatelessWidget {
     required this.gap,
   });
 
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 5,
+      width: double.infinity,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Stack(children: _getListOfStripes((constraints.maxWidth / 2).ceil()));
+        },
+      ),
+    );
+  }
+
   List<Widget> _getListOfStripes(int count) {
     final stripes = <Widget>[];
     for (var i = 0; i < count; i++) {
@@ -377,18 +391,5 @@ class _DangerStrips extends StatelessWidget {
     }
 
     return stripes;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 5,
-      width: double.infinity,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          return Stack(children: _getListOfStripes((constraints.maxWidth / 2).ceil()));
-        },
-      ),
-    );
   }
 }

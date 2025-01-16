@@ -2,8 +2,6 @@ import 'package:glade_forms/src/core/glade_error_keys.dart';
 import 'package:glade_forms/src/validator/validator.dart';
 
 class StringValidator extends GladeValidator<String> {
-  StringValidator();
-
   /// Given value can't be empty string (or null).
   void notEmpty({
     OnValidateError<String>? devError,

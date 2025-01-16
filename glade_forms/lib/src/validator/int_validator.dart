@@ -1,8 +1,6 @@
 import 'package:glade_forms/src/src.dart';
 
 class IntValidator extends GladeValidator<int> {
-  IntValidator();
-
   /// Compares given value with [min] and [max] values. With [inclusiveInterval] set to true(default), the comparison is inclusive.
   void isBetween({
     required int min,

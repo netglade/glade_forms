@@ -5,7 +5,7 @@ import 'package:flutter_highlighter/themes/github.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
-class UsecaseContainer extends HookWidget {
+class UsecaseContainer extends StatelessWidget {
   final Widget child;
   final String shortDescription;
   final String? description;
@@ -52,10 +52,6 @@ class _CodeSample extends HookWidget {
   final String fileName;
   const _CodeSample({required this.fileName});
 
-  Future<String> _getFileContent() {
-    return rootBundle.loadString('lib/usecases/$fileName');
-  }
-
   @override
   Widget build(BuildContext context) {
     final getFileContentFutureMemo = useMemoized(_getFileContent);
@@ -86,8 +82,10 @@ class _CodeSample extends HookWidget {
                 ),
               ),
             ),
-            Align(
+            Container(
               alignment: Alignment.topRight,
+              padding: const EdgeInsets.all(8),
+            
               child: Padding(
                 padding: const EdgeInsets.all(8),
                 child: SizedBox(
@@ -111,5 +109,9 @@ class _CodeSample extends HookWidget {
         );
       },
     );
+  }
+
+  Future<String> _getFileContent() {
+    return rootBundle.loadString('lib/usecases/$fileName');
   }
 }
