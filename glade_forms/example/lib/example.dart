@@ -32,6 +32,7 @@ class Example extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GladeFormBuilder.create(
+      // ignore: avoid-undisposed-instances, handled by GladeFormBuilder
       create: (context) => _Model(),
       builder: (context, model, _) => Padding(
         padding: const EdgeInsets.all(32),

@@ -212,9 +212,8 @@ class _Table extends StatelessWidget {
             if (showControllerText) const _ColumnHeader('controller.text'),
           ],
         ),
-        // ignore: avoid-slow-collection-methods, necessary for now
-        ...inputs.mapIndexed(
-          (index, x) => TableRow(
+        for (final (index, x) in inputs.indexed)
+          TableRow(
             decoration: BoxDecoration(color: index.isEven ? Colors.white : const Color.fromARGB(255, 235, 234, 234)),
             children: [
               Padding(
@@ -230,7 +229,6 @@ class _Table extends StatelessWidget {
               if (showControllerText) _RowValue(value: x.controller?.text, colorizedValue: true),
             ],
           ),
-        ),
       ],
     );
   }

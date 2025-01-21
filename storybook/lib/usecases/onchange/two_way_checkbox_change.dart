@@ -1,4 +1,4 @@
-// ignore_for_file: prefer-match-file-name, avoid-passing-self-as-argument
+// ignore_for_file: prefer-match-file-name, avoid-passing-self-as-argument, prefer-single-widget-per-file
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +6,7 @@ import 'package:glade_forms/glade_forms.dart';
 import 'package:glade_forms_storybook/generated/locale_keys.g.dart';
 import 'package:glade_forms_storybook/shared/usecase_container.dart';
 
-class _ErrorKeys {
+abstract final class _ErrorKeys {
   static const String ageRestriction = 'age-restriction';
 }
 
