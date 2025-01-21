@@ -86,9 +86,9 @@ class ComplexObjectMappingExample extends StatelessWidget {
                           validator: model.availableStats.textFormFieldInputValidator,
                         ),
                         Row(
+                          spacing: 30,
                           children: [
                             const Text('Character item'),
-                            const SizedBox(width: 30),
                             DropdownButton(
                               items: model.availableItems
                                   .map(

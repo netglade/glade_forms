@@ -44,13 +44,13 @@ class _GladeFormListenerState<M extends GladeModel> extends State<GladeFormListe
     super.didChangeDependencies();
   }
 
-  void _onModelUpdate() {
-    final m = context.read<M>();
-    widget.listener(context, m, m.lastUpdatedInputKeys);
-  }
-
   @override
   Widget build(BuildContext context) {
     return widget.child;
+  }
+
+  void _onModelUpdate() {
+    final m = context.read<M>();
+    widget.listener(context, m, m.lastUpdatedInputKeys);
   }
 }

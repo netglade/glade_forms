@@ -9,3 +9,8 @@ analyzer:
 dart_code_metrics:
   extends:
     - package:netglade_analysis/dcm.yaml
+  rules:
+    prefer-single-declaration-per-file: false 
+    avoid-commented-out-code: false # code examples in comments
+    prefer-boolean-prefixes: false # TODO
+    prefer-abstract-final-static-class: false # TODO

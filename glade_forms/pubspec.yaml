@@ -1,6 +1,6 @@
 name: glade_forms
 description: A universal way to define form validators with support of translations.
-version: 3.0.1
+version: 3.1.0
 repository: https://github.com/netglade/glade_forms
 issue_tracker: https://github.com/netglade/glade_forms/issues
 screenshots:
@@ -8,7 +8,8 @@ screenshots:
     path: doc/icon.png
 
 environment:
-  sdk: ^3.0.0
+  sdk: ^3.5.0
+resolution: workspace
 
 # Add regular dependencies here.
 dependencies:
@@ -20,5 +21,5 @@ dependencies:
   provider: ^6.0.5
 
 dev_dependencies:
-  netglade_analysis: ^7.0.0
-  test: ^1.24.6
+  netglade_analysis: ^15.0.0
+  test: ^1.25.8

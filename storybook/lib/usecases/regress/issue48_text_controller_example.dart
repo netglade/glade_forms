@@ -14,8 +14,6 @@ class _Model extends GladeModel {
   @override
   List<GladeInput<Object?>> get inputs => [nameWithController, age, email, nameWrong];
 
-  _Model();
-
   @override
   void initialize() {
     nameWithController = GladeInput.stringInput(inputKey: 'name');
@@ -27,7 +25,7 @@ class _Model extends GladeModel {
   }
 }
 
-class Issue48TextControllerExample extends HookWidget {
+class Issue48TextControllerExample extends StatelessWidget {
   const Issue48TextControllerExample({super.key});
 
   @override

@@ -1,4 +1,4 @@
-class RegexPatterns {
+abstract final class RegexPatterns {
   static const email = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
   static const urlWithOptionalHttp = r'^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&\(\)\*\+,;=.]+$';
   static const urlWithHttp =

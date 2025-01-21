@@ -5,3 +5,17 @@ dart_code_metrics:
     - package:netglade_analysis/dcm.yaml
   pubspec-rules:
     prefer-publish-to-none: false
+  rules:
+    avoid-commented-out-code: false # code examples in comments
+    prefer-boolean-prefixes: false # # TODO: release new major version (breaking change)
+    prefer-named-parameters: false # TODO: release new major version (breaking change)
+    dispose-class-fields: false # callback parameters are better without named
+    avoid-undisposed-instances:
+      ignored-invocations:
+          - WithAutoDispose
+    prefer-single-declaration-per-file:
+      exclude:
+        - build/unit_test_assets/**
+    prefer-abstract-final-static-class:
+      exclude:
+        - build/unit_test_assets/**
