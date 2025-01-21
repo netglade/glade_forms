@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:glade_forms/src/model/glade_model.dart';
 import 'package:glade_forms/src/widgets/glade_form_builder.dart';
