@@ -199,7 +199,7 @@ class _Table extends StatelessWidget {
       children: [
         // Columns header.
         TableRow(
-          decoration: const BoxDecoration(color: Colors.black12, border: Border(bottom: BorderSide())),
+          decoration: const BoxDecoration(color: Colors.black, border: Border(bottom: BorderSide())),
           children: [
             const _ColumnHeader('Input'),
             if (showIsUnchanged) const _ColumnHeader('isUnchanged'),
@@ -213,7 +213,9 @@ class _Table extends StatelessWidget {
         ),
         for (final (index, x) in inputs.indexed)
           TableRow(
-            decoration: BoxDecoration(color: index.isEven ? Colors.white : const Color.fromARGB(255, 235, 234, 234)),
+            decoration: BoxDecoration(
+              color: index.isEven ? Theme.of(context).canvasColor : Theme.of(context).canvasColor.darken(0.2),
+            ),
             children: [
               Padding(
                 padding: const EdgeInsets.only(left: 5),
@@ -305,10 +307,14 @@ class _StringValue extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      x ?? '',
-      style:
-          Theme.of(context).textTheme.bodyMedium?.copyWith(backgroundColor: const Color.fromARGB(255, 196, 222, 184)),
+    return ColoredBox(
+      color: Theme.of(context).brightness == Brightness.light
+          ? const Color.fromARGB(255, 196, 222, 184)
+          : const Color.fromARGB(255, 15, 46, 0),
+      child: Text(
+        x ?? '',
+        //style: Theme.of(context).textTheme.bodyLarge?.copyWith(backgroundColor: ),
+      ),
     );
   }
 }
@@ -388,5 +394,27 @@ class _DangerStrips extends StatelessWidget {
     }
 
     return stripes;
+  }
+}
+
+extension _ColorExtensions on Color {
+  /// Returns color darkened by [amount].
+  Color darken([double amount = 0.1]) {
+    assert(amount >= 0 && amount <= 1, 'amount must be between 0 and 1');
+
+    final hsl = HSLColor.fromColor(this);
+    final hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
+
+    return hslDark.toColor();
+  }
+
+  /// Returns color lightened by [amount].
+  Color lighten([double amount = 0.1]) {
+    assert(amount >= 0 && amount <= 1, 'amount must be between 0 and 1');
+
+    final hsl = HSLColor.fromColor(this);
+    final hslLight = hsl.withLightness((hsl.lightness + amount).clamp(0.0, 1.0));
+
+    return hslLight.toColor();
   }
 }
