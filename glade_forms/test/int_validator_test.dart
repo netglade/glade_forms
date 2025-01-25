@@ -1,6 +1,6 @@
 // ignore_for_file: avoid-unsafe-collection-methods
 
-import 'package:glade_forms/src/validator/int_validator.dart';
+import 'package:glade_forms/src/validator/specialized/int_validator.dart';
 import 'package:test/test.dart';
 
 void main() {

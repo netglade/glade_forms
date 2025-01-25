@@ -1,4 +1,4 @@
-import 'package:glade_forms/src/core/glade_error_keys.dart';
+import 'package:glade_forms/src/core/error/glade_error_keys.dart';
 import 'package:glade_forms/src/validator/validator.dart';
 
 class StringValidator extends GladeValidator<String> {

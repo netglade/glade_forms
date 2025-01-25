@@ -1,5 +1,5 @@
-import 'package:glade_forms/src/core/convert_error.dart';
-import 'package:glade_forms/src/core/glade_error_keys.dart';
+import 'package:glade_forms/src/core/error/convert_error.dart';
+import 'package:glade_forms/src/core/error/glade_error_keys.dart';
 
 typedef OnErrorCallback<T> = ConvertError<T> Function(String? rawValue, Object error);
 

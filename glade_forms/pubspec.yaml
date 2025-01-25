@@ -13,11 +13,13 @@ resolution: workspace
 
 # Add regular dependencies here.
 dependencies:
+  clock: ^1.1.1
   collection: ^1.17.1
   equatable: ^2.0.5
   flutter:
     sdk: flutter
   meta: ^1.9.1
+  netglade_utils: ^2.4.1
   provider: ^6.0.5
 
 dev_dependencies:

@@ -4,12 +4,13 @@ import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart';
 import 'package:glade_forms/src/converters/glade_type_converters.dart';
 import 'package:glade_forms/src/core/changes_info.dart';
-import 'package:glade_forms/src/core/convert_error.dart';
-import 'package:glade_forms/src/core/error_translator.dart';
+import 'package:glade_forms/src/core/error/convert_error.dart';
+import 'package:glade_forms/src/core/error/error_translator.dart';
 import 'package:glade_forms/src/core/input_dependencies.dart';
 import 'package:glade_forms/src/core/string_to_type_converter.dart';
-import 'package:glade_forms/src/core/type_helper.dart';
+import 'package:glade_forms/src/utils/type_helper.dart';
 import 'package:glade_forms/src/model/glade_model.dart';
+import 'package:glade_forms/src/validator/specialized/date_time_validator.dart';
 import 'package:glade_forms/src/validator/validator.dart';
 import 'package:glade_forms/src/validator/validator_result.dart';
 import 'package:meta/meta.dart';
@@ -18,6 +19,8 @@ typedef ValueComparator<T> = bool Function(T? initial, T? value);
 typedef ValidatorFactory<T> = ValidatorInstance<T> Function(GladeValidator<T> v);
 typedef StringValidatorFactory = ValidatorInstance<String> Function(StringValidator validator);
 typedef IntValidatorFactory = ValidatorInstance<int> Function(IntValidator validator);
+typedef DateTimeValidatorFactory = ValidatorInstance<DateTime> Function(DateTimeValidator validator);
+typedef DateTimeValidatorFactoryNullable = ValidatorInstance<DateTime?> Function(DateTimeValidatorNullable validator);
 typedef OnChange<T> = void Function(ChangesInfo<T> info);
 typedef OnDependencyChange = void Function(List<String> updateInputKeys);
 typedef ValueTransform<T> = T Function(T input);
@@ -26,6 +29,8 @@ typedef StringInput = GladeInput<String>;
 typedef StringInputNullable = GladeInput<String?>;
 typedef IntInput = GladeInput<int>;
 typedef BooleanInput = GladeInput<bool>;
+typedef DateTimeInput = GladeInput<DateTime>;
+typedef DateTimeNullableInput = GladeInput<DateTime?>;
 
 class GladeInput<T> {
   /// Compares initial and current value.
@@ -405,6 +410,84 @@ class GladeInput<T> {
         valueTransform: valueTransform,
         trackUnchanged: trackUnchanged,
       );
+
+  static DateTimeInput dateTimeInput({
+    required DateTime value,
+    String? inputKey,
+    DateTime? initialValue,
+    DateTimeValidatorFactory? validator,
+    bool pure = true,
+    ErrorTranslator<DateTime>? translateError,
+    DefaultTranslations? defaultTranslations,
+    ValueComparator<DateTime>? valueComparator,
+    InputDependenciesFactory? dependencies,
+    OnChange<DateTime>? onChange,
+    OnDependencyChange? onDependencyChange,
+    TextEditingController? textEditingController,
+    bool useTextEditingController = false,
+    ValueTransform<DateTime>? valueTransform,
+    bool trackUnchanged = true,
+  }) {
+    final validatorInstance = validator?.call(DateTimeValidator()) ?? DateTimeValidator().build();
+
+    return GladeInput._(
+      value: value,
+      initialValue: initialValue ?? value,
+      validatorInstance: validatorInstance,
+      isPure: pure,
+      translateError: translateError,
+      defaultTranslations: defaultTranslations,
+      valueComparator: valueComparator,
+      inputKey: inputKey,
+      dependenciesFactory: dependencies,
+      stringToValueConverter: GladeTypeConverters.dateTimeIso8601,
+      onChange: onChange,
+      onDependencyChange: onDependencyChange,
+      textEditingController: textEditingController,
+      useTextEditingController: useTextEditingController,
+      valueTransform: valueTransform,
+      trackUnchanged: trackUnchanged,
+    );
+  }
+
+  static DateTimeNullableInput dateTimeInputNullable({
+    required DateTime? value,
+    String? inputKey,
+    DateTime? initialValue,
+    DateTimeValidatorFactoryNullable? validator,
+    bool pure = true,
+    ErrorTranslator<DateTime?>? translateError,
+    DefaultTranslations? defaultTranslations,
+    ValueComparator<DateTime?>? valueComparator,
+    InputDependenciesFactory? dependencies,
+    OnChange<DateTime?>? onChange,
+    OnDependencyChange? onDependencyChange,
+    TextEditingController? textEditingController,
+    bool useTextEditingController = false,
+    ValueTransform<DateTime?>? valueTransform,
+    bool trackUnchanged = true,
+  }) {
+    final validatorInstance = validator?.call(DateTimeValidatorNullable()) ?? DateTimeValidatorNullable().build();
+
+    return GladeInput._(
+      value: value,
+      initialValue: initialValue ?? value,
+      validatorInstance: validatorInstance,
+      isPure: pure,
+      translateError: translateError,
+      defaultTranslations: defaultTranslations,
+      valueComparator: valueComparator,
+      inputKey: inputKey,
+      dependenciesFactory: dependencies,
+      stringToValueConverter: GladeTypeConverters.dateTimeIso8601,
+      onChange: onChange,
+      onDependencyChange: onDependencyChange,
+      textEditingController: textEditingController,
+      useTextEditingController: useTextEditingController,
+      valueTransform: valueTransform,
+      trackUnchanged: trackUnchanged,
+    );
+  }
 
   static StringInput stringInput({
     String? inputKey,
