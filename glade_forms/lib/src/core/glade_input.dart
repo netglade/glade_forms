@@ -23,7 +23,9 @@ typedef OnDependencyChange = void Function(List<String> updateInputKeys);
 typedef ValueTransform<T> = T Function(T input);
 
 typedef StringInput = GladeInput<String>;
+typedef StringInputNullable = GladeInput<String?>;
 typedef IntInput = GladeInput<int>;
+typedef BooleanInput = GladeInput<bool>;
 
 class GladeInput<T> {
   /// Compares initial and current value.
@@ -329,7 +331,7 @@ class GladeInput<T> {
   // ignore: use_setters_to_change_properties, as method.
   void bindToModel(GladeModel model) => _bindedModel = model;
 
-  static GladeInput<int> intInput({
+  static IntInput intInput({
     required int value,
     String? inputKey,
     int? initialValue,
@@ -368,7 +370,7 @@ class GladeInput<T> {
     );
   }
 
-  static GladeInput<bool> boolInput({
+  static BooleanInput boolInput({
     required bool value,
     String? inputKey,
     bool? initialValue,
@@ -404,7 +406,7 @@ class GladeInput<T> {
         trackUnchanged: trackUnchanged,
       );
 
-  static GladeInput<String> stringInput({
+  static StringInput stringInput({
     String? inputKey,
     String? value,
     String? initialValue,

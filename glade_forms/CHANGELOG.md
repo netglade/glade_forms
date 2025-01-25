@@ -1,3 +1,7 @@
+## 3.1.1
+- Add typedefs `IntInput` and `BooleanInput`
+- Fix GladeModelDebugInfo colors in DarkMode.
+
 ## 3.1.0
 - updated dependencies
 
