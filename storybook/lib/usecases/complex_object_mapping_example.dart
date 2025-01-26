@@ -33,7 +33,7 @@ class _Model extends GladeModel {
       validator: (v) => v.build(),
       value: [],
       inputKey: 'stats',
-      valueConverter: StringToTypeConverter(
+      stringToValueConverter: StringToTypeConverter(
         converter: (rawInput, cantConvert) {
           final r = RegExp(r'^\d+(,\s*\d+\s*)*$');
           final input = rawInput;

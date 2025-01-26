@@ -3,20 +3,20 @@ import 'package:glade_forms/glade_forms.dart';
 
 // ! When updating dont forget to update README.md quickstart as well
 class _Model extends GladeModel {
-  late StringInput name;
-  late IntInput age;
-  late StringInput email;
-  late IntInput income;
+  late GladeStringInput name;
+  late GladeIntInput age;
+  late GladeStringInput email;
+  late GladeIntInput income;
 
   @override
   List<GladeInput<Object?>> get inputs => [name, age, email, income];
 
   @override
   void initialize() {
-    name = GladeInput.stringInput(inputKey: 'name');
-    age = GladeInput.intInput(value: 0, inputKey: 'age');
-    email = GladeInput.stringInput(validator: (validator) => (validator..isEmail()).build(), inputKey: 'email');
-    income = GladeInput.intInput(
+    name = GladeStringInput(inputKey: 'name');
+    age = GladeIntInput(value: 0, inputKey: 'age');
+    email = GladeStringInput(validator: (validator) => (validator..isEmail()).build(), inputKey: 'email');
+    income = GladeIntInput(
       value: 10000,
       validator: (validator) => (validator..isMin(min: 1000)).build(),
       inputKey: 'income',

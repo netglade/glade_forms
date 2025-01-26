@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:glade_forms/src/core/glade_input_error.dart';
+import 'package:glade_forms/src/core/error/glade_input_error.dart';
 import 'package:glade_forms/src/validator/validator_error/value_null_error.dart';
 
 /// When validation failed but we already have propert [T] value.

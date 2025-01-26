@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:glade_forms/src/core/glade_input_error.dart';
+import 'package:glade_forms/src/core/error/glade_input_error.dart';
 
 /// Before validation when converer from string to prpoer type failed.
 typedef OnConvertError = String Function(String? rawInput, {Object? key});

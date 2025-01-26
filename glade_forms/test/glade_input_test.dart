@@ -10,8 +10,8 @@ void main() {
 
   group('onChange tests', () {
     test('Setter always trigger change', () {
-      final dependentInput = GladeInput.intInput(value: -1);
-      final input = GladeInput.intInput(
+      final dependentInput = GladeIntInput(value: -1);
+      final input = GladeIntInput(
         value: 0,
         onChange: (info) {
           dependentInput.value = info.value;
@@ -28,8 +28,8 @@ void main() {
     });
 
     test('updateValue by default trigger change', () {
-      final dependentInput = GladeInput.intInput(value: -1);
-      final input = GladeInput.intInput(
+      final dependentInput = GladeIntInput(value: -1);
+      final input = GladeIntInput(
         value: 0,
         onChange: (info) {
           dependentInput.value = info.value;
@@ -46,8 +46,8 @@ void main() {
     });
 
     test('updateValue disables trigger onChange', () {
-      final dependentInput = GladeInput.intInput(value: -1);
-      final input = GladeInput.intInput(
+      final dependentInput = GladeIntInput(value: -1);
+      final input = GladeIntInput(
         value: 0,
         onChange: (info) {
           dependentInput.value = info.value;
@@ -67,8 +67,8 @@ void main() {
 
   group('onChange with Controller tests', () {
     test('Controller always trigger change', () {
-      final dependentInput = GladeInput.intInput(value: -1);
-      final input = GladeInput.intInput(
+      final dependentInput = GladeIntInput(value: -1);
+      final input = GladeIntInput(
         value: 0,
         useTextEditingController: true,
         onChange: (info) {
@@ -86,8 +86,8 @@ void main() {
     });
 
     test('Setter always trigger change', () {
-      final dependentInput = GladeInput.intInput(value: -1);
-      final input = GladeInput.intInput(
+      final dependentInput = GladeIntInput(value: -1);
+      final input = GladeIntInput(
         value: 0,
         useTextEditingController: true,
         onChange: (info) {
@@ -105,8 +105,8 @@ void main() {
     });
 
     test('updateValue by default trigger change', () {
-      final dependentInput = GladeInput.intInput(value: -1);
-      final input = GladeInput.intInput(
+      final dependentInput = GladeIntInput(value: -1);
+      final input = GladeIntInput(
         value: 0,
         useTextEditingController: true,
         onChange: (info) {
@@ -124,8 +124,8 @@ void main() {
     });
 
     test('updateValue disables trigger onChange', () {
-      final dependentInput = GladeInput.intInput(value: -1);
-      final input = GladeInput.intInput(
+      final dependentInput = GladeIntInput(value: -1);
+      final input = GladeIntInput(
         value: 0,
         useTextEditingController: true,
         onChange: (info) {
@@ -146,7 +146,7 @@ void main() {
 
   group('Pure test', () {
     test('ResetToPure', () {
-      final input = GladeInput.intInput(
+      final input = GladeIntInput(
         value: 100,
         initialValue: 10,
         useTextEditingController: true,
@@ -166,7 +166,7 @@ void main() {
     });
 
     test('SetAsNewPure', () {
-      final input = GladeInput.intInput(
+      final input = GladeIntInput(
         initialValue: 20,
         value: 100,
         useTextEditingController: true,

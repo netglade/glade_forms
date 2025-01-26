@@ -1,3 +1,19 @@
+## 4.0.0
+
+**Breaking change release**
+
+- Specialized versions of inputs such as `IntInput` or `StringInput` were renamed to `Glade*Input`.
+- Removed specialized version factories. Now specialized versions are sub-classes of GladeInput
+  - This removes the weird possibility to create calls such as `StringInput.intInput()` which in the end threw a runtime exception due to type mismatch.
+  
+- **Added** `GladeDateTimeInput` - specialized GladeInput for DateTime inputs.
+- **Added** `inclusive` argument for `int` validations.
+- `GladeIntInput` and `GladeDateTimeInput` offer *Nullable versions to support null values
+  - `StringInput` does not offer a nullable version as we believe that in most cases you don't really need to differentiate between a null string and an empty string. Feel free to open an issue if you disagree.
+- 
+
+
+
 ## 3.1.1
 - Add typedefs `IntInput` and `BooleanInput`
 - Fix GladeModelDebugInfo colors in DarkMode.
@@ -5,7 +21,7 @@
 ## 3.1.0
 - updated dependencies
 
-# 3.0.1
+## 3.0.1
 - **[Fix]**: GladeFormProvider is missing key property [Fix 73](https://github.com/netglade/glade_forms/issues/73)
 - **[Fix]**: enable value transform with text editing controller [Fix 72](https://github.com/netglade/glade_forms/issues/72)
 - **[Fix]**: Input subscribed to its own changes in onDependencyChange [Fix 76](https://github.com/netglade/glade_forms/issues/76)
@@ -13,7 +29,7 @@
 
 ## 3.0.0
 
-**Breaking release**
+**Breaking change release**
 
 - **[Add]**: Add `allowBlank` parameter to `isEmpty` string validator.
 - **[Add]**: Add `IntInput` as a specialized variant of GladeInput<int> which has additional, int related, validations such as `isBetween`, `isMin`, `isMax`

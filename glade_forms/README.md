@@ -19,7 +19,9 @@ A universal way to define form validators with support of translations.
 - [✨ Features](#-features)
   - [GladeInput](#gladeinput)
   - [String based input and TextEditingController](#string-based-input-and-texteditingcontroller)
-    - [StringInput](#stringinput)
+    - [GladeStringInput](#gladestringinput)
+    - [GladeIntInput](#gladeintinput)
+    - [More specialised variants](#more-specialised-variants)
   - [Validation](#validation)
   - [Skipping Specific Validation](#skipping-specific-validation)
     - [Using validators without GladeInput](#using-validators-without-gladeinput)
@@ -55,18 +57,18 @@ setup a Model class that holds glade inputs together.
 
 ```dart
 class _Model extends GladeModel {
-  late GladeInput<String> name;
-  late GladeInput<int> age;
-  late GladeInput<String> email;
+  late GladeStringInput name;
+  late GladeIntInput age;
+  late GladeStringInput email;
 
   @override
   List<GladeInput<Object?>> get inputs => [name, age, email];
 
   @override
   void initialize() {
-    name = GladeInput.stringInput();
-    age = GladeInput.intInput(value: 0, useTextEditingController: true);
-    email = GladeInput.stringInput(validator: (validator) => (validator..isEmail()).build());
+    name = GladeStringInput();
+    age = GladeIntInput(value: 0, useTextEditingController: true);
+    email = GladeStringInput(validator: (validator) => (validator..isEmail()).build());
 
     super.initialize();
   }
@@ -127,7 +129,7 @@ On each input we can define
  - **initialValue** - Initial input's value. Used with valueComparator and for computing `isUnchanged`.
  - **validator** - Input's value must satisfy validation to be *valid* input.
  - **translateError** - If there are validation errors, this function is use to translate those errors.
- - **dependencies** (WIP) - Each input can depend on another inputs for listening changes.
+ - **dependencies** - Each input can depend on another inputs for listening changes.
  - **stringToValueConverter** - If input is used by TextField and `T` is not a `String`, value converter should be provided.
  - **valueComparator** - Sometimes it is handy to provide `initialValue` which will be never updated after input is mutated. `valueComparator` should be provided to compare `initialValue` and `value` if `T` is not comparable type by default. Note that GladeForms handle deep equality of collections and assumes that complex types are comparable by values.
  - **valueTransform** - transform `T` value into different `T` value. An example of usage can be sanitazation of string input (trim(),...).
@@ -147,7 +149,7 @@ NOTE: Prior to *GladeForms 2.0*, each input generated its own TextEditingControl
 
 ----
 
-With the introduction of *GladeForms 2.0*, inputs by default (excluding the StringInput variant), do not create a TextEditingController. As a result, developers are required to use `updateValue()`, `updateValueWithString()` or directly set the `value` (via setter) to update the input's value.
+With the introduction of *GladeForms 2.0*, inputs by default (excluding the `GladeStringInput` variant), do not create a TextEditingController. As a result, developers are required to use `updateValue()`, `updateValueWithString()` or directly set the `value` (via setter) to update the input's value.
 
 If your implementation involves an input paired with a TextField (or any similar widget that utilizes a TextEditingController), you should set `useTextEditingController` to true.
 
@@ -158,13 +160,13 @@ Activating the useTextEditingController mode for a GladeInput results in a few b
 - Consequently, developers are advised to provide only the controller property and a validator to the widget. 
 - While the use of updateValue (or similar methods) and resetToPure remains possible, be aware that these actions will override the text in the controller and reset text selection and other keyboard-related features.
 
-#### StringInput
+#### GladeStringInput
 
-StringInput is specialized variant of GladeInput<String> which has additional, string related, validations such as `isEmail`, `isUrl`, `maxLength` and more. 
+GladeStringInput is specialized variant of GladeInput<String> which has additional, string related, validations such as `isEmail`, `isUrl`, `maxLength` and more. 
 
-Moreover `StringInput` by default uses TextEditingController under the hood. 
+Moreover `GladeStringInput` by default uses TextEditingController under the hood. 
 
-#### IntInput
+#### GladeIntInput
 
 IntInput is specialized variant of GladeInput<int> which has additional, int related, validations such as `isBetween`, `isMin`, `isMax` and more.
 
@@ -178,6 +180,9 @@ Moreover `IntInput` by default uses TextEditingController under the hood.
 final validator = (IntValidator()..isMax(max: 10)).build();
 final result = validator.validate(5); // valid
 ```
+
+#### More specialised variants
+Check out also `GladeBoolInput` and `GladeDateTimeInput` specialised variants.
 
 ### Validation
 

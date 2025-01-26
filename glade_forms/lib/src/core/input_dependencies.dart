@@ -2,7 +2,7 @@
 
 import 'package:collection/collection.dart';
 import 'package:glade_forms/src/core/core.dart';
-import 'package:glade_forms/src/core/object_ex.dart';
+import 'package:glade_forms/src/utils/object_ex.dart';
 
 typedef InputDependencies = List<GladeInput<Object?>>;
 typedef InputDependenciesFactory = InputDependencies Function();
