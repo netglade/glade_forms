@@ -3,6 +3,9 @@
 import 'package:glade_forms/src/src.dart';
 import 'package:netglade_utils/netglade_utils.dart';
 
+typedef DateTimeValidatorFactory = ValidatorInstance<DateTime> Function(DateTimeValidator validator);
+typedef DateTimeValidatorFactoryNullable = ValidatorInstance<DateTime?> Function(DateTimeValidatorNullable validator);
+
 class DateTimeValidator extends GladeValidator<DateTime> {
   /// Compares given value with [start] and [end] values. With [inclusiveInterval] set to true(default), the comparison is inclusive.
   void isBetween({

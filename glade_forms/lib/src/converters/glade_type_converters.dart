@@ -12,6 +12,17 @@ abstract final class GladeTypeConverters {
     converterBack: (rawInput) => rawInput.toString(),
   );
 
+  static final intConverterNullable = StringToTypeConverter<int?>(
+    converter: (rawValue, cantConvert) {
+      if (rawValue == null) {
+        return null;
+      }
+
+      return int.tryParse(rawValue) ?? cantConvert('Can not convert', rawValue: rawValue);
+    },
+    converterBack: (rawInput) => rawInput?.toString(),
+  );
+
   static final boolConverter = StringToTypeConverter<bool>(
     converter: (rawValue, cantConvert) {
       if (rawValue == null) {
@@ -32,5 +43,16 @@ abstract final class GladeTypeConverters {
       return DateTime.tryParse(rawValue) ?? cantConvert('Can not convert', rawValue: rawValue);
     },
     converterBack: (rawInput) => rawInput.toIso8601String(),
+  );
+
+  static final dateTimeIso8601Nullable = StringToTypeConverter<DateTime?>(
+    converter: (rawValue, cantConvert) {
+      if (rawValue == null) {
+        return null;
+      }
+
+      return DateTime.tryParse(rawValue) ?? cantConvert('Can not convert', rawValue: rawValue);
+    },
+    converterBack: (rawInput) => rawInput?.toIso8601String(),
   );
 }

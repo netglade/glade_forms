@@ -1,6 +1,8 @@
 import 'package:glade_forms/src/core/error/glade_error_keys.dart';
 import 'package:glade_forms/src/validator/validator.dart';
 
+typedef StringValidatorFactory = ValidatorInstance<String> Function(StringValidator validator);
+
 class StringValidator extends GladeValidator<String> {
   /// Given value can't be empty string (or null).
   void notEmpty({

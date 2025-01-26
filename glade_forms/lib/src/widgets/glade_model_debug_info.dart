@@ -199,7 +199,7 @@ class _Table extends StatelessWidget {
       children: [
         // Columns header.
         TableRow(
-          decoration: const BoxDecoration(color: Colors.black, border: Border(bottom: BorderSide())),
+          decoration: BoxDecoration(color: Theme.of(context).canvasColor, border: const Border(bottom: BorderSide())),
           children: [
             const _ColumnHeader('Input'),
             if (showIsUnchanged) const _ColumnHeader('isUnchanged'),
@@ -214,7 +214,7 @@ class _Table extends StatelessWidget {
         for (final (index, x) in inputs.indexed)
           TableRow(
             decoration: BoxDecoration(
-              color: index.isEven ? Theme.of(context).canvasColor : Theme.of(context).canvasColor.darken(0.2),
+              color: index.isEven ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.onSecondary,
             ),
             children: [
               Padding(

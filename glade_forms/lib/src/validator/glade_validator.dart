@@ -7,6 +7,7 @@ import 'package:glade_forms/src/validator/validator_instance.dart';
 
 typedef ValidateFunction<T> = GladeValidatorError<T>? Function(T value);
 typedef ValidateFunctionWithKey<T> = GladeValidatorError<T>? Function(T value, Object? key);
+typedef ValidatorFactory<T> = ValidatorInstance<T> Function(GladeValidator<T> v);
 
 class GladeValidator<T> {
   List<InputValidatorPart<T>> parts = [];

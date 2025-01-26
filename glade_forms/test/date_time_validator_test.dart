@@ -139,7 +139,10 @@ void main() {
           final validator = (DateTimeValidator()
                 // ignore: avoid_redundant_argument_values, be explcit in tests.,
                 ..isBetween(
-                    start: testCase.$2.start, end: testCase.$2.end, includeTime: false, inclusiveInterval: true))
+                  start: testCase.$2.start,
+                  end: testCase.$2.end,
+                  includeTime: false,
+                ))
               .build();
 
           final result = validator.validate(testCase.$2.test);
@@ -212,7 +215,11 @@ void main() {
           final validator = (DateTimeValidator()
                 // ignore: avoid_redundant_argument_values,  be explcit in tests.,
                 ..isBetween(
-                    start: testCase.$2.start, end: testCase.$2.end, includeTime: false, inclusiveInterval: false))
+                  start: testCase.$2.start,
+                  end: testCase.$2.end,
+                  includeTime: false,
+                  inclusiveInterval: false,
+                ))
               .build();
 
           final result = validator.validate(testCase.$2.test);
