@@ -24,7 +24,7 @@ class GladeStringInput extends GladeInput<String> {
           value: value ?? initialValue ?? '',
           initialValue: initialValue ?? '',
           validatorInstance: isRequired
-              ? (validator?.call(StringValidator()..notNull()) ?? (StringValidator()..notNull()).build())
+              ? (validator?.call(StringValidator()..notEmpty()) ?? (StringValidator()..notEmpty()).build())
               : (validator?.call(StringValidator()) ?? StringValidator().build()),
         );
 }
