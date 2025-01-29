@@ -6,7 +6,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:glade_forms/glade_forms.dart';
 import 'package:glade_forms_storybook/generated/locale_keys.g.dart';
 
-class _ErrorKeys {
+abstract final class _ErrorKeys {
   static const String ageRestriction = 'age-restriction';
 }
 
@@ -37,19 +37,7 @@ class AgeRestrictedModel extends GladeModel {
     ageInput = GladeIntInput(
       validator: (v) => (v
             ..notNull()
-            ..isMin(min: 18, shouldValidate: (_) => vipInput.value)
-          // ..satisfy(
-          //   (value) {
-          //     if (!vipInput.value) {
-          //       return true;
-          //     }
-
-          //     return value >= 18;
-          //   },
-          //   devError: (_) => 'When VIP enabled you must be at least 18 years old.',
-          //   key: _ErrorKeys.ageRestriction,
-          // )
-          )
+            ..isMin(min: 18, shouldValidate: (_) => vipInput.value))
           .build(),
       value: 0,
       dependencies: () => [vipInput],

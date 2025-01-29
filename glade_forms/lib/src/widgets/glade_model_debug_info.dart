@@ -396,15 +396,3 @@ class _DangerStrips extends StatelessWidget {
     return stripes;
   }
 }
-
-extension _ColorExtensions on Color {
-  /// Returns color darkened by [amount].
-  Color darken([double amount = 0.1]) {
-    assert(amount >= 0 && amount <= 1, 'amount must be between 0 and 1');
-
-    final hsl = HSLColor.fromColor(this);
-    final hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
-
-    return hslDark.toColor();
-  }
-}

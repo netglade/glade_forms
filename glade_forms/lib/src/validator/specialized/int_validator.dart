@@ -35,7 +35,7 @@ class IntValidator extends GladeValidator<int> {
       satisfy(
         (value) => isInclusive ? value >= min : value > min,
         devError: devError ?? (value) => 'Value ${value ?? 'NULL'} is less than $min.',
-        key: key ?? GladeErrorKeys.intCompareError,
+        key: key ?? GladeErrorKeys.intCompareMinError,
         shouldValidate: shouldValidate,
       );
 
@@ -50,7 +50,7 @@ class IntValidator extends GladeValidator<int> {
       satisfy(
         (value) => isInclusive ? value <= max : value < max,
         devError: devError ?? (value) => 'Value ${value ?? 'NULL'} is bigger than $max.',
-        key: key ?? GladeErrorKeys.intCompareError,
+        key: key ?? GladeErrorKeys.intCompareMaxError,
         shouldValidate: shouldValidate,
       );
 }
@@ -93,7 +93,7 @@ class IntValidatorNullable extends GladeValidator<int?> {
           return isInclusive ? value >= min : value > min;
         },
         devError: devError ?? (value) => 'Value ${value ?? 'NULL'} is less than $min.',
-        key: key ?? GladeErrorKeys.intCompareError,
+        key: key ?? GladeErrorKeys.intCompareMinError,
         shouldValidate: shouldValidate,
       );
 
@@ -112,7 +112,7 @@ class IntValidatorNullable extends GladeValidator<int?> {
           return isInclusive ? value <= max : value < max;
         },
         devError: devError ?? (value) => 'Value ${value ?? 'NULL'} is bigger than $max.',
-        key: key ?? GladeErrorKeys.intCompareError,
+        key: key ?? GladeErrorKeys.intCompareMaxError,
         shouldValidate: shouldValidate,
       );
 }

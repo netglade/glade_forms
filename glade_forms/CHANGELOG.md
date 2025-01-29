@@ -5,6 +5,7 @@
 - Specialized versions of inputs such as `IntInput` or `StringInput` were renamed to `Glade*Input`.
 - Removed specialized version factories. Now specialized versions are sub-classes of GladeInput
   - This removes the weird possibility to create calls such as `StringInput.intInput()` which in the end threw a runtime exception due to type mismatch.
+- Renamed `valueConverter` in `create()` factory to match internal name `stringToValueConverter` which is more explicit
   
 - **Added** `GladeDateTimeInput` - specialized GladeInput for DateTime inputs.
 - **Added** `inclusive` argument for `int` validations.
