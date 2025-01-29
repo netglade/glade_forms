@@ -19,32 +19,12 @@ class GladeStringInput extends GladeInput<String> {
     super.valueTransform,
     super.defaultTranslations,
     super.trackUnchanged = true,
+    bool isRequired = true,
   }) : super.internalCreate(
           value: value ?? initialValue ?? '',
           initialValue: initialValue ?? '',
-          validatorInstance: validator?.call(StringValidator()) ?? StringValidator().build(),
-        );
-
-  GladeStringInput.required({
-    super.inputKey,
-    String? value,
-    String? initialValue,
-    StringValidatorFactory? validator,
-    super.isPure,
-    super.translateError,
-    super.valueComparator,
-    super.stringToValueConverter,
-    super.dependencies,
-    super.onChange,
-    super.onDependencyChange,
-    super.textEditingController,
-    super.useTextEditingController = true,
-    super.valueTransform,
-    super.defaultTranslations,
-    super.trackUnchanged = true,
-  }) : super.internalCreate(
-          value: value ?? initialValue ?? '',
-          initialValue: initialValue ?? '',
-          validatorInstance: validator?.call(StringValidator()..notEmpty()) ?? (StringValidator()..notEmpty()).build(),
+          validatorInstance: isRequired
+              ? (validator?.call(StringValidator()..notNull()) ?? (StringValidator()..notNull()).build())
+              : (validator?.call(StringValidator()) ?? StringValidator().build()),
         );
 }

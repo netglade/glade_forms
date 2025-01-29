@@ -18,8 +18,11 @@ class GladeBoolInput extends GladeInput<bool> {
     super.valueTransform,
     super.defaultTranslations,
     super.trackUnchanged = true,
+    bool isRequired = true,
   }) : super.internalCreate(
           stringToValueConverter: stringToValueConverter ?? GladeTypeConverters.boolConverter,
-          validatorInstance: validator?.call(GladeValidator()) ?? GladeValidator<bool>().build(),
+          validatorInstance: isRequired
+              ? (validator?.call(GladeValidator<bool>()..notNull()) ?? (GladeValidator<bool>()..notNull()).build())
+              : (validator?.call(GladeValidator()) ?? GladeValidator<bool>().build()),
         );
 }

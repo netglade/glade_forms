@@ -23,9 +23,12 @@ class GladeDateTimeInput extends GladeInput<DateTime> {
     super.valueTransform,
     super.defaultTranslations,
     super.trackUnchanged = true,
+    bool isRequired = true,
   }) : super.internalCreate(
           stringToValueConverter: stringToValueConverter ?? GladeTypeConverters.dateTimeIso8601,
-          validatorInstance: validator?.call(DateTimeValidator()) ?? DateTimeValidator().build(),
+          validatorInstance: isRequired
+              ? (validator?.call(DateTimeValidator()..notNull()) ?? (DateTimeValidator()..notNull()).build())
+              : (validator?.call(DateTimeValidator()) ?? DateTimeValidator().build()),
         );
 }
 
@@ -47,31 +50,12 @@ class GladeDateTimeInputNullable extends GladeInput<DateTime?> {
     super.valueTransform,
     super.defaultTranslations,
     super.trackUnchanged = true,
+    bool isRquired = false,
   }) : super.internalCreate(
           stringToValueConverter: stringToValueConverter ?? GladeTypeConverters.dateTimeIso8601Nullable,
-          validatorInstance: validator?.call(DateTimeValidatorNullable()) ?? DateTimeValidatorNullable().build(),
-        );
-
-  GladeDateTimeInputNullable.required({
-    super.inputKey,
-    super.value,
-    super.initialValue,
-    DateTimeValidatorFactoryNullable? validator,
-    super.isPure,
-    super.translateError,
-    super.valueComparator,
-    StringToTypeConverter<DateTime?>? stringToValueConverter,
-    super.dependencies,
-    super.onChange,
-    super.onDependencyChange,
-    super.textEditingController,
-    super.useTextEditingController = false,
-    super.valueTransform,
-    super.defaultTranslations,
-    super.trackUnchanged = true,
-  }) : super.internalCreate(
-          stringToValueConverter: stringToValueConverter ?? GladeTypeConverters.dateTimeIso8601Nullable,
-          validatorInstance: validator?.call(DateTimeValidatorNullable()..notNull()) ??
-              (DateTimeValidatorNullable()..notNull()).build(),
+          validatorInstance: isRquired
+              ? (validator?.call(DateTimeValidatorNullable()..notNull()) ??
+                  (DateTimeValidatorNullable()..notNull()).build())
+              : (validator?.call(DateTimeValidatorNullable()) ?? DateTimeValidatorNullable().build()),
         );
 }

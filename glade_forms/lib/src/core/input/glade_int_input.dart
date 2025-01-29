@@ -23,9 +23,12 @@ class GladeIntInput extends GladeInput<int> {
     super.valueTransform,
     super.defaultTranslations,
     super.trackUnchanged = true,
+    bool isRequired = true,
   }) : super.internalCreate(
           stringToValueConverter: stringToValueConverter ?? GladeTypeConverters.intConverter,
-          validatorInstance: validator?.call(IntValidator()) ?? IntValidator().build(),
+          validatorInstance: isRequired
+              ? (validator?.call(IntValidator()..notNull()) ?? (IntValidator()..notNull()).build())
+              : (validator?.call(IntValidator()) ?? IntValidator().build()),
         );
 }
 
@@ -47,31 +50,11 @@ class GladeIntInputNullable extends GladeInput<int?> {
     super.valueTransform,
     super.defaultTranslations,
     super.trackUnchanged = true,
+    bool isRequired = false,
   }) : super.internalCreate(
           stringToValueConverter: stringToValueConverter ?? GladeTypeConverters.intConverterNullable,
-          validatorInstance: validator?.call(IntValidatorNullable()) ?? IntValidatorNullable().build(),
-        );
-
-  GladeIntInputNullable.required({
-    super.inputKey,
-    super.value,
-    super.initialValue,
-    IntValidatorFactoryNullable? validator,
-    super.isPure,
-    super.translateError,
-    super.valueComparator,
-    StringToTypeConverter<int?>? stringToValueConverter,
-    super.dependencies,
-    super.onChange,
-    super.onDependencyChange,
-    super.textEditingController,
-    super.useTextEditingController = false,
-    super.valueTransform,
-    super.defaultTranslations,
-    super.trackUnchanged = true,
-  }) : super.internalCreate(
-          stringToValueConverter: stringToValueConverter ?? GladeTypeConverters.intConverterNullable,
-          validatorInstance:
-              validator?.call(IntValidatorNullable()..notNull()) ?? (IntValidatorNullable()..notNull()).build(),
+          validatorInstance: isRequired
+              ? (validator?.call(IntValidatorNullable()..notNull()) ?? (IntValidatorNullable()..notNull()).build())
+              : (validator?.call(IntValidatorNullable()) ?? IntValidatorNullable().build()),
         );
 }
