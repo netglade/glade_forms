@@ -3,7 +3,7 @@
 import 'package:glade_forms/src/src.dart';
 
 typedef IntValidatorFactory = ValidatorInstance<int> Function(IntValidator validator);
-typedef IntValidatorFactoryNullable = ValidatorInstance<int> Function(IntValidatorNullable validator);
+typedef IntValidatorFactoryNullable = ValidatorInstance<int?> Function(IntValidatorNullable validator);
 
 class IntValidator extends GladeValidator<int> {
   /// Compares given value with [min] and [max] values. With [inclusiveInterval] set to true(default), the comparison is inclusive.

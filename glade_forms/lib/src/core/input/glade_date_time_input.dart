@@ -51,4 +51,27 @@ class GladeDateTimeInputNullable extends GladeInput<DateTime?> {
           stringToValueConverter: stringToValueConverter ?? GladeTypeConverters.dateTimeIso8601Nullable,
           validatorInstance: validator?.call(DateTimeValidatorNullable()) ?? DateTimeValidatorNullable().build(),
         );
+
+  GladeDateTimeInputNullable.required({
+    super.inputKey,
+    super.value,
+    super.initialValue,
+    DateTimeValidatorFactoryNullable? validator,
+    super.isPure,
+    super.translateError,
+    super.valueComparator,
+    StringToTypeConverter<DateTime?>? stringToValueConverter,
+    super.dependencies,
+    super.onChange,
+    super.onDependencyChange,
+    super.textEditingController,
+    super.useTextEditingController = false,
+    super.valueTransform,
+    super.defaultTranslations,
+    super.trackUnchanged = true,
+  }) : super.internalCreate(
+          stringToValueConverter: stringToValueConverter ?? GladeTypeConverters.dateTimeIso8601Nullable,
+          validatorInstance: validator?.call(DateTimeValidatorNullable()..notNull()) ??
+              (DateTimeValidatorNullable()..notNull()).build(),
+        );
 }

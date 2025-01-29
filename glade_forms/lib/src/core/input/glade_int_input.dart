@@ -29,8 +29,8 @@ class GladeIntInput extends GladeInput<int> {
         );
 }
 
-class GladeIntInputNullabe extends GladeInput<int?> {
-  GladeIntInputNullabe({
+class GladeIntInputNullable extends GladeInput<int?> {
+  GladeIntInputNullable({
     super.inputKey,
     super.value,
     super.initialValue,
@@ -38,7 +38,7 @@ class GladeIntInputNullabe extends GladeInput<int?> {
     super.isPure,
     super.translateError,
     super.valueComparator,
-    StringToTypeConverter<int>? stringToValueConverter,
+    StringToTypeConverter<int?>? stringToValueConverter,
     super.dependencies,
     super.onChange,
     super.onDependencyChange,
@@ -50,5 +50,28 @@ class GladeIntInputNullabe extends GladeInput<int?> {
   }) : super.internalCreate(
           stringToValueConverter: stringToValueConverter ?? GladeTypeConverters.intConverterNullable,
           validatorInstance: validator?.call(IntValidatorNullable()) ?? IntValidatorNullable().build(),
+        );
+
+  GladeIntInputNullable.required({
+    super.inputKey,
+    super.value,
+    super.initialValue,
+    IntValidatorFactoryNullable? validator,
+    super.isPure,
+    super.translateError,
+    super.valueComparator,
+    StringToTypeConverter<int?>? stringToValueConverter,
+    super.dependencies,
+    super.onChange,
+    super.onDependencyChange,
+    super.textEditingController,
+    super.useTextEditingController = false,
+    super.valueTransform,
+    super.defaultTranslations,
+    super.trackUnchanged = true,
+  }) : super.internalCreate(
+          stringToValueConverter: stringToValueConverter ?? GladeTypeConverters.intConverterNullable,
+          validatorInstance:
+              validator?.call(IntValidatorNullable()..notNull()) ?? (IntValidatorNullable()..notNull()).build(),
         );
 }
