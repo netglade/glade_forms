@@ -53,6 +53,34 @@ class IntValidator extends GladeValidator<int> {
         key: key ?? GladeErrorKeys.intCompareMaxError,
         shouldValidate: shouldValidate,
       );
+
+  void isPositive({
+    bool includeZero = true,
+    OnValidateError<int>? devError,
+    Object? key,
+    ShouldValidateCallback<int>? shouldValidate,
+  }) =>
+      isMin(
+        min: 0,
+        isInclusive: includeZero,
+        devError: devError,
+        key: key ?? GladeErrorKeys.intCompareIsPositiveError,
+        shouldValidate: shouldValidate,
+      );
+
+  void isNegative({
+    bool includeZero = true,
+    OnValidateError<int>? devError,
+    Object? key,
+    ShouldValidateCallback<int>? shouldValidate,
+  }) =>
+      isMax(
+        max: 0,
+        isInclusive: includeZero,
+        devError: devError,
+        key: key ?? GladeErrorKeys.intCompareIsNegativeError,
+        shouldValidate: shouldValidate,
+      );
 }
 
 class IntValidatorNullable extends GladeValidator<int?> {
@@ -113,6 +141,34 @@ class IntValidatorNullable extends GladeValidator<int?> {
         },
         devError: devError ?? (value) => 'Value ${value ?? 'NULL'} is bigger than $max.',
         key: key ?? GladeErrorKeys.intCompareMaxError,
+        shouldValidate: shouldValidate,
+      );
+
+  void isPositive({
+    bool includeZero = true,
+    OnValidateError<int?>? devError,
+    Object? key,
+    ShouldValidateCallback<int?>? shouldValidate,
+  }) =>
+      isMin(
+        min: 0,
+        isInclusive: includeZero,
+        devError: devError,
+        key: key ?? GladeErrorKeys.intCompareIsPositiveError,
+        shouldValidate: shouldValidate,
+      );
+
+  void isNegative({
+    bool includeZero = true,
+    OnValidateError<int?>? devError,
+    Object? key,
+    ShouldValidateCallback<int?>? shouldValidate,
+  }) =>
+      isMax(
+        max: 0,
+        isInclusive: includeZero,
+        devError: devError,
+        key: key ?? GladeErrorKeys.intCompareIsNegativeError,
         shouldValidate: shouldValidate,
       );
 }
