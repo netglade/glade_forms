@@ -23,6 +23,28 @@ abstract final class GladeTypeConverters {
     converterBack: (rawInput) => rawInput?.toString(),
   );
 
+  static final doubleConverter = StringToTypeConverter<double>(
+    converter: (rawValue, cantConvert) {
+      if (rawValue == null) {
+        return cantConvert('Input can not be null', rawValue: rawValue, key: GladeErrorKeys.valueIsNull);
+      }
+
+      return double.tryParse(rawValue) ?? cantConvert('Can not convert', rawValue: rawValue);
+    },
+    converterBack: (rawInput) => rawInput.toString(),
+  );
+
+  static final doubleConverterNullable = StringToTypeConverter<double?>(
+    converter: (rawValue, cantConvert) {
+      if (rawValue == null) {
+        return null;
+      }
+
+      return double.tryParse(rawValue) ?? cantConvert('Can not convert', rawValue: rawValue);
+    },
+    converterBack: (rawInput) => rawInput?.toString(),
+  );
+
   static final boolConverter = StringToTypeConverter<bool>(
     converter: (rawValue, cantConvert) {
       if (rawValue == null) {
