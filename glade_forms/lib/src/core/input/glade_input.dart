@@ -168,19 +168,21 @@ class GladeInput<T> {
         dependenciesFactory = dependencies ?? (() => []),
         inputKey = inputKey ?? '__${T.runtimeType}__${Random().nextInt(100000000)}',
         _valueTransform = valueTransform,
-        _textEditingController = textEditingController ??
-            (useTextEditingController
-                ? TextEditingController(
-                    text: switch (value) {
-                      final String? x => x,
-                      != null => stringToValueConverter?.convertBack(value),
-                      _ => null,
-                    },
-                  )
-                : null),
 
         // ignore: avoid_bool_literals_in_conditional_expressions, cant be simplified.
         _useTextEditingController = textEditingController != null ? true : useTextEditingController {
+    final defaultValue = (value ?? initialValue) as T;
+    _textEditingController = textEditingController ??
+        (useTextEditingController
+            ? TextEditingController(
+                text: switch (defaultValue) {
+                  final String? x => x,
+                  != null => stringToValueConverter?.convertBack(defaultValue),
+                  _ => null,
+                },
+              )
+            : null);
+
     validatorInstance.bindInput(this);
 
     if (_useTextEditingController) {
@@ -270,7 +272,7 @@ class GladeInput<T> {
   ///
   /// In case of need of any aditional validation use [GladeInput.create] directly.
   factory GladeInput.required({
-    required T value,
+    T? value,
     T? initialValue,
     String? inputKey,
     bool pure = true,

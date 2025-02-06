@@ -18,8 +18,7 @@ class IntValidator extends GladeValidator<int> {
       satisfy(
         (value) => inclusiveInterval ? value >= min && value <= max : value > min && value < max,
         devError: devError ??
-            (value) =>
-                'Value ${value ?? 'NULL'} (inclusiveInterval: $inclusiveInterval) is not in between $min and $max.',
+            (value) => 'Value $value  (inclusiveInterval: $inclusiveInterval) is not in between $min and $max.',
         key: key ?? GladeErrorKeys.intCompareError,
         shouldValidate: shouldValidate,
       );
@@ -34,7 +33,7 @@ class IntValidator extends GladeValidator<int> {
   }) =>
       satisfy(
         (value) => isInclusive ? value >= min : value > min,
-        devError: devError ?? (value) => 'Value ${value ?? 'NULL'} is less than $min.',
+        devError: devError ?? (value) => 'Value $value is less than $min.',
         key: key ?? GladeErrorKeys.intCompareMinError,
         shouldValidate: shouldValidate,
       );
@@ -49,7 +48,7 @@ class IntValidator extends GladeValidator<int> {
   }) =>
       satisfy(
         (value) => isInclusive ? value <= max : value < max,
-        devError: devError ?? (value) => 'Value ${value ?? 'NULL'} is bigger than $max.',
+        devError: devError ?? (value) => 'Value $value is bigger than $max.',
         key: key ?? GladeErrorKeys.intCompareMaxError,
         shouldValidate: shouldValidate,
       );

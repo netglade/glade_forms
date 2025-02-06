@@ -12,6 +12,8 @@
 - `GladeIntInput` and `GladeDateTimeInput` offer *Nullable versions to support null values
   - `StringInput` does not offer a nullable version as we believe that in most cases you don't really need to differentiate between a null string and an empty string. Feel free to open an issue if you disagree.
 - **Added** Add `isPositive()` and `isNegative()` to Int validator.
+- **Fixed** Input did not propagate initialValue into TextEditingController.
+- **Fixed** Fix nullability value in `devError` callback in validator.
 
 
 

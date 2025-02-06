@@ -37,7 +37,7 @@ class StringValidator extends GladeValidator<String> {
 
           return regExp.hasMatch(x);
         },
-        devError: devError ?? (value) => 'Value "${value ?? 'NULL'}" is not in e-mail format',
+        devError: devError ?? (value) => 'Value "$value" is not in e-mail format',
         key: key ?? GladeErrorKeys.stringNotEmail,
         shouldValidate: shouldValidate,
       );
@@ -70,7 +70,7 @@ class StringValidator extends GladeValidator<String> {
 
           return exp.hasMatch(value);
         },
-        devError: devError ?? (value) => 'Value "${value ?? 'NULL'}" is not valid URL address',
+        devError: devError ?? (value) => 'Value "$value" is not valid URL address',
         key: key,
         shouldValidate: shouldValidate,
       );
@@ -93,7 +93,7 @@ class StringValidator extends GladeValidator<String> {
 
           return regex.hasMatch(value);
         },
-        devError: devError ?? (value) => 'Value "${value ?? 'NULL'}" does not match regex',
+        devError: devError ?? (value) => 'Value "$value" does not match regex',
         key: key ?? GladeErrorKeys.stringPatternMatch,
         shouldValidate: shouldValidate,
       );
@@ -109,7 +109,7 @@ class StringValidator extends GladeValidator<String> {
         (value) {
           return value.length >= length;
         },
-        devError: devError ?? (value) => 'Value "${value ?? 'NULL'}" is shorter than allowed length $length',
+        devError: devError ?? (value) => 'Value "$value" is shorter than allowed length $length',
         key: key ?? GladeErrorKeys.stringMinLength,
         shouldValidate: shouldValidate,
       );
@@ -123,7 +123,7 @@ class StringValidator extends GladeValidator<String> {
   }) =>
       satisfy(
         (value) => value.length < length,
-        devError: devError ?? (value) => 'Value "${value ?? 'NULL'}" is longer than allowed length $length',
+        devError: devError ?? (value) => 'Value "$value " is longer than allowed length $length',
         key: key ?? GladeErrorKeys.stringMaxLength,
         shouldValidate: shouldValidate,
       );
@@ -137,7 +137,7 @@ class StringValidator extends GladeValidator<String> {
   }) =>
       satisfy(
         (value) => value.length == length,
-        devError: devError ?? (value) => 'Value "${value ?? 'NULL'}" has to be $length long characters.',
+        devError: devError ?? (value) => 'Value "$value " has to be $length long characters.',
         key: key ?? GladeErrorKeys.stringExactLength,
         shouldValidate: shouldValidate,
       );
