@@ -3,8 +3,7 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart';
 import 'package:glade_forms/src/core/changes_info.dart';
-import 'package:glade_forms/src/core/error/convert_error.dart';
-import 'package:glade_forms/src/core/error/error_translator.dart';
+import 'package:glade_forms/src/core/error/error.dart';
 import 'package:glade_forms/src/core/input_dependencies.dart';
 import 'package:glade_forms/src/core/string_to_type_converter.dart';
 import 'package:glade_forms/src/model/glade_model.dart';
@@ -112,6 +111,8 @@ class GladeInput<T> {
   bool get isNotValid => !isValid;
 
   bool get hasConversionError => __conversionError != null;
+
+  List<GladeInputError<T>> get validationErrors => validatorResult.errors;
 
   /// String representattion of [value].
   String get stringValue => stringToValueConverter?.convertBack(value) ?? value.toString();

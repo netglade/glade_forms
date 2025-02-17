@@ -18,3 +18,18 @@ abstract class GladeInputError<T> {
 
   const GladeInputError({this.key});
 }
+
+// ignore: prefer-single-declaration-per-file, keep here.
+extension GladeInputErrorListExtension<T> on List<GladeInputError<T>> {
+  bool get hasConversionError => any((error) => error.isConversionError);
+
+  bool get hasNullError => any((error) => error.isNullError);
+
+  bool get hasStringEmptyOrNullErrorKey => any((error) => error.hasStringEmptyOrNullErrorKey);
+
+  bool get hasNullValueOrEmptyValueKey => any((error) => error.hasNullValueOrEmptyValueKey);
+
+  bool hasErrorKey(Object key) => any((error) => error.key == key);
+
+  bool hasOnlySpecificErrorKey(Object key) => every((error) => error.key == key);
+}
