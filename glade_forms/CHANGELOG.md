@@ -6,6 +6,15 @@
 - Removed specialized version factories. Now specialized versions are sub-classes of GladeInput
   - This removes the weird possibility to create calls such as `StringInput.intInput()` which in the end threw a runtime exception due to type mismatch.
 - Renamed `valueConverter` in `create()` factory to match internal name `stringToValueConverter` which is more explicit
+- Rename `resetToPure()` to `resetToInitialValue()`
+- Change `setAsNewPure` to `setNewInitialValue()`
+  - Updates input to new initial value
+  - Optionally input's value can be reset into new initial value (`shouldResetToInitialValue` argument).
+- On Model level
+  - Rename `resetToPure()` to `resetToInitialValue()`
+  - Change `setAsNewPure` to `setInputValuesAsNewInitialValues()`
+    - Updates all inputs to new initial value
+    - Optionally input's value can be reset into new initial value (`shouldResetToInitialValue` argument).
   
 - **Added** `GladeDateTimeInput` - specialized GladeInput for DateTime inputs.
 - **Added** `inclusive` argument for `int` validations.

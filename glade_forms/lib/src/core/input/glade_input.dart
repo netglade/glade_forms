@@ -87,18 +87,20 @@ class GladeInput<T> {
 
   InputDependencies get dependencies => dependenciesFactory();
 
+  /// Initial value of input.
   T? get initialValue => _initialValue;
 
+  /// Text editing controller for input. Used for syncing input with text field.
   TextEditingController? get controller => _textEditingController;
 
   T get value => _value;
 
   T? get previousValue => _previousValue;
 
-  /// Input's value was not changed.
+  /// Input is pure if its value is same as initial value and value was never updated.
+  ///
+  /// Pure can be reset when [resetToInitialValue] is called.
   bool get isPure => _isPure;
-
-  ValidatorResult<T> get validatorResult => validatorInstance.validate(value);
 
   /// [value] is equal to [initialValue].
   ///
@@ -108,9 +110,12 @@ class GladeInput<T> {
   /// Input does not have conversion error nor validation error.
   bool get isValid => !hasConversionError && validatorInstance.validate(value).isValid;
 
+  /// True when input is not valid.
   bool get isNotValid => !isValid;
 
   bool get hasConversionError => __conversionError != null;
+
+  ValidatorResult<T> get validatorResult => validatorInstance.validate(value);
 
   List<GladeInputError<T>> get validationErrors => validatorResult.errors;
 
@@ -405,48 +410,33 @@ class GladeInput<T> {
     updateValue(value, shouldTriggerOnChange: shouldTriggerOnChange);
   }
 
-  /// Sets a new pure state for the input.
-  ///
-  /// Allows to set new initialValue and value if needed.
-  /// By default ([invokeUpdate]=`true`) setting value will trigger listeners.
-  void setAsNewPure({
-    ValueGetter<T>? value,
-    ValueGetter<T>? initialValue,
-    bool invokeUpdate = true,
-    bool copyValueToInitialValue = false,
+  /// Sets new initial value and resets the input to it.
+  void setNewInitialValue({
+    required ValueGetter<T> initialValue,
+    bool shouldResetToInitialValue = false,
+    bool shouldTriggerOnChange = true,
   }) {
-    if (value != null) {
-      if (_useTextEditingController) {
-        _syncValueWithController(value(), shouldTriggerOnChange: invokeUpdate);
-      } else {
-        if (invokeUpdate) {
-          this.value = value();
-        } else {
-          _value = value();
-        }
-      }
-    }
-    this._isPure = true;
-    if (initialValue != null) {
-      this._initialValue = initialValue();
+    this._initialValue = initialValue();
 
-      if (invokeUpdate) _bindedModel?.notifyInputUpdated(this);
-    }
-
-    if (copyValueToInitialValue) {
-      this._initialValue = this.value;
-
-      if (invokeUpdate) _bindedModel?.notifyInputUpdated(this);
+    if (shouldResetToInitialValue) {
+      resetToInitialValue(shouldTriggerOnChange: shouldTriggerOnChange);
+    } else {
+      _bindedModel?.notifyInputUpdated(this);
     }
   }
 
   /// Resets the input value to its initial value and sets it as pure.
-  void resetToPure() {
+  void resetToInitialValue({bool shouldTriggerOnChange = true}) {
+    assert(_initialValue != null || TypeHelper.typeIsNullable<T>(), 'Initial can not be null for non-nullable type');
+
+    if (!TypeHelper.typeIsNullable<T>() && _initialValue == null) return;
+
     if (_useTextEditingController) {
-      _syncValueWithController(_initialValue as T, shouldTriggerOnChange: true);
+      _syncValueWithController(_initialValue as T, shouldTriggerOnChange: shouldTriggerOnChange);
     } else {
-      _value = _initialValue as T;
+      updateValue(_initialValue as T, shouldTriggerOnChange: shouldTriggerOnChange);
     }
+
     this._isPure = true;
     _bindedModel?.notifyInputUpdated(this);
   }

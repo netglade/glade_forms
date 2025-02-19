@@ -159,7 +159,7 @@ void main() {
 
       expect(input.value, equals(0));
 
-      input.resetToPure();
+      input.resetToInitialValue();
 
       expect(input.isPure, isTrue);
       expect(input.value, equals(input.initialValue));
@@ -178,10 +178,14 @@ void main() {
       expect(input.isPure, isTrue);
 
       // Set as new pure with a new value
-      input.setAsNewPure(value: () => 200, initialValue: () => 10, invokeUpdate: true, copyValueToInitialValue: false);
+      input.setNewInitialValue(
+        initialValue: () => 10,
+        shouldResetToInitialValue: false,
+      );
 
       // Check the new state
-      expect(input.value, equals(200));
+      // ignore: avoid-duplicate-test-assertions, check again
+      expect(input.value, equals(100));
       expect(input.initialValue, equals(10));
       // ignore: avoid-duplicate-test-assertions, the state changed, its not the same as before, its after setAsNewPure, to test if the new value is set.
       expect(input.isPure, isTrue);
