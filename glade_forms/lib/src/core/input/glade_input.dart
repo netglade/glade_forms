@@ -411,6 +411,8 @@ class GladeInput<T> {
   }
 
   /// Sets new initial value and resets the input to it.
+  ///
+  /// [shouldTriggerOnChange] - if true, onChange callbacks will be triggered.
   void setNewInitialValue({
     required ValueGetter<T> initialValue,
     bool shouldResetToInitialValue = false,
@@ -426,6 +428,8 @@ class GladeInput<T> {
   }
 
   /// Resets the input value to its initial value and sets it as pure.
+  ///
+  /// [shouldTriggerOnChange] - if true, onChange callbacks will be triggered.
   void resetToInitialValue({bool shouldTriggerOnChange = true}) {
     assert(_initialValue != null || TypeHelper.typeIsNullable<T>(), 'Initial can not be null for non-nullable type');
 
@@ -439,6 +443,17 @@ class GladeInput<T> {
 
     this._isPure = true;
     _bindedModel?.notifyInputUpdated(this);
+  }
+
+  /// Sets the input as pure and sets new initial value as current value.
+  ///
+  /// [shouldTriggerOnChange] - if true, onChange callbacks will be triggered.
+  void setNewInitialValueAsCurrentValue({bool shouldTriggerOnChange = true}) {
+    setNewInitialValue(
+      initialValue: () => value,
+      shouldResetToInitialValue: true,
+      shouldTriggerOnChange: shouldTriggerOnChange,
+    );
   }
 
   @protected

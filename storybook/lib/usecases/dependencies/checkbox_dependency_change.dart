@@ -116,7 +116,7 @@ In this example both bussiness rules controll checkbox via onChange and onDepend
                     child: const Text('Save'),
                   ),
                 ),
-                const GladeModelDebugInfo<AgeRestrictedModel>(
+                const GladeFormDebugInfo<AgeRestrictedModel>(
                   showControllerText: true,
                 ),
               ],

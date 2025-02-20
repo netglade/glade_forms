@@ -3,7 +3,7 @@ import 'package:glade_forms/src/model/glade_model.dart';
 import 'package:glade_forms/src/widgets/glade_form_builder.dart';
 
 /// Provides debug table displaying model's inputs and validation errors.
-class GladeModelDebugInfo<M extends GladeModel> extends StatelessWidget {
+class GladeFormDebugInfo<M extends GladeModel> extends StatelessWidget {
   final bool showIsUnchanged;
   final bool showIsValid;
   final bool showValidationError;
@@ -17,7 +17,7 @@ class GladeModelDebugInfo<M extends GladeModel> extends StatelessWidget {
 
   final bool scrollable;
 
-  const GladeModelDebugInfo({
+  const GladeFormDebugInfo({
     super.key,
     this.showIsUnchanged = true,
     this.showIsValid = true,
@@ -30,7 +30,7 @@ class GladeModelDebugInfo<M extends GladeModel> extends StatelessWidget {
     this.scrollable = true,
   });
 
-  const GladeModelDebugInfo.clean({
+  const GladeFormDebugInfo.clean({
     super.key,
     this.showIsUnchanged = false,
     this.showIsValid = false,

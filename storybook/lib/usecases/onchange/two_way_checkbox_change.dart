@@ -110,7 +110,7 @@ If *age* is changed to value under 18, *vip content* is unchecked and vice-versa
                     child: const Text('Save'),
                   ),
                 ),
-                const GladeModelDebugInfo<AgeRestrictedModel>(
+                const GladeFormDebugInfo<AgeRestrictedModel>(
                   showControllerText: true,
                 ),
               ],

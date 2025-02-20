@@ -148,11 +148,7 @@ abstract class GladeModel extends ChangeNotifier {
   /// [shouldTriggerOnChange] - if true, onChange callbacks will be triggered.
   void setInputValuesAsNewInitialValues({bool shouldTriggerOnChange = true}) {
     for (final input in inputs) {
-      input.setNewInitialValue(
-        initialValue: () => input.value,
-        shouldResetToInitialValue: true,
-        shouldTriggerOnChange: shouldTriggerOnChange,
-      );
+      input.setNewInitialValueAsCurrentValue(shouldTriggerOnChange: shouldTriggerOnChange);
     }
 
     notifyListeners();

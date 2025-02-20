@@ -15,7 +15,10 @@
   - Change `setAsNewPure` to `setInputValuesAsNewInitialValues()`
     - Updates all inputs to new initial value
     - Optionally input's value can be reset into new initial value (`shouldResetToInitialValue` argument).
+- Rename `GladeModelDebugInfo` to `GladeFormDebugInfo` to align with other widgets.
+- Rename `GadeModelDebugInfoModal` to `GladeFormDebugInfoModal`.
   
+- **Added** `setNewInitialValueAsCurrentValue` method as shorthand for setting new initial value as current input's value.
 - **Added** `GladeDateTimeInput` - specialized GladeInput for DateTime inputs.
 - **Added** `inclusive` argument for `int` validations.
 - `GladeIntInput` and `GladeDateTimeInput` offer *Nullable versions to support null values
