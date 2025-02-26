@@ -1,5 +1,5 @@
-import 'package:glade_forms/src/core/convert_error.dart';
-import 'package:glade_forms/src/core/glade_error_keys.dart';
+import 'package:glade_forms/src/core/error/convert_error.dart';
+import 'package:glade_forms/src/core/error/glade_error_keys.dart';
 
 typedef OnErrorCallback<T> = ConvertError<T> Function(String? rawValue, Object error);
 
@@ -34,6 +34,7 @@ class StringToTypeConverter<T> {
   })  : _converterBack = converterBack ?? ((rawInput) => rawInput?.toString() ?? ''),
         onError = ((rawValue, error) => ConvertError<T>(input: rawValue, error: error));
 
+  /// Converts string input into `T` value.
   T convert(String? input) {
     try {
       return converter(input, _cantConvert);
@@ -48,6 +49,7 @@ class StringToTypeConverter<T> {
     }
   }
 
+  /// Converts [T] back to string.
   String convertBack(T input) => _converterBack(input) ?? input.toString();
 
   T _cantConvert(

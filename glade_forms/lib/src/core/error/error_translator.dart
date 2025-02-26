@@ -1,6 +1,6 @@
 // ignore_for_file: prefer-match-file-name
 
-import 'package:glade_forms/src/core/glade_input_error.dart';
+import 'package:glade_forms/src/core/error/glade_input_error.dart';
 import 'package:glade_forms/src/core/input_dependencies.dart';
 
 typedef ErrorTranslator<T> = String Function(

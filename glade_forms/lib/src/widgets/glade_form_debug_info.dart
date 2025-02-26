@@ -3,13 +3,26 @@ import 'package:glade_forms/src/model/glade_model.dart';
 import 'package:glade_forms/src/widgets/glade_form_builder.dart';
 
 /// Provides debug table displaying model's inputs and validation errors.
-class GladeModelDebugInfo<M extends GladeModel> extends StatelessWidget {
+class GladeFormDebugInfo<M extends GladeModel> extends StatelessWidget {
+  /// Whether to show isUnchanged column.
   final bool showIsUnchanged;
+
+  /// Whether to show isValid column.
   final bool showIsValid;
+
+  /// Whether to show validation error column.
   final bool showValidationError;
+
+  /// Whether to show conversion error column.
   final bool showConversionError;
+
+  /// Whether to show value column.
   final bool showValue;
+
+  /// Whether to show initialValue column.
   final bool showInitialValue;
+
+  /// Whether to show controller.text column.
   final bool showControllerText;
 
   /// Inputs (defined by key) which are hidden from listing.
@@ -17,7 +30,7 @@ class GladeModelDebugInfo<M extends GladeModel> extends StatelessWidget {
 
   final bool scrollable;
 
-  const GladeModelDebugInfo({
+  const GladeFormDebugInfo({
     super.key,
     this.showIsUnchanged = true,
     this.showIsValid = true,
@@ -30,7 +43,7 @@ class GladeModelDebugInfo<M extends GladeModel> extends StatelessWidget {
     this.scrollable = true,
   });
 
-  const GladeModelDebugInfo.clean({
+  const GladeFormDebugInfo.clean({
     super.key,
     this.showIsUnchanged = false,
     this.showIsValid = false,
@@ -192,6 +205,9 @@ class _Table extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final inputs = model.inputs.where((element) => !hiddenKeys.contains(element.inputKey));
+    final rowColor = Theme.of(context).colorScheme.surface;
+    final alternativeRowColor =
+        MediaQuery.platformBrightnessOf(context) == Brightness.dark ? rowColor.lighten() : rowColor.darken();
 
     return Table(
       defaultColumnWidth: scrollable ? const IntrinsicColumnWidth() : const FlexColumnWidth(),
@@ -199,7 +215,7 @@ class _Table extends StatelessWidget {
       children: [
         // Columns header.
         TableRow(
-          decoration: const BoxDecoration(color: Colors.black, border: Border(bottom: BorderSide())),
+          decoration: BoxDecoration(color: Theme.of(context).canvasColor, border: const Border(bottom: BorderSide())),
           children: [
             const _ColumnHeader('Input'),
             if (showIsUnchanged) const _ColumnHeader('isUnchanged'),
@@ -214,7 +230,7 @@ class _Table extends StatelessWidget {
         for (final (index, x) in inputs.indexed)
           TableRow(
             decoration: BoxDecoration(
-              color: index.isEven ? Theme.of(context).canvasColor : Theme.of(context).canvasColor.darken(0.2),
+              color: index.isEven ? rowColor : alternativeRowColor,
             ),
             children: [
               Padding(
@@ -397,7 +413,7 @@ class _DangerStrips extends StatelessWidget {
   }
 }
 
-extension _ColorExtensions on Color {
+extension _PrivateColorEx on Color {
   /// Returns color darkened by [amount].
   Color darken([double amount = 0.1]) {
     assert(amount >= 0 && amount <= 1, 'amount must be between 0 and 1');
@@ -406,5 +422,15 @@ extension _ColorExtensions on Color {
     final hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
 
     return hslDark.toColor();
+  }
+
+  /// Returns color lightened by [amount].
+  Color lighten([double amount = 0.1]) {
+    assert(amount >= 0 && amount <= 1, 'amount must be between 0 and 1');
+
+    final hsl = HSLColor.fromColor(this);
+    final hslLight = hsl.withLightness((hsl.lightness + amount).clamp(0.0, 1.0));
+
+    return hslLight.toColor();
   }
 }

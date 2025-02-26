@@ -11,38 +11,27 @@ abstract final class _ErrorKeys {
 }
 
 class AgeRestrictedModel extends GladeModel {
-  late StringInput nameInput;
-  late GladeInput<int> ageInput;
-  late GladeInput<bool> vipInput;
+  late GladeStringInput nameInput;
+  late GladeIntInput ageInput;
+  late GladeBoolInput vipInput;
 
   @override
   List<GladeInput<Object?>> get inputs => [nameInput, ageInput, vipInput];
 
   @override
   void initialize() {
-    nameInput = GladeInput.stringInput(
+    nameInput = GladeStringInput(
       inputKey: 'name-input',
       defaultTranslations: DefaultTranslations(
         defaultValueIsNullOrEmptyMessage: LocaleKeys.empty.tr(),
       ),
     );
-    ageInput = GladeInput.create(
+    ageInput = GladeIntInput(
       validator: (v) => (v
             ..notNull()
-            ..satisfy(
-              (value) {
-                if (!vipInput.value) {
-                  return true;
-                }
-
-                return value >= 18;
-              },
-              devError: (_) => 'When VIP enabled you must be at least 18 years old.',
-              key: _ErrorKeys.ageRestriction,
-            ))
+            ..isMin(min: 18, shouldValidate: (_) => vipInput.value, key: _ErrorKeys.ageRestriction))
           .build(),
       value: 0,
-      valueConverter: GladeTypeConverters.intConverter,
       inputKey: 'age-input',
       translateError: (error, key, devMessage, dependencies) {
         if (key == _ErrorKeys.ageRestriction) return LocaleKeys.ageRestriction_under18.tr();
@@ -51,14 +40,9 @@ class AgeRestrictedModel extends GladeModel {
 
         return devMessage;
       },
-      // * cyclic dependency between ageInput and vipInput
-      // Better to use onDependencyChange inside vipInput
-      // onChange: (info) {
-      //   vipInput.value = info.value >= 18;
-      // },
       useTextEditingController: true,
     );
-    vipInput = GladeInput.create(
+    vipInput = GladeBoolInput(
       validator: (v) => (v..notNull()).build(),
       value: false,
       inputKey: 'vip-input',
@@ -106,13 +90,11 @@ If *age* is changed to value under 18, *vip content* is unchecked and vice-versa
                 TextFormField(
                   controller: formModel.nameInput.controller,
                   decoration: const InputDecoration(labelText: 'Name'),
-                  // onChanged: formModel.nameInput.updateValueWithString,
                   validator: formModel.nameInput.textFormFieldInputValidator,
                 ),
                 TextFormField(
                   controller: formModel.ageInput.controller,
                   decoration: const InputDecoration(labelText: 'Age'),
-                  //  onChanged: formModel.ageInput.updateValueWithString,
                   validator: (v) => formModel.ageInput.textFormFieldInputValidator(v),
                 ),
                 CheckboxListTile(
@@ -128,7 +110,7 @@ If *age* is changed to value under 18, *vip content* is unchecked and vice-versa
                     child: const Text('Save'),
                   ),
                 ),
-                const GladeModelDebugInfo<AgeRestrictedModel>(
+                const GladeFormDebugInfo<AgeRestrictedModel>(
                   showControllerText: true,
                 ),
               ],

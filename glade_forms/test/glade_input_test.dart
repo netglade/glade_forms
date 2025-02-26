@@ -10,8 +10,8 @@ void main() {
 
   group('onChange tests', () {
     test('Setter always trigger change', () {
-      final dependentInput = GladeInput.intInput(value: -1);
-      final input = GladeInput.intInput(
+      final dependentInput = GladeIntInput(value: -1);
+      final input = GladeIntInput(
         value: 0,
         onChange: (info) {
           dependentInput.value = info.value;
@@ -28,8 +28,8 @@ void main() {
     });
 
     test('updateValue by default trigger change', () {
-      final dependentInput = GladeInput.intInput(value: -1);
-      final input = GladeInput.intInput(
+      final dependentInput = GladeIntInput(value: -1);
+      final input = GladeIntInput(
         value: 0,
         onChange: (info) {
           dependentInput.value = info.value;
@@ -46,8 +46,8 @@ void main() {
     });
 
     test('updateValue disables trigger onChange', () {
-      final dependentInput = GladeInput.intInput(value: -1);
-      final input = GladeInput.intInput(
+      final dependentInput = GladeIntInput(value: -1);
+      final input = GladeIntInput(
         value: 0,
         onChange: (info) {
           dependentInput.value = info.value;
@@ -67,8 +67,8 @@ void main() {
 
   group('onChange with Controller tests', () {
     test('Controller always trigger change', () {
-      final dependentInput = GladeInput.intInput(value: -1);
-      final input = GladeInput.intInput(
+      final dependentInput = GladeIntInput(value: -1);
+      final input = GladeIntInput(
         value: 0,
         useTextEditingController: true,
         onChange: (info) {
@@ -86,8 +86,8 @@ void main() {
     });
 
     test('Setter always trigger change', () {
-      final dependentInput = GladeInput.intInput(value: -1);
-      final input = GladeInput.intInput(
+      final dependentInput = GladeIntInput(value: -1);
+      final input = GladeIntInput(
         value: 0,
         useTextEditingController: true,
         onChange: (info) {
@@ -105,8 +105,8 @@ void main() {
     });
 
     test('updateValue by default trigger change', () {
-      final dependentInput = GladeInput.intInput(value: -1);
-      final input = GladeInput.intInput(
+      final dependentInput = GladeIntInput(value: -1);
+      final input = GladeIntInput(
         value: 0,
         useTextEditingController: true,
         onChange: (info) {
@@ -124,8 +124,8 @@ void main() {
     });
 
     test('updateValue disables trigger onChange', () {
-      final dependentInput = GladeInput.intInput(value: -1);
-      final input = GladeInput.intInput(
+      final dependentInput = GladeIntInput(value: -1);
+      final input = GladeIntInput(
         value: 0,
         useTextEditingController: true,
         onChange: (info) {
@@ -146,7 +146,7 @@ void main() {
 
   group('Pure test', () {
     test('ResetToPure', () {
-      final input = GladeInput.intInput(
+      final input = GladeIntInput(
         value: 100,
         initialValue: 10,
         useTextEditingController: true,
@@ -159,14 +159,14 @@ void main() {
 
       expect(input.value, equals(0));
 
-      input.resetToPure();
+      input.resetToInitialValue();
 
       expect(input.isPure, isTrue);
       expect(input.value, equals(input.initialValue));
     });
 
     test('SetAsNewPure', () {
-      final input = GladeInput.intInput(
+      final input = GladeIntInput(
         initialValue: 20,
         value: 100,
         useTextEditingController: true,
@@ -178,10 +178,14 @@ void main() {
       expect(input.isPure, isTrue);
 
       // Set as new pure with a new value
-      input.setAsNewPure(value: () => 200, initialValue: () => 10, invokeUpdate: true, copyValueToInitialValue: false);
+      input.setNewInitialValue(
+        initialValue: () => 10,
+        shouldResetToInitialValue: false,
+      );
 
       // Check the new state
-      expect(input.value, equals(200));
+      // ignore: avoid-duplicate-test-assertions, check again
+      expect(input.value, equals(100));
       expect(input.initialValue, equals(10));
       // ignore: avoid-duplicate-test-assertions, the state changed, its not the same as before, its after setAsNewPure, to test if the new value is set.
       expect(input.isPure, isTrue);

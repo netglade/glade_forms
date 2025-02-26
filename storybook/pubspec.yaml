@@ -12,12 +12,12 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_highlighter: ^0.1.1
-  flutter_hooks: ^0.20.1
-  flutter_markdown: ^0.7.1
+  flutter_hooks: ^0.20.5
+  flutter_markdown: ^0.7.6
   glade_forms:
     path: ../glade_forms
-  provider: ^6.0.2
-  widgetbook: ^3.3.0
+  provider: ^6.1.2
+  widgetbook: ^3.11.0
 
 dev_dependencies:
   flutter_test:

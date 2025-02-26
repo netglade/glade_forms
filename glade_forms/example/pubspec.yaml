@@ -10,4 +10,5 @@ resolution: workspace
 dependencies:
   flutter:
     sdk: flutter
-  glade_forms: ^3.1.0
+  glade_forms:
+    path: ../

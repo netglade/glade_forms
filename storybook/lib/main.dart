@@ -19,9 +19,9 @@ void main() async {
   final _ = WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
 
-  const debugModel = String.fromEnvironment('DEBUG_MODEL', defaultValue: 'false') == 'true';
+  const isDebugModel = String.fromEnvironment('DEBUG_MODEL', defaultValue: 'false') == 'true';
 
-  if (debugModel) {
+  if (isDebugModel) {
     runApp(const _DebugModelApp());
   }
 

@@ -12,8 +12,8 @@ class _Model extends GladeModel {
 
   @override
   void initialize() {
-    a = GladeInput.intInput(value: 0, inputKey: 'a');
-    b = GladeInput.intInput(value: 1, inputKey: 'b');
+    a = GladeIntInput(value: 0, inputKey: 'a');
+    b = GladeIntInput(value: 1, inputKey: 'b');
 
     super.initialize();
   }
@@ -35,9 +35,9 @@ class _ModeWithDependencies extends GladeModel {
 
   @override
   void initialize() {
-    a = GladeInput.intInput(value: 0, inputKey: 'a');
-    b = GladeInput.intInput(value: 1, inputKey: 'b');
-    c = GladeInput.intInput(
+    a = GladeIntInput(value: 0, inputKey: 'a');
+    b = GladeIntInput(value: 1, inputKey: 'b');
+    c = GladeIntInput(
       value: 1,
       inputKey: 'c',
       dependencies: () => [a, b],
