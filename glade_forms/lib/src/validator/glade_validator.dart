@@ -20,6 +20,7 @@ class GladeValidator<T> {
   }) =>
       ValidatorInstance(parts: parts, stopOnFirstError: stopOnFirstError);
 
+  /// Clears all validation parts.
   void clear() => parts = [];
 
   /// Checks value with custom validation function.

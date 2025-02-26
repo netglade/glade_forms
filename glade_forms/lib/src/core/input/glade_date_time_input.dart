@@ -5,6 +5,13 @@ import 'package:glade_forms/src/core/input/glade_input.dart';
 import 'package:glade_forms/src/core/string_to_type_converter.dart';
 import 'package:glade_forms/src/validator/specialized/date_time_validator.dart';
 
+/// A [GladeInput] for [DateTime] values.
+///
+/// This input is required by default.
+///
+/// Includes default conversion from string to [DateTime] using [GladeTypeConverters.dateTimeIso8601].
+///
+/// Includes default validator [DateTimeValidator] with [DateTimeValidator.notNull] rule if `isRequired` is true.
 class GladeDateTimeInput extends GladeInput<DateTime> {
   GladeDateTimeInput({
     super.inputKey,
@@ -32,6 +39,13 @@ class GladeDateTimeInput extends GladeInput<DateTime> {
         );
 }
 
+/// A [GladeInput] for [DateTime?] values.
+///
+/// This input is not required by default.
+///
+/// Includes default conversion from string to [DateTime] using [GladeTypeConverters.dateTimeIso8601Nullable].
+///
+/// Includes default validator [DateTimeValidatorNullable] with [DateTimeValidatorNullable.notNull] rule if `isRequired` is true.
 class GladeDateTimeInputNullable extends GladeInput<DateTime?> {
   GladeDateTimeInputNullable({
     super.inputKey,

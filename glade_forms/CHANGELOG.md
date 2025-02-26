@@ -17,6 +17,7 @@
     - Optionally input's value can be reset into new initial value (`shouldResetToInitialValue` argument).
 - Rename `GladeModelDebugInfo` to `GladeFormDebugInfo` to align with other widgets.
 - Rename `GadeModelDebugInfoModal` to `GladeFormDebugInfoModal`.
+- Rename ValidatorResult.`isInvalid` to `isNotValid` to align  with properties in GladeInput and GladeModel.
   
 - **Added** `setNewInitialValueAsCurrentValue` method as shorthand for setting new initial value as current input's value.
 - **Added** `GladeDateTimeInput` - specialized GladeInput for DateTime inputs.

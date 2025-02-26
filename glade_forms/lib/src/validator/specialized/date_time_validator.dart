@@ -7,7 +7,13 @@ typedef DateTimeValidatorFactory = ValidatorInstance<DateTime> Function(DateTime
 typedef DateTimeValidatorFactoryNullable = ValidatorInstance<DateTime?> Function(DateTimeValidatorNullable validator);
 
 class DateTimeValidator extends GladeValidator<DateTime> {
-  /// Compares given value with [start] and [end] values. With [inclusiveInterval] set to true(default), the comparison is inclusive.
+  /// Compares given value with [start] and [end] values.
+  ///
+  /// With [inclusiveInterval] set to true(default), the comparison is inclusive.
+  ///
+  /// With [includeTime] set to true(default), the comparison includes time.
+  ///
+  /// Default [key] is [ GladeErrorKeys.dateTimeIsBetweenError].
   void isBetween({
     required DateTime start,
     required DateTime end,
@@ -34,6 +40,13 @@ class DateTimeValidator extends GladeValidator<DateTime> {
         shouldValidate: shouldValidate,
       );
 
+  /// Compares given value with [start] value if it is after.
+  ///
+  /// With [inclusiveInterval] set to true(default), the comparison is inclusive.
+  ///
+  /// With [includeTime] set to true(default), the comparison includes time.
+  ///
+  /// Default [key] is [ GladeErrorKeys.dateTimeIsAfterError].
   void isAfter({
     required DateTime start,
     OnValidateError<DateTime>? devError,
@@ -56,6 +69,13 @@ class DateTimeValidator extends GladeValidator<DateTime> {
         shouldValidate: shouldValidate,
       );
 
+  /// Compares given value with [end] value if it is before.
+  ///
+  /// With [inclusiveInterval] set to true(default), the comparison is inclusive.
+  ///
+  /// With [includeTime] set to true(default), the comparison includes time.
+  ///
+  /// Default [key] is [ GladeErrorKeys.dateTimeIsBeforeError].
   void isBefore({
     required DateTime end,
     OnValidateError<DateTime>? devError,
@@ -80,7 +100,13 @@ class DateTimeValidator extends GladeValidator<DateTime> {
 }
 
 class DateTimeValidatorNullable extends GladeValidator<DateTime?> {
-  /// Compares given value with [start] and [end] values. With [inclusiveInterval] set to true(default), the comparison is inclusive.
+  /// Compares given value with [start] and [end] values.
+  ///
+  ///  With [inclusiveInterval] set to true(default), the comparison is inclusive.
+  ///
+  /// With [includeTime] set to true(default), the comparison includes time.
+  ///
+  /// Default [key] is [ GladeErrorKeys.dateTimeIsBetweenError].
   void isBetween({
     required DateTime start,
     required DateTime end,
@@ -110,6 +136,13 @@ class DateTimeValidatorNullable extends GladeValidator<DateTime?> {
         shouldValidate: shouldValidate,
       );
 
+  /// Compares given value with [start] value if it is after.
+  ///
+  /// With [inclusiveInterval] set to true(default), the comparison is inclusive.
+  ///
+  /// With [includeTime] set to true(default), the comparison includes time.
+  ///
+  /// Default [key] is [ GladeErrorKeys.dateTimeIsAfterError].
   void isAfter({
     required DateTime start,
     OnValidateError<DateTime?>? devError,
@@ -135,6 +168,11 @@ class DateTimeValidatorNullable extends GladeValidator<DateTime?> {
         shouldValidate: shouldValidate,
       );
 
+  /// Compares given value with [end] value if it is before.
+  ///
+  /// With [inclusiveInterval] set to true(default), the comparison is inclusive.
+  ///
+  /// With [includeTime] set to true(default), the comparison includes time.
   void isBefore({
     required DateTime end,
     OnValidateError<DateTime?>? devError,

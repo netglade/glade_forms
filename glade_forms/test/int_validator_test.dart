@@ -11,7 +11,7 @@ void main() {
       final result = validator.validate(6);
 
       expect(result.isValid, isTrue);
-      expect(result.isInvalid, isFalse);
+      expect(result.isNotValid, isFalse);
     });
 
     test('success inclusive max', () {
@@ -20,7 +20,7 @@ void main() {
       final result = validator.validate(10);
 
       expect(result.isValid, isTrue);
-      expect(result.isInvalid, isFalse);
+      expect(result.isNotValid, isFalse);
     });
 
     test('success inclusive min', () {
@@ -29,7 +29,7 @@ void main() {
       final result = validator.validate(5);
 
       expect(result.isValid, isTrue);
-      expect(result.isInvalid, isFalse);
+      expect(result.isNotValid, isFalse);
     });
 
     test('fails non-inclusive max', () {
@@ -38,7 +38,7 @@ void main() {
       final result = validator.validate(10);
 
       expect(result.isValid, isFalse);
-      expect(result.isInvalid, isTrue);
+      expect(result.isNotValid, isTrue);
     });
 
     test('fails non-inclusive min', () {
@@ -47,7 +47,7 @@ void main() {
       final result = validator.validate(5);
 
       expect(result.isValid, isFalse);
-      expect(result.isInvalid, isTrue);
+      expect(result.isNotValid, isTrue);
     });
 
     test('fails', () {
@@ -56,7 +56,7 @@ void main() {
       final result = validator.validate(1);
 
       expect(result.isValid, isFalse);
-      expect(result.isInvalid, isTrue);
+      expect(result.isNotValid, isTrue);
     });
   });
 
@@ -67,7 +67,7 @@ void main() {
       final result = validator.validate(5);
 
       expect(result.isValid, isTrue);
-      expect(result.isInvalid, isFalse);
+      expect(result.isNotValid, isFalse);
     });
 
     test('fails', () {
@@ -76,7 +76,7 @@ void main() {
       final result = validator.validate(25);
 
       expect(result.isValid, isFalse);
-      expect(result.isInvalid, isTrue);
+      expect(result.isNotValid, isTrue);
     });
   });
 
@@ -87,7 +87,7 @@ void main() {
       final result = validator.validate(5);
 
       expect(result.isValid, isTrue);
-      expect(result.isInvalid, isFalse);
+      expect(result.isNotValid, isFalse);
     });
 
     test('fails', () {
@@ -96,7 +96,7 @@ void main() {
       final result = validator.validate(5);
 
       expect(result.isValid, isFalse);
-      expect(result.isInvalid, isTrue);
+      expect(result.isNotValid, isTrue);
     });
   });
 }

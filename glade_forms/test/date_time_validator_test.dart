@@ -79,7 +79,7 @@ void main() {
           final result = validator.validate(testDate);
 
           expect(result.isValid, equals(isValid));
-          expect(result.isInvalid, equals(!isValid));
+          expect(result.isNotValid, equals(!isValid));
         },
       );
     }
@@ -162,7 +162,7 @@ void main() {
           final result = validator.validate(testDate);
 
           expect(result.isValid, equals(isValid));
-          expect(result.isInvalid, equals(!isValid));
+          expect(result.isNotValid, equals(!isValid));
         },
       );
     }
@@ -246,7 +246,7 @@ void main() {
           final result = validator.validate(testDate);
 
           expect(result.isValid, equals(isValid));
-          expect(result.isInvalid, equals(!isValid));
+          expect(result.isNotValid, equals(!isValid));
         },
       );
     }
@@ -330,7 +330,7 @@ void main() {
           final result = validator.validate(testDate);
 
           expect(result.isValid, equals(isValid));
-          expect(result.isInvalid, equals(!isValid));
+          expect(result.isNotValid, equals(!isValid));
         },
       );
     }
@@ -378,7 +378,7 @@ void main() {
           final result = validator.validate(testDate);
 
           expect(result.isValid, equals(isValid));
-          expect(result.isInvalid, equals(!isValid));
+          expect(result.isNotValid, equals(!isValid));
         },
       );
     }
@@ -424,7 +424,7 @@ void main() {
           final result = validator.validate(testDate);
 
           expect(result.isValid, equals(isValid));
-          expect(result.isInvalid, equals(!isValid));
+          expect(result.isNotValid, equals(!isValid));
         },
       );
     }
@@ -466,7 +466,7 @@ void main() {
           final result = validator.validate(testDate);
 
           expect(result.isValid, equals(isValid));
-          expect(result.isInvalid, equals(!isValid));
+          expect(result.isNotValid, equals(!isValid));
         },
       );
     }
@@ -509,7 +509,7 @@ void main() {
           final result = validator.validate(testDate);
 
           expect(result.isValid, equals(isValid));
-          expect(result.isInvalid, equals(!isValid));
+          expect(result.isNotValid, equals(!isValid));
         },
       );
     }
@@ -557,7 +557,7 @@ void main() {
           final result = validator.validate(testDate);
 
           expect(result.isValid, equals(isValid));
-          expect(result.isInvalid, equals(!isValid));
+          expect(result.isNotValid, equals(!isValid));
         },
       );
     }
@@ -603,7 +603,7 @@ void main() {
           final result = validator.validate(testDate);
 
           expect(result.isValid, equals(isValid));
-          expect(result.isInvalid, equals(!isValid));
+          expect(result.isNotValid, equals(!isValid));
         },
       );
     }
@@ -637,7 +637,7 @@ void main() {
           final result = validator.validate(testDate);
 
           expect(result.isValid, equals(isValid));
-          expect(result.isInvalid, equals(!isValid));
+          expect(result.isNotValid, equals(!isValid));
         },
       );
     }
@@ -676,7 +676,7 @@ void main() {
           final result = validator.validate(testDate);
 
           expect(result.isValid, equals(isValid));
-          expect(result.isInvalid, equals(!isValid));
+          expect(result.isNotValid, equals(!isValid));
         },
       );
     }

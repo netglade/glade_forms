@@ -1,6 +1,13 @@
 import 'package:glade_forms/src/core/input/glade_input.dart';
 import 'package:glade_forms/src/validator/specialized/string_validator.dart';
 
+/// A string input.
+///
+/// This input is required by default.
+///
+/// Includes default validator [StringValidator] with [StringValidator.notEmpty] rule if `isRequired` is true.
+///
+/// Creates textEditingController by default.
 class GladeStringInput extends GladeInput<String> {
   GladeStringInput({
     super.inputKey,

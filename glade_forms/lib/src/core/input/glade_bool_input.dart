@@ -1,5 +1,8 @@
 import 'package:glade_forms/glade_forms.dart';
 
+/// A [GladeInput] for [bool] values.
+///
+/// This class is a specialized [GladeInput] for [bool] values.
 class GladeBoolInput extends GladeInput<bool> {
   GladeBoolInput({
     super.inputKey,

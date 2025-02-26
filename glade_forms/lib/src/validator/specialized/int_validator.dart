@@ -5,8 +5,13 @@ import 'package:glade_forms/src/src.dart';
 typedef IntValidatorFactory = ValidatorInstance<int> Function(IntValidator validator);
 typedef IntValidatorFactoryNullable = ValidatorInstance<int?> Function(IntValidatorNullable validator);
 
+/// Validator for [int] values.
 class IntValidator extends GladeValidator<int> {
-  /// Compares given value with [min] and [max] values. With [inclusiveInterval] set to true(default), the comparison is inclusive.
+  /// Compares given value with [min] and [max] values.
+  ///
+  /// With [inclusiveInterval] set to true(default), the comparison is inclusive.
+  ///
+  /// Default [key] is [ GladeErrorKeys.intCompareError].
   void isBetween({
     required int min,
     required int max,
@@ -24,6 +29,10 @@ class IntValidator extends GladeValidator<int> {
       );
 
   /// Compares given value with [min] value.
+  ///
+  /// If [isInclusive] is set to true(default), the comparison is inclusive.
+  ///
+  /// Default [key] is [ GladeErrorKeys.intCompareMinError].
   void isMin({
     required int min,
     bool isInclusive = true,
@@ -39,6 +48,10 @@ class IntValidator extends GladeValidator<int> {
       );
 
   /// Compares given value with [max] value.
+  ///
+  /// If [isInclusive] is set to true(default), the comparison is inclusive.
+  ///
+  /// Default [key] is [ GladeErrorKeys.intCompareMaxError].
   void isMax({
     required int max,
     bool isInclusive = true,
@@ -53,6 +66,11 @@ class IntValidator extends GladeValidator<int> {
         shouldValidate: shouldValidate,
       );
 
+  /// Checks if the given value is positive.
+  ///
+  /// If [includeZero] is set to true(default), the value can be zero.
+  ///
+  /// Default [key] is [GladeErrorKeys.intCompareIsPositiveError].
   void isPositive({
     bool includeZero = true,
     OnValidateError<int>? devError,
@@ -67,6 +85,11 @@ class IntValidator extends GladeValidator<int> {
         shouldValidate: shouldValidate,
       );
 
+  /// Checks if the given value is negative.
+  ///
+  /// If [includeZero] is set to true(default), the value can be zero.
+  ///
+  /// Default [key] is [GladeErrorKeys.intCompareIsNegativeError].
   void isNegative({
     bool includeZero = true,
     OnValidateError<int>? devError,
@@ -82,8 +105,13 @@ class IntValidator extends GladeValidator<int> {
       );
 }
 
+/// Nullable version of [IntValidator].
 class IntValidatorNullable extends GladeValidator<int?> {
-  /// Compares given value with [min] and [max] values. With [inclusiveInterval] set to true(default), the comparison is inclusive.
+  /// Compares given value with [min] and [max] values.
+  ///
+  /// With [inclusiveInterval] set to true(default), the comparison is inclusive.
+  ///
+  /// Default [key] is [ GladeErrorKeys.intCompareError].
   void isBetween({
     required int min,
     required int max,
@@ -106,6 +134,10 @@ class IntValidatorNullable extends GladeValidator<int?> {
       );
 
   /// Compares given value with [min] value.
+  ///
+  /// If [isInclusive] is set to true(default), the comparison is inclusive.
+  ///
+  /// Default [key] is [ GladeErrorKeys.intCompareMinError].
   void isMin({
     required int min,
     bool isInclusive = true,
@@ -125,6 +157,10 @@ class IntValidatorNullable extends GladeValidator<int?> {
       );
 
   /// Compares given value with [max] value.
+  ///
+  /// If [isInclusive] is set to true(default), the comparison is inclusive.
+  ///
+  /// Default [key] is [ GladeErrorKeys.intCompareMaxError].
   void isMax({
     required int max,
     bool isInclusive = true,
@@ -143,6 +179,11 @@ class IntValidatorNullable extends GladeValidator<int?> {
         shouldValidate: shouldValidate,
       );
 
+  /// Checks if the given value is positive.
+  ///
+  /// If [includeZero] is set to true(default), the value can be zero.
+  ///
+  /// Default [key] is [GladeErrorKeys.intCompareIsPositiveError].
   void isPositive({
     bool includeZero = true,
     OnValidateError<int?>? devError,
@@ -157,6 +198,11 @@ class IntValidatorNullable extends GladeValidator<int?> {
         shouldValidate: shouldValidate,
       );
 
+  /// Checks if the given value is negative.
+  ///
+  /// If [includeZero] is set to true(default), the value can be zero.
+  ///
+  /// Default [key] is [GladeErrorKeys.intCompareIsNegativeError].
   void isNegative({
     bool includeZero = true,
     OnValidateError<int?>? devError,

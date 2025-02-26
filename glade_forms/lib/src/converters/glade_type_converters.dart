@@ -1,5 +1,6 @@
 import 'package:glade_forms/src/core/core.dart';
 
+/// Contains type converters for common types.
 abstract final class GladeTypeConverters {
   static final intConverter = StringToTypeConverter<int>(
     converter: (rawValue, cantConvert) {

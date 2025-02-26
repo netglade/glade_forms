@@ -5,6 +5,13 @@ import 'package:glade_forms/src/core/input/glade_input.dart';
 import 'package:glade_forms/src/core/string_to_type_converter.dart';
 import 'package:glade_forms/src/validator/specialized/int_validator.dart';
 
+/// A [GladeInput] for [int] values.
+///
+/// This input is required by default.
+///
+/// Includes default conversion from string to [int] using [GladeTypeConverters.intConverter].
+///
+/// Includes default validator [IntValidator] with [IntValidator.notNull] rule if `isRequired` is true.
 class GladeIntInput extends GladeInput<int> {
   GladeIntInput({
     super.inputKey,
@@ -32,6 +39,13 @@ class GladeIntInput extends GladeInput<int> {
         );
 }
 
+/// A [GladeInput] for [int?] values.
+///
+/// This input is not required by default.
+///
+/// Includes default conversion from string to [int] using [GladeTypeConverters.intConverterNullable].
+///
+/// Includes default validator [IntValidatorNullable] with [IntValidatorNullable.notNull] rule if `isRequired` is true.
 class GladeIntInputNullable extends GladeInput<int?> {
   GladeIntInputNullable({
     super.inputKey,

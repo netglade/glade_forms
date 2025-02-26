@@ -46,7 +46,7 @@ abstract class GladeModel extends ChangeNotifier {
   /// Formats errors from `inputs`.
   String get formattedValidationErrors => inputs
       .map((e) {
-        if (e.validatorResult.isInvalid) {
+        if (e.validatorResult.isNotValid) {
           return e.errorFormatted();
         }
 
@@ -55,10 +55,11 @@ abstract class GladeModel extends ChangeNotifier {
       .where((element) => element.isNotEmpty)
       .join('\n');
 
+  /// Formats errors from `inputs` with debug information.
   String get debugFormattedValidationErrors => inputs.map((e) {
         if (e.hasConversionError) return '${e.inputKey} - CONVERSION ERROR';
 
-        if (e.validatorResult.isInvalid) {
+        if (e.validatorResult.isNotValid) {
           return '${e.inputKey} - ${e.errorFormatted()}';
         }
 
@@ -88,6 +89,7 @@ abstract class GladeModel extends ChangeNotifier {
     }
   }
 
+  /// Binds input to model.
   void bindToModel(GladeInput<Object?> input) => input.bindToModel(this);
 
   /// Updates model's input with String? value using its converter.

@@ -329,7 +329,7 @@ class GladeInput<T> {
     // ignore: avoid-non-null-assertion, it is not null
     if (hasConversionError) return _translateConversionError(__conversionError!);
 
-    return validatorResult.isInvalid ? (_translate() ?? '') : '';
+    return validatorResult.isNotValid ? (_translate() ?? '') : '';
   }
 
   /// Shorthand validator for TextFieldForm inputs.
@@ -364,7 +364,7 @@ class GladeInput<T> {
   String? formFieldValidator(T value) {
     final convertedError = validatorInstance.validate(value);
 
-    return convertedError.isInvalid ? _translate(customError: convertedError) : null;
+    return convertedError.isNotValid ? _translate(customError: convertedError) : null;
   }
 
   void updateValueWithString(String? strValue, {bool shouldTriggerOnChange = true}) {

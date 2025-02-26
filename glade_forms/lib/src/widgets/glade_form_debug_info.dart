@@ -4,12 +4,25 @@ import 'package:glade_forms/src/widgets/glade_form_builder.dart';
 
 /// Provides debug table displaying model's inputs and validation errors.
 class GladeFormDebugInfo<M extends GladeModel> extends StatelessWidget {
+  /// Whether to show isUnchanged column.
   final bool showIsUnchanged;
+
+  /// Whether to show isValid column.
   final bool showIsValid;
+
+  /// Whether to show validation error column.
   final bool showValidationError;
+
+  /// Whether to show conversion error column.
   final bool showConversionError;
+
+  /// Whether to show value column.
   final bool showValue;
+
+  /// Whether to show initialValue column.
   final bool showInitialValue;
+
+  /// Whether to show controller.text column.
   final bool showControllerText;
 
   /// Inputs (defined by key) which are hidden from listing.
@@ -400,7 +413,7 @@ class _DangerStrips extends StatelessWidget {
   }
 }
 
-extension on Color {
+extension _PrivateColorEx on Color {
   /// Returns color darkened by [amount].
   Color darken([double amount = 0.1]) {
     assert(amount >= 0 && amount <= 1, 'amount must be between 0 and 1');
@@ -411,6 +424,7 @@ extension on Color {
     return hslDark.toColor();
   }
 
+  /// Returns color lightened by [amount].
   Color lighten([double amount = 0.1]) {
     assert(amount >= 0 && amount <= 1, 'amount must be between 0 and 1');
 

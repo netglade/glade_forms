@@ -11,7 +11,7 @@ void main() {
       final result = validator.validate(1);
 
       expect(result.isValid, isTrue);
-      expect(result.isInvalid, isFalse);
+      expect(result.isNotValid, isFalse);
     });
 
     test('fails', () {
@@ -20,7 +20,7 @@ void main() {
       final result = validator.validate(null);
 
       expect(result.isValid, isFalse);
-      expect(result.isInvalid, isTrue);
+      expect(result.isNotValid, isTrue);
       expect(result.errors, isNotEmpty);
       expect(
         result.errors.first,
@@ -36,7 +36,7 @@ void main() {
       final result = validator.validate(6);
 
       expect(result.isValid, isTrue);
-      expect(result.isInvalid, isFalse);
+      expect(result.isNotValid, isFalse);
     });
 
     test('fails', () {
@@ -45,7 +45,7 @@ void main() {
       final result = validator.validate(5);
 
       expect(result.isValid, isFalse);
-      expect(result.isInvalid, isTrue);
+      expect(result.isNotValid, isTrue);
       expect(result.errors, isNotEmpty);
       expect(
         result.errors.first,
@@ -67,7 +67,7 @@ void main() {
       final result = validator.validate(6);
 
       expect(result.isValid, isTrue);
-      expect(result.isInvalid, isFalse);
+      expect(result.isNotValid, isFalse);
     });
 
     test('fails', () {
@@ -82,7 +82,7 @@ void main() {
       final result = validator.validate(5);
 
       expect(result.isValid, isFalse);
-      expect(result.isInvalid, isTrue);
+      expect(result.isNotValid, isTrue);
       expect(result.errors, isNotEmpty);
       expect(
         result.errors.first,

@@ -5,6 +5,10 @@ typedef StringValidatorFactory = ValidatorInstance<String> Function(StringValida
 
 class StringValidator extends GladeValidator<String> {
   /// Given value can't be empty string (or null).
+  ///
+  /// If [allowBlank] is set to true, the value can be empty string.
+  ///
+  /// Default [key] is [ GladeErrorKeys.stringEmpty].
   void notEmpty({
     OnValidateError<String>? devError,
     Object? key,
@@ -21,6 +25,10 @@ class StringValidator extends GladeValidator<String> {
   /// Checks that value is valid email address.
   ///
   /// Used Regex expression `^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$`.
+  ///
+  /// If [allowEmpty] is set to true, the value can be empty string.
+  ///
+  /// Default [key] is [ GladeErrorKeys.stringNotEmail].
   void isEmail({
     OnValidateError<String>? devError,
     bool allowEmpty = false,
@@ -45,6 +53,7 @@ class StringValidator extends GladeValidator<String> {
   /// Checks that value is valid URL address.
   ///
   /// [requiresScheme] - if true HTTP(S) is mandatory.
+  ///
   /// Default [key] is [ GladeErrorKeys.stringNotUrl].
   void isUrl({
     OnValidateError<String>? devError,
@@ -76,6 +85,16 @@ class StringValidator extends GladeValidator<String> {
       );
 
   /// Matches provided regex [pattern].
+  ///
+  /// [multiline] - if true, the pattern will match line terminators.
+  ///
+  /// [caseSensitive] - if false, the pattern will ignore case.
+  ///
+  /// [dotAll] - if true, the pattern will match any character including line terminators.
+  ///
+  /// [unicode] - if true, the pattern will match unicode characters.
+  ///
+  /// Default [key] is [ GladeErrorKeys.stringPatternMatch].
   void match({
     required String pattern,
     bool multiline = false,
@@ -99,6 +118,8 @@ class StringValidator extends GladeValidator<String> {
       );
 
   /// String's length has to be greater or equal to provided [length].
+  ///
+  /// Default [key] is [ GladeErrorKeys.stringMinLength].
   void minLength({
     required int length,
     OnValidateError<String>? devError,
@@ -115,6 +136,8 @@ class StringValidator extends GladeValidator<String> {
       );
 
   /// String's length has to be less or equal to provided [length].
+  ///
+  /// Default [key] is [ GladeErrorKeys.stringMaxLength].
   void maxLength({
     required int length,
     OnValidateError<String>? devError,
@@ -129,6 +152,8 @@ class StringValidator extends GladeValidator<String> {
       );
 
   /// String's length has to be equal to provided [length].
+  ///
+  /// Default [key] is [ GladeErrorKeys.stringExactLength].
   void exactLength({
     required int length,
     OnValidateError<String>? devError,

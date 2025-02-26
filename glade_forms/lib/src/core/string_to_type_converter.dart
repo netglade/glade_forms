@@ -34,6 +34,7 @@ class StringToTypeConverter<T> {
   })  : _converterBack = converterBack ?? ((rawInput) => rawInput?.toString() ?? ''),
         onError = ((rawValue, error) => ConvertError<T>(input: rawValue, error: error));
 
+  /// Converts string input into `T` value.
   T convert(String? input) {
     try {
       return converter(input, _cantConvert);
@@ -48,6 +49,7 @@ class StringToTypeConverter<T> {
     }
   }
 
+  /// Converts [T] back to string.
   String convertBack(T input) => _converterBack(input) ?? input.toString();
 
   T _cantConvert(
