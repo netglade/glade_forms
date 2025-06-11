@@ -1,9 +1,15 @@
+// ignore_for_file: cascade_invocations
+
 import 'package:glade_forms/glade_forms.dart';
 import 'package:test/test.dart';
 
 void main() {
   test('GladeInput with non-nullable type', () {
-    final input = GladeInput<int>.create(validator: (v) => v.build(), value: 0, inputKey: 'a');
+    final input = GladeInput<int>.create(
+      validator: (v) => v.build(),
+      value: 0,
+      inputKey: 'a',
+    );
 
     expect(input.isValid, isTrue);
   });
@@ -142,6 +148,85 @@ void main() {
       expect(dependentInput.value, equals(-1));
       expect(input.value, equals(100));
     });
+  });
+
+  group('input with controller triggers onChange correctly', () {
+    test('when controller text changes then onChange is called', () {
+      // Arrange
+      final changes = <String>[];
+      final input = GladeInput<String>.create(
+        value: 'a',
+        useTextEditingController: true,
+        onChange: (info) => changes.add(info.value),
+      );
+
+      // Act
+      input.controller?.text = 'b';
+
+      // Assert
+      expect(input.value, equals('b'));
+      expect(changes, equals(['b']));
+    });
+
+    test('when updateValue is called then onChange is called', () {
+      // Arrange
+      final changes = <String>[];
+      final input = GladeInput<String>.create(
+        value: 'a',
+        useTextEditingController: true,
+        onChange: (info) => changes.add(info.value),
+      );
+
+      // Act
+      input.updateValue('b');
+
+      // Assert
+      expect(input.value, equals('b'));
+      expect(changes, equals(['b']));
+    });
+
+    test(
+      'when updateValue is called with shouldTriggerOnChange: false then onChange is called not called',
+      () {
+        // Arrange
+        final changes = <String>[];
+        final input = GladeInput<String>.create(
+          value: 'a',
+          useTextEditingController: true,
+          onChange: (info) => changes.add(info.value),
+        );
+
+        // Act
+        input.updateValue('b', shouldTriggerOnChange: false);
+
+        // Assert
+        expect(input.value, equals('b'));
+        expect(changes, equals([]));
+      },
+    );
+
+    test(
+      'when updateValue is called with shouldTriggerOnChange: false and second updateValue is called without it then only the second call triggers onChange',
+      () {
+        // Arrange
+        final changes = <String>[];
+        final input = GladeInput<String>.create(
+          value: 'a',
+          useTextEditingController: true,
+          onChange: (info) => changes.add(info.value),
+        );
+
+        // Act
+        // Won't trigger onChange.
+        input.updateValue('b', shouldTriggerOnChange: false);
+        // Should trigger onChange.
+        input.updateValue('c');
+
+        // Assert
+        expect(input.value, equals('c'));
+        expect(changes, equals(['c']));
+      },
+    );
   });
 
   group('Pure test', () {

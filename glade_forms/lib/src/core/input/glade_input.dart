@@ -77,7 +77,7 @@ class GladeInput<T> {
   /// Input did not updated its value from initialValue.
   bool _isPure;
 
-  /// If true onChange() is not triggered.
+  /// If true onChange() is triggered.
   bool _controllerTriggersOnChange = true;
 
   /// Input is in invalid state when there was conversion error.
@@ -526,9 +526,13 @@ class GladeInput<T> {
   void _onTextControllerChange() {
     final converter = stringToValueConverter ?? _defaultConverter;
 
+    final shouldTriggerOnNextChange = _controllerTriggersOnChange;
+    _controllerTriggersOnChange = true;
+
     try {
       final convertedValue = converter.convert(controller?.text);
-      _setValue(convertedValue, shouldTriggerOnChange: _controllerTriggersOnChange);
+      
+      _setValue(convertedValue, shouldTriggerOnChange: shouldTriggerOnNextChange);
     } on ConvertError<T> catch (e) {
       _conversionError = e;
     }
