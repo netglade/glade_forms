@@ -3,19 +3,20 @@
 import 'package:glade_forms/src/core/error/glade_input_error.dart';
 import 'package:glade_forms/src/core/input_dependencies.dart';
 
-typedef ErrorTranslator<T> = String Function(
-  /// Error to translate.
-  GladeInputError<T> error,
+typedef ErrorTranslator<T> =
+    String Function(
+      /// Error to translate.
+      GladeInputError<T> error,
 
-  /// An error identification.
-  Object? key,
+      /// An error identification.
+      Object? key,
 
-  /// Default dev message.
-  String devMessage,
+      /// Default dev message.
+      String devMessage,
 
-  /// Input's dependencies.
-  InputDependencies dependencies,
-);
+      /// Input's dependencies.
+      InputDependencies dependencies,
+    );
 
 class DefaultTranslations {
   /// Used when one of values `GladeErrorKeys.valueIsEmpty`,`GladeErrorKeys.valueIsNull`, `GladeErrorKeys.stringEmpty` is present.

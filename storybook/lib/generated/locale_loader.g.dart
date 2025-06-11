@@ -6,7 +6,7 @@ import 'dart:ui';
 
 import 'package:easy_localization/easy_localization.dart' show AssetLoader;
 
-class CodegenLoader extends AssetLoader{
+class CodegenLoader extends AssetLoader {
   const CodegenLoader();
 
   @override
@@ -14,19 +14,13 @@ class CodegenLoader extends AssetLoader{
     return Future.value(mapLocales[locale.toString()]);
   }
 
-  static const Map<String,dynamic> cs_CZ = {
-  "ageRestriction": {
-    "under18": "Musí vám být alespoň 18 let pro vstup",
-    "ageFormat": "Věk musí být číslo"
-  },
-  "empty": "Povinná hodnota"
-};
-static const Map<String,dynamic> en_US = {
-  "ageRestriction": {
-    "under18": "You must be at least 18 years old for entry",
-    "ageFormat": "Age has to be number"
-  },
-  "empty": "You must fill in value"
-};
-static const Map<String, Map<String,dynamic>> mapLocales = {"cs_CZ": cs_CZ, "en_US": en_US};
+  static const Map<String, dynamic> cs_CZ = {
+    "ageRestriction": {"under18": "Musí vám být alespoň 18 let pro vstup", "ageFormat": "Věk musí být číslo"},
+    "empty": "Povinná hodnota",
+  };
+  static const Map<String, dynamic> en_US = {
+    "ageRestriction": {"under18": "You must be at least 18 years old for entry", "ageFormat": "Age has to be number"},
+    "empty": "You must fill in value",
+  };
+  static const Map<String, Map<String, dynamic>> mapLocales = {"cs_CZ": cs_CZ, "en_US": en_US};
 }

@@ -164,21 +164,22 @@ class GladeInput<T> {
     ValueTransform<T>? valueTransform,
     this.defaultTranslations,
     this.trackUnchanged = true,
-  })  : assert(
-          value != null || initialValue != null || TypeHelper.typeIsNullable<T>(),
-          'If type is not nullable, at least one of value or initialValue must be set (affected input: $inputKey)',
-        ),
-        _isPure = isPure,
-        _value = (value ?? initialValue) as T,
-        _initialValue = initialValue,
-        dependenciesFactory = dependencies ?? (() => []),
-        inputKey = inputKey ?? '__${T.runtimeType}__${Random().nextInt(100000000)}',
-        _valueTransform = valueTransform,
+  }) : assert(
+         value != null || initialValue != null || TypeHelper.typeIsNullable<T>(),
+         'If type is not nullable, at least one of value or initialValue must be set (affected input: $inputKey)',
+       ),
+       _isPure = isPure,
+       _value = (value ?? initialValue) as T,
+       _initialValue = initialValue,
+       dependenciesFactory = dependencies ?? (() => []),
+       inputKey = inputKey ?? '__${T.runtimeType}__${Random().nextInt(100_000_000)}',
+       _valueTransform = valueTransform,
 
-        // ignore: avoid_bool_literals_in_conditional_expressions, cant be simplified.
-        _useTextEditingController = textEditingController != null ? true : useTextEditingController {
+       // ignore: avoid_bool_literals_in_conditional_expressions, cant be simplified.
+       _useTextEditingController = textEditingController != null ? true : useTextEditingController {
     final defaultValue = (value ?? initialValue) as T;
-    _textEditingController = textEditingController ??
+    _textEditingController =
+        textEditingController ??
         (useTextEditingController
             ? TextEditingController(
                 text: switch (defaultValue) {
@@ -214,25 +215,24 @@ class GladeInput<T> {
     ValueTransform<T>? valueTransform,
     DefaultTranslations? defaultTranslations,
     bool trackUnchanged = true,
-  }) =>
-      GladeInput.internalCreate(
-        validatorInstance: validator?.call(GladeValidator()) ?? GladeValidator<T>().build(),
-        inputKey: inputKey,
-        value: value,
-        initialValue: initialValue,
-        isPure: isPure,
-        translateError: translateError,
-        valueComparator: valueComparator,
-        stringToValueConverter: stringToValueConverter,
-        dependencies: dependencies,
-        onChange: onChange,
-        onDependencyChange: onDependencyChange,
-        textEditingController: textEditingController,
-        useTextEditingController: useTextEditingController,
-        valueTransform: valueTransform,
-        defaultTranslations: defaultTranslations,
-        trackUnchanged: trackUnchanged,
-      );
+  }) => GladeInput.internalCreate(
+    validatorInstance: validator?.call(GladeValidator()) ?? GladeValidator<T>().build(),
+    inputKey: inputKey,
+    value: value,
+    initialValue: initialValue,
+    isPure: isPure,
+    translateError: translateError,
+    valueComparator: valueComparator,
+    stringToValueConverter: stringToValueConverter,
+    dependencies: dependencies,
+    onChange: onChange,
+    onDependencyChange: onDependencyChange,
+    textEditingController: textEditingController,
+    useTextEditingController: useTextEditingController,
+    valueTransform: valueTransform,
+    defaultTranslations: defaultTranslations,
+    trackUnchanged: trackUnchanged,
+  );
 
   ///
   /// Useful for input which allows null value without additional validations.
@@ -254,25 +254,24 @@ class GladeInput<T> {
     bool useTextEditingController = false,
     ValueTransform<T>? valueTransform,
     bool trackUnchanged = true,
-  }) =>
-      GladeInput.create(
-        validator: (v) => v.build(),
-        value: value ?? initialValue,
-        initialValue: initialValue,
-        translateError: translateError,
-        defaultTranslations: defaultTranslations,
-        valueComparator: valueComparator,
-        stringToValueConverter: stringToValueConverter,
-        inputKey: inputKey,
-        isPure: pure,
-        dependencies: dependencies,
-        onChange: onChange,
-        onDependencyChange: onDependencyChange,
-        textEditingController: textEditingController,
-        useTextEditingController: useTextEditingController,
-        valueTransform: valueTransform,
-        trackUnchanged: trackUnchanged,
-      );
+  }) => GladeInput.create(
+    validator: (v) => v.build(),
+    value: value ?? initialValue,
+    initialValue: initialValue,
+    translateError: translateError,
+    defaultTranslations: defaultTranslations,
+    valueComparator: valueComparator,
+    stringToValueConverter: stringToValueConverter,
+    inputKey: inputKey,
+    isPure: pure,
+    dependencies: dependencies,
+    onChange: onChange,
+    onDependencyChange: onDependencyChange,
+    textEditingController: textEditingController,
+    useTextEditingController: useTextEditingController,
+    valueTransform: valueTransform,
+    trackUnchanged: trackUnchanged,
+  );
 
   /// Predefined GenericInput with predefined `notNull` validation.
   ///
@@ -293,25 +292,24 @@ class GladeInput<T> {
     bool useTextEditingController = false,
     ValueTransform<T>? valueTransform,
     bool trackUnchanged = true,
-  }) =>
-      GladeInput.create(
-        validator: (v) => (v..notNull()).build(),
-        value: value,
-        initialValue: initialValue,
-        translateError: translateError,
-        defaultTranslations: defaultTranslations,
-        valueComparator: valueComparator,
-        stringToValueConverter: stringToValueConverter,
-        inputKey: inputKey,
-        isPure: pure,
-        dependencies: dependencies,
-        onChange: onChange,
-        onDependencyChange: onDependencyChange,
-        textEditingController: textEditingController,
-        useTextEditingController: useTextEditingController,
-        valueTransform: valueTransform,
-        trackUnchanged: trackUnchanged,
-      );
+  }) => GladeInput.create(
+    validator: (v) => (v..notNull()).build(),
+    value: value,
+    initialValue: initialValue,
+    translateError: translateError,
+    defaultTranslations: defaultTranslations,
+    valueComparator: valueComparator,
+    stringToValueConverter: stringToValueConverter,
+    inputKey: inputKey,
+    isPure: pure,
+    dependencies: dependencies,
+    onChange: onChange,
+    onDependencyChange: onDependencyChange,
+    textEditingController: textEditingController,
+    useTextEditingController: useTextEditingController,
+    valueTransform: valueTransform,
+    trackUnchanged: trackUnchanged,
+  );
 
   @internal
   // ignore: use_setters_to_change_properties, as method.
@@ -531,7 +529,7 @@ class GladeInput<T> {
 
     try {
       final convertedValue = converter.convert(controller?.text);
-      
+
       _setValue(convertedValue, shouldTriggerOnChange: shouldTriggerOnNextChange);
     } on ConvertError<T> catch (e) {
       _conversionError = e;
@@ -613,15 +611,17 @@ class GladeInput<T> {
           .join(delimiter);
     }
 
-    return inputErrors.errors.map((e) {
-      if (defaultTranslationsTmp != null &&
-          (e.isNullError || e.hasStringEmptyOrNullErrorKey || e.hasNullValueOrEmptyValueKey)) {
-        return defaultTranslationsTmp.defaultValueIsNullOrEmptyMessage ?? e.toString();
-      } else if (this._bindedModel case final model?) {
-        return model.defaultErrorTranslate(e, e.key, e.devErrorMessage, dependenciesFactory());
-      }
+    return inputErrors.errors
+        .map((e) {
+          if (defaultTranslationsTmp != null &&
+              (e.isNullError || e.hasStringEmptyOrNullErrorKey || e.hasNullValueOrEmptyValueKey)) {
+            return defaultTranslationsTmp.defaultValueIsNullOrEmptyMessage ?? e.toString();
+          } else if (this._bindedModel case final model?) {
+            return model.defaultErrorTranslate(e, e.key, e.devErrorMessage, dependenciesFactory());
+          }
 
-      return e.toString();
-    }).join(delimiter);
+          return e.toString();
+        })
+        .join(delimiter);
   }
 }

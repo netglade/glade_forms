@@ -1,3 +1,7 @@
+## 4.1.0
+- Require Dart SDK 3.8.0 (Flutter 3.32).
+- Adhere to netglade_analysis 17.0.0
+
 ## 4.0.1
 - Fix `input.updateValue` `shouldTriggerOnChange` parameter, so now next updates already trigger `onChange`.
   - Add tests.
@@ -34,8 +38,6 @@
 - **Added** Add several extension methods on List of GladeInputError such as `hasErrorKey()`.
 - **Fixed** Input did not propagate initialValue into TextEditingController.
 - **Fixed** Fix nullability value in `devError` callback in validator.
-
-
 
 ## 3.1.1
 - Add typedefs `IntInput` and `BooleanInput`

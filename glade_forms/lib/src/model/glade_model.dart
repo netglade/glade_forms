@@ -27,7 +27,8 @@ abstract class GladeModel extends ChangeNotifier {
   /// Input is unchanged if its value is same as initial value, even if value was updated into initial value.
   bool get isUnchanged => inputs.where((input) => input.trackUnchanged).every((input) => input.isUnchanged);
 
-  ErrorTranslator<Object?> get defaultErrorTranslate => (error, key, devMessage, dependencies) => devMessage;
+  ErrorTranslator<Object?> get defaultErrorTranslate =>
+      (error, key, devMessage, dependencies) => devMessage;
 
   /// Currently tracked inputs by GladeModel.
   ///
@@ -56,7 +57,8 @@ abstract class GladeModel extends ChangeNotifier {
       .join('\n');
 
   /// Formats errors from `inputs` with debug information.
-  String get debugFormattedValidationErrors => inputs.map((e) {
+  String get debugFormattedValidationErrors => inputs
+      .map((e) {
         if (e.hasConversionError) return '${e.inputKey} - CONVERSION ERROR';
 
         if (e.validatorResult.isNotValid) {
@@ -64,7 +66,8 @@ abstract class GladeModel extends ChangeNotifier {
         }
 
         return '${e.inputKey} - VALID';
-      }).join('\n');
+      })
+      .join('\n');
 
   List<Object?> get errors => inputs.map((e) => e.validatorResult).toList();
 

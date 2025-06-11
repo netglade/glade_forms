@@ -16,8 +16,7 @@ class GladeFormBuilder<M extends GladeModel> extends StatelessWidget {
     required GladeFormWidgetBuilder<M> builder,
     Key? key,
     Widget? child,
-  }) =>
-      GladeFormBuilder._(builder: builder, key: key, child: child);
+  }) => GladeFormBuilder._(builder: builder, key: key, child: child);
 
   const GladeFormBuilder._({
     required this.builder,
@@ -32,26 +31,24 @@ class GladeFormBuilder<M extends GladeModel> extends StatelessWidget {
     required GladeFormWidgetBuilder<M> builder,
     Widget? child,
     Key? key,
-  }) =>
-      GladeFormBuilder._(
-        builder: builder,
-        create: create,
-        key: key,
-        child: child,
-      );
+  }) => GladeFormBuilder._(
+    builder: builder,
+    create: create,
+    key: key,
+    child: child,
+  );
 
   factory GladeFormBuilder.value({
     required GladeFormWidgetBuilder<M> builder,
     required M value,
     Widget? child,
     Key? key,
-  }) =>
-      GladeFormBuilder._(
-        builder: builder,
-        value: value,
-        key: key,
-        child: child,
-      );
+  }) => GladeFormBuilder._(
+    builder: builder,
+    value: value,
+    key: key,
+    child: child,
+  );
 
   @override
   Widget build(BuildContext context) {

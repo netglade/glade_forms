@@ -206,8 +206,9 @@ class _Table extends StatelessWidget {
   Widget build(BuildContext context) {
     final inputs = model.inputs.where((element) => !hiddenKeys.contains(element.inputKey));
     final rowColor = Theme.of(context).colorScheme.surface;
-    final alternativeRowColor =
-        MediaQuery.platformBrightnessOf(context) == Brightness.dark ? rowColor.lighten() : rowColor.darken();
+    final alternativeRowColor = MediaQuery.platformBrightnessOf(context) == Brightness.dark
+        ? rowColor.lighten()
+        : rowColor.darken();
 
     return Table(
       defaultColumnWidth: scrollable ? const IntrinsicColumnWidth() : const FlexColumnWidth(),
@@ -215,7 +216,10 @@ class _Table extends StatelessWidget {
       children: [
         // Columns header.
         TableRow(
-          decoration: BoxDecoration(color: Theme.of(context).canvasColor, border: const Border(bottom: BorderSide())),
+          decoration: BoxDecoration(
+            color: Theme.of(context).canvasColor,
+            border: const Border(bottom: BorderSide()),
+          ),
           children: [
             const _ColumnHeader('Input'),
             if (showIsUnchanged) const _ColumnHeader('isUnchanged'),
@@ -258,7 +262,10 @@ class _ColumnHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(padding: const EdgeInsets.only(left: 10), child: Center(child: Text(label)));
+    return Padding(
+      padding: const EdgeInsets.only(left: 10),
+      child: Center(child: Text(label)),
+    );
   }
 }
 

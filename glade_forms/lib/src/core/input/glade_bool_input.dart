@@ -1,4 +1,7 @@
-import 'package:glade_forms/glade_forms.dart';
+import 'package:glade_forms/src/converters/converters.dart';
+import 'package:glade_forms/src/core/input/glade_input.dart';
+import 'package:glade_forms/src/core/string_to_type_converter.dart';
+import 'package:glade_forms/src/validator/glade_validator.dart';
 
 /// A [GladeInput] for [bool] values.
 ///
@@ -23,9 +26,9 @@ class GladeBoolInput extends GladeInput<bool> {
     super.trackUnchanged = true,
     bool isRequired = true,
   }) : super.internalCreate(
-          stringToValueConverter: stringToValueConverter ?? GladeTypeConverters.boolConverter,
-          validatorInstance: isRequired
-              ? (validator?.call(GladeValidator<bool>()..notNull()) ?? (GladeValidator<bool>()..notNull()).build())
-              : (validator?.call(GladeValidator()) ?? GladeValidator<bool>().build()),
-        );
+         stringToValueConverter: stringToValueConverter ?? GladeTypeConverters.boolConverter,
+         validatorInstance: isRequired
+             ? (validator?.call(GladeValidator<bool>()..notNull()) ?? (GladeValidator<bool>()..notNull()).build())
+             : (validator?.call(GladeValidator()) ?? GladeValidator<bool>().build()),
+       );
 }
