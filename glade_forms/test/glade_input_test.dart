@@ -186,7 +186,7 @@ void main() {
     });
 
     test(
-      'when updateValue is called with shouldTriggerOnChange: false then onChange is called not called',
+      'when updateValue is called with shouldTriggerOnChange: false then onChange is not called',
       () {
         // Arrange
         final changes = <String>[];
