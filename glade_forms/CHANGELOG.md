@@ -1,3 +1,8 @@
+## 4.0.1
+- Fix `input.updateValue` `shouldTriggerOnChange` parameter, so now next updates already trigger `onChange`.
+  - Add tests.
+- Fix code so it is valid Dart 3.6.0 (Flutter 3.27).
+
 ## 4.0.0
 
 **Breaking change release**
