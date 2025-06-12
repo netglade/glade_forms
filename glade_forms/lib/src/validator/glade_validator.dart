@@ -17,8 +17,7 @@ class GladeValidator<T> {
     ///
     /// Beware that some validators assume non-null value.
     bool stopOnFirstError = true,
-  }) =>
-      ValidatorInstance(parts: parts, stopOnFirstError: stopOnFirstError);
+  }) => ValidatorInstance(parts: parts, stopOnFirstError: stopOnFirstError);
 
   /// Clears all validation parts.
   void clear() => parts = [];
@@ -56,15 +55,14 @@ class GladeValidator<T> {
     OnValidateError<T>? devError,
     Object? key,
     ShouldValidateCallback<T>? shouldValidate,
-  }) =>
-      parts.add(
-        SatisfyPredicatePart(
-          predicate: predicate,
-          devError: devError ?? (value) => 'Value ${value ?? 'NULL'} does not satisfy given predicate.',
-          key: key,
-          shouldValidate: shouldValidate,
-        ),
-      );
+  }) => parts.add(
+    SatisfyPredicatePart(
+      predicate: predicate,
+      devError: devError ?? (value) => 'Value ${value ?? 'NULL'} does not satisfy given predicate.',
+      key: key,
+      shouldValidate: shouldValidate,
+    ),
+  );
 
   /// Checks value with custom validation function.
   void _customInternal(ValidateFunction<T> onValidate, {Object? key, ShouldValidateCallback<T>? shouldValidate}) =>

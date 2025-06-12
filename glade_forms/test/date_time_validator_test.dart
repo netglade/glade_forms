@@ -71,10 +71,11 @@ void main() {
       test(
         '($index): $testDate should be valid between $start - $end when testing inclusive and with included time',
         () {
-          final validator = (DateTimeValidator()
-                // ignore: avoid_redundant_argument_values, be explicit in tests.
-                ..isBetween(start: start, end: end, includeTime: true, inclusiveInterval: true))
-              .build();
+          final validator =
+              (DateTimeValidator()
+                    // ignore: avoid_redundant_argument_values, be explicit in tests.
+                    ..isBetween(start: start, end: end, includeTime: true, inclusiveInterval: true))
+                  .build();
 
           final result = validator.validate(testDate);
 
@@ -150,14 +151,13 @@ void main() {
       test(
         '($index): $testDate should be valid between $start - $end when testing inclusive and but without included time',
         () {
-          final validator = (DateTimeValidator()
-                ..isBetween(
-                  start: start,
-                  end: end,
-                  // ignore: avoid_redundant_argument_values, be explcit in tests.,
-                  includeTime: false,
-                ))
-              .build();
+          final validator =
+              (DateTimeValidator()..isBetween(
+                    start: start,
+                    end: end,
+                    includeTime: false,
+                  ))
+                  .build();
 
           final result = validator.validate(testDate);
 
@@ -233,15 +233,14 @@ void main() {
       test(
         '($index): $testDate should be valid between $start - $end when testing without inclusive and without included time',
         () {
-          final validator = (DateTimeValidator()
-                // ignore: avoid_redundant_argument_values, be explicit in tests.
-                ..isBetween(
-                  start: start,
-                  end: end,
-                  includeTime: false,
-                  inclusiveInterval: false,
-                ))
-              .build();
+          final validator =
+              (DateTimeValidator()..isBetween(
+                    start: start,
+                    end: end,
+                    includeTime: false,
+                    inclusiveInterval: false,
+                  ))
+                  .build();
 
           final result = validator.validate(testDate);
 
@@ -317,15 +316,15 @@ void main() {
       test(
         '($index): $testDate should be valid between $start - $end when testing without inclusive but with included time',
         () {
-          final validator = (DateTimeValidator()
-                ..isBetween(
-                  start: start,
-                  end: end,
-                  inclusiveInterval: false,
-                  // ignore: avoid_redundant_argument_values, be explicit
-                  includeTime: true,
-                ))
-              .build();
+          final validator =
+              (DateTimeValidator()..isBetween(
+                    start: start,
+                    end: end,
+                    inclusiveInterval: false,
+                    // ignore: avoid_redundant_argument_values, be explicit
+                    includeTime: true,
+                  ))
+                  .build();
 
           final result = validator.validate(testDate);
 
@@ -503,8 +502,8 @@ void main() {
       test(
         '($index): $testDate should be valid after $start when testing exclusive and without included time',
         () {
-          final validator =
-              (DateTimeValidator()..isAfter(start: start, includeTime: false, inclusiveInterval: false)).build();
+          final validator = (DateTimeValidator()..isAfter(start: start, includeTime: false, inclusiveInterval: false))
+              .build();
 
           final result = validator.validate(testDate);
 
@@ -670,8 +669,8 @@ void main() {
       test(
         '($index): $testDate should be valid before $end when testing exclusive and without included time',
         () {
-          final validator =
-              (DateTimeValidator()..isBefore(end: end, includeTime: false, inclusiveInterval: false)).build();
+          final validator = (DateTimeValidator()..isBefore(end: end, includeTime: false, inclusiveInterval: false))
+              .build();
 
           final result = validator.validate(testDate);
 

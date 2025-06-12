@@ -1,4 +1,4 @@
-abstract class RegexPatterns {
+abstract final class RegexPatterns {
   /// Email regex pattern.
   static const email = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
 

@@ -3,15 +3,17 @@ import 'package:glade_forms/src/core/error/glade_error_keys.dart';
 
 typedef OnErrorCallback<T> = ConvertError<T> Function(String? rawValue, Object error);
 
-typedef ConverterToType<T> = T Function(
-  String? rawInput,
-  T Function(
-    Object error, {
-    required String? rawValue,
-    Object? key,
-    OnConvertError? onError,
-  }) cantConvert,
-);
+typedef ConverterToType<T> =
+    T Function(
+      String? rawInput,
+      T Function(
+        Object error, {
+        required String? rawValue,
+        Object? key,
+        OnConvertError? onError,
+      })
+      cantConvert,
+    );
 
 typedef TypeConverterToString<T> = String? Function(T rawInput);
 
@@ -31,8 +33,8 @@ class StringToTypeConverter<T> {
     /// Converts [T] back to string.
     TypeConverterToString<T>? converterBack,
     //OnErrorCallback<T>? onError,
-  })  : _converterBack = converterBack ?? ((rawInput) => rawInput?.toString() ?? ''),
-        onError = ((rawValue, error) => ConvertError<T>(input: rawValue, error: error));
+  }) : _converterBack = converterBack ?? ((rawInput) => rawInput?.toString() ?? ''),
+       onError = ((rawValue, error) => ConvertError<T>(input: rawValue, error: error));
 
   /// Converts string input into `T` value.
   T convert(String? input) {
@@ -41,9 +43,7 @@ class StringToTypeConverter<T> {
     } on ConvertError<T> {
       // If _cantConvert were used -> we already thrown an Error.
       rethrow;
-    }
-    // ignore: avoid_catches_without_on_clauses, has to be generic to catch everything
-    catch (e) {
+    } catch (e) {
       // ignore: avoid-throw-in-catch-block, this method should throw custom exception
       throw onError(input, e);
     }
@@ -57,11 +57,10 @@ class StringToTypeConverter<T> {
     required String? rawValue,
     Object? key,
     OnConvertError? onError,
-  }) =>
-      throw ConvertError<T>(
-        input: rawValue,
-        formatError: onError,
-        error: error,
-        key: key ?? GladeErrorKeys.conversionError,
-      );
+  }) => throw ConvertError<T>(
+    input: rawValue,
+    formatError: onError,
+    error: error,
+    key: key ?? GladeErrorKeys.conversionError,
+  );
 }

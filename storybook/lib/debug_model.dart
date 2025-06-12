@@ -35,10 +35,11 @@ class AgeRestrictedModel extends GladeModel {
       trackUnchanged: false,
     );
     ageInput = GladeIntInput(
-      validator: (v) => (v
-            ..notNull()
-            ..isMin(min: 18, shouldValidate: (_) => vipInput.value))
-          .build(),
+      validator: (v) =>
+          (v
+                ..notNull()
+                ..isMin(min: 18, shouldValidate: (_) => vipInput.value))
+              .build(),
       value: 0,
       dependencies: () => [vipInput],
       stringToValueConverter: GladeTypeConverters.intConverter,

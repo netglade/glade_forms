@@ -85,7 +85,7 @@ class _CodeSample extends HookWidget {
             Container(
               alignment: Alignment.topRight,
               padding: const EdgeInsets.all(8),
-            
+
               child: Padding(
                 padding: const EdgeInsets.all(8),
                 child: SizedBox(
@@ -96,8 +96,9 @@ class _CodeSample extends HookWidget {
                     onPressed: () {
                       // ignore: avoid-async-call-in-sync-function, avoid-non-null-assertion , ok here
                       Clipboard.setData(ClipboardData(text: getFileFuture.data!));
-                      final _ = ScaffoldMessenger.of(context)
-                          .showSnackBar(const SnackBar(content: Text('Code copied to clipboad')));
+                      final _ = ScaffoldMessenger.of(
+                        context, // ignore: unnecessary-trailing-comma, false positive
+                      ).showSnackBar(const SnackBar(content: Text('Code copied to clipboad')));
                     },
                     icon: const Icon(Icons.code),
                     label: const Text('Copy code'),

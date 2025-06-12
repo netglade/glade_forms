@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:glade_forms/src/model/glade_model.dart';
 import 'package:provider/provider.dart';
 
-typedef GladeFormListenerFn<M extends GladeModel> = void Function(
-  BuildContext context,
-  M model,
-  List<String> lastUpdatedInputKey,
-);
+typedef GladeFormListenerFn<M extends GladeModel> =
+    void Function(
+      BuildContext context,
+      M model,
+      List<String> lastUpdatedInputKey,
+    );
 
 class GladeFormListener<M extends GladeModel> extends StatefulWidget {
   final Widget child;

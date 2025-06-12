@@ -28,10 +28,10 @@ class GladeStringInput extends GladeInput<String> {
     super.trackUnchanged = true,
     bool isRequired = true,
   }) : super.internalCreate(
-          value: value ?? initialValue ?? '',
-          initialValue: initialValue ?? '',
-          validatorInstance: isRequired
-              ? (validator?.call(StringValidator()..notEmpty()) ?? (StringValidator()..notEmpty()).build())
-              : (validator?.call(StringValidator()) ?? StringValidator().build()),
-        );
+         value: value ?? initialValue ?? '',
+         initialValue: initialValue ?? '',
+         validatorInstance: isRequired
+             ? (validator?.call(StringValidator()..notEmpty()) ?? (StringValidator()..notEmpty()).build())
+             : (validator?.call(StringValidator()) ?? StringValidator().build()),
+       );
 }

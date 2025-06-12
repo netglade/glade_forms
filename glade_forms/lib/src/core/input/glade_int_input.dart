@@ -32,11 +32,11 @@ class GladeIntInput extends GladeInput<int> {
     super.trackUnchanged = true,
     bool isRequired = true,
   }) : super.internalCreate(
-          stringToValueConverter: stringToValueConverter ?? GladeTypeConverters.intConverter,
-          validatorInstance: isRequired
-              ? (validator?.call(IntValidator()..notNull()) ?? (IntValidator()..notNull()).build())
-              : (validator?.call(IntValidator()) ?? IntValidator().build()),
-        );
+         stringToValueConverter: stringToValueConverter ?? GladeTypeConverters.intConverter,
+         validatorInstance: isRequired
+             ? (validator?.call(IntValidator()..notNull()) ?? (IntValidator()..notNull()).build())
+             : (validator?.call(IntValidator()) ?? IntValidator().build()),
+       );
 }
 
 /// A [GladeInput] for [int?] values.
@@ -66,9 +66,9 @@ class GladeIntInputNullable extends GladeInput<int?> {
     super.trackUnchanged = true,
     bool isRequired = false,
   }) : super.internalCreate(
-          stringToValueConverter: stringToValueConverter ?? GladeTypeConverters.intConverterNullable,
-          validatorInstance: isRequired
-              ? (validator?.call(IntValidatorNullable()..notNull()) ?? (IntValidatorNullable()..notNull()).build())
-              : (validator?.call(IntValidatorNullable()) ?? IntValidatorNullable().build()),
-        );
+         stringToValueConverter: stringToValueConverter ?? GladeTypeConverters.intConverterNullable,
+         validatorInstance: isRequired
+             ? (validator?.call(IntValidatorNullable()..notNull()) ?? (IntValidatorNullable()..notNull()).build())
+             : (validator?.call(IntValidatorNullable()) ?? IntValidatorNullable().build()),
+       );
 }

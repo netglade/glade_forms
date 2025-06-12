@@ -29,8 +29,8 @@ class ConvertError<T> extends GladeInputError<T> with EquatableMixin implements 
     required this.input,
     super.key,
     OnConvertError? formatError,
-  })  : _convertError = error,
-        devError = formatError ?? ((rawValue, {key}) => 'Conversion error: $error');
+  }) : _convertError = error,
+       devError = formatError ?? ((rawValue, {key}) => 'Conversion error: $error');
 
   @override
   String toString() => devError(input, key: key);

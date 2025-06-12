@@ -25,9 +25,10 @@ abstract class GladeValidatorError<T> extends GladeInputError<T> with EquatableM
     required this.value,
     required super.key,
     OnValidateError<T>? devError,
-  }) : devError = devError ??
-            ((v) =>
-                'Value "${v ?? 'NULL'}" does not satisfy validation. [This is default validation meessage. Use `devError` to customize validation errors]');
+  }) : devError =
+           devError ??
+           ((v) =>
+               'Value "${v ?? 'NULL'}" does not satisfy validation. [This is default validation meessage. Use `devError` to customize validation errors]');
 
   @override
   String toString() {

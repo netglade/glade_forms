@@ -4,7 +4,7 @@ version: 1.0.0
 publish_to: none
 
 environment:
-  sdk: ^3.6.0
+  sdk: ^3.8.0
 resolution: workspace
 
 dependencies:
@@ -22,7 +22,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  netglade_analysis: ^15.0.0
+  netglade_analysis: ^17.0.0
 
 flutter:
   uses-material-design: true
