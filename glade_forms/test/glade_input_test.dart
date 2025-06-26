@@ -278,7 +278,7 @@ void main() {
   });
 
   group('TransformValue', () {
-    test('No trasnformaValue sets updated value', () {
+    test('No transformValue sets updated value', () {
       final input = GladeInput<int>.create(value: 0);
 
       // Act
