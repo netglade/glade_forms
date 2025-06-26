@@ -276,4 +276,30 @@ void main() {
       expect(input.isPure, isTrue);
     });
   });
+
+  group('TransformValue', () {
+    test('With non-nullable type returns transformed value', () {
+      final input = GladeInput<int>.create(
+        value: 0,
+        valueTransform: (value) => value * 2,
+      );
+
+      // Act
+      input.updateValue(5);
+
+      expect(input.value, equals(10));
+    });
+
+    test('With nullable type and passed null return original value', () {
+      final input = GladeInput<int?>.create(
+        value: 2,
+        valueTransform: (value) => value == 4 ? null : 20,
+      );
+
+      // Act
+      input.updateValue(4);
+
+      expect(input.value, equals(2));
+    });
+  });
 }

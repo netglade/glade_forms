@@ -531,7 +531,7 @@ class GladeInput<T> {
 
     try {
       final convertedValue = converter.convert(controller?.text);
-      
+
       _setValue(convertedValue, shouldTriggerOnChange: shouldTriggerOnNextChange);
     } on ConvertError<T> catch (e) {
       _conversionError = e;
@@ -540,7 +540,10 @@ class GladeInput<T> {
 
   void _setValue(T value, {required bool shouldTriggerOnChange}) {
     _previousValue = _value;
-    _value = _valueTransform?.call(value) ?? value;
+
+    if (_valueTransform != null) {
+      _value = TypeHelper.typeIsNullable<T>() ? _valueTransform(value) : (_valueTransform(value) ?? value);
+    }
 
     _isPure = false;
     __conversionError = null;
