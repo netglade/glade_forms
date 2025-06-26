@@ -541,8 +541,11 @@ class GladeInput<T> {
   void _setValue(T value, {required bool shouldTriggerOnChange}) {
     _previousValue = _value;
 
+    // ignore: prefer-conditional-expressions, keep explicit if-else
     if (_valueTransform != null) {
       _value = TypeHelper.typeIsNullable<T>() ? _valueTransform(value) : (_valueTransform(value) ?? value);
+    } else {
+      _value = value;
     }
 
     _isPure = false;

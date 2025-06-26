@@ -278,6 +278,24 @@ void main() {
   });
 
   group('TransformValue', () {
+    test('No trasnformaValue sets updated value', () {
+      final input = GladeInput<int>.create(value: 0);
+
+      // Act
+      input.updateValue(5);
+
+      expect(input.value, equals(5));
+    });
+
+    test('No trasnformaValue in NullabeType sets updated value to null', () {
+      final input = GladeInput<int?>.create(value: 2);
+
+      // Act
+      input.updateValue(null);
+
+      expect(input.value, isNull);
+    });
+
     test('With non-nullable type returns transformed value', () {
       final input = GladeInput<int>.create(
         value: 0,
