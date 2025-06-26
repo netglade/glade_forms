@@ -290,7 +290,7 @@ void main() {
       expect(input.value, equals(10));
     });
 
-    test('With nullable type and passed null return original value', () {
+    test('With nullable type and passed null return null', () {
       final input = GladeInput<int?>.create(
         value: 2,
         valueTransform: (value) => value == 4 ? null : 20,
@@ -299,7 +299,19 @@ void main() {
       // Act
       input.updateValue(4);
 
-      expect(input.value, equals(2));
+      expect(input.value, equals(null));
+    });
+
+    test('With nullable type and passed value returns transformed value', () {
+      final input = GladeInput<int?>.create(
+        value: 2,
+        valueTransform: (value) => value == 4 ? null : 20,
+      );
+
+      // Act
+      input.updateValue(10);
+
+      expect(input.value, equals(20));
     });
   });
 }
