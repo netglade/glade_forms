@@ -287,7 +287,7 @@ void main() {
       expect(input.value, equals(5));
     });
 
-    test('No trasnformaValue in NullabeType sets updated value to null', () {
+    test('No transformValue in nullable type sets updated value to null', () {
       final input = GladeInput<int?>.create(value: 2);
 
       // Act
