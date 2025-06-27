@@ -1,3 +1,6 @@
+## 4.0.2
+- **[Fix]**: Fix `ValueTransform` in nullable type does not allow null values.
+
 ## 4.0.1
 - Fix `input.updateValue` `shouldTriggerOnChange` parameter, so now next updates already trigger `onChange`.
   - Add tests.
