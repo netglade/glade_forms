@@ -1,4 +1,6 @@
+import 'package:glade_forms/src/core/error/glade_error_keys.dart';
 import 'package:glade_forms/src/core/input/glade_input.dart';
+import 'package:glade_forms/src/validator/part/satisfy_predicate_part.dart';
 import 'package:glade_forms/src/validator/specialized/string_validator.dart';
 
 /// A string input.
@@ -9,6 +11,17 @@ import 'package:glade_forms/src/validator/specialized/string_validator.dart';
 ///
 /// Creates textEditingController by default.
 class GladeStringInput extends GladeInput<String> {
+  /// Maximum length of the string if `maxLength()` standard validator is used.
+  ///
+  /// Otherwise `GladeErrorKeys.stringMaxLength` as key is needed in custom validator.
+  int? get maxLength {
+    final validator = validatorInstance.tryFindValidatorPart(GladeErrorKeys.stringMaxLength);
+
+    if (validator == null) return null;
+
+    return validator is SatisfyPredicatePart<int> ? (validator as SatisfyPredicatePart).metaData as int? : null;
+  }
+
   GladeStringInput({
     super.inputKey,
     String? value,
