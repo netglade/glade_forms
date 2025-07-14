@@ -1,3 +1,7 @@
+## 4.1.2
+- **[Add]**: Add `metaData` to `SatisfyPredicatePart` and `GladeValidator.satisfyPredicate()` to allow passing additional data.
+- **[Add]**: Add `getMaxLength()` intto `GladeStringInput` to get maximum length of the string if `maxLength()` standard validator is used.
+
 ## 4.0.2
 - **[Fix]**: Fix `ValueTransform` in nullable type does not allow null values.
 

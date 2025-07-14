@@ -56,6 +56,7 @@ class GladeValidator<T> {
     OnValidateError<T>? devError,
     Object? key,
     ShouldValidateCallback<T>? shouldValidate,
+    Object? metaData,
   }) =>
       parts.add(
         SatisfyPredicatePart(
@@ -63,6 +64,7 @@ class GladeValidator<T> {
           devError: devError ?? (value) => 'Value ${value ?? 'NULL'} does not satisfy given predicate.',
           key: key,
           shouldValidate: shouldValidate,
+          metaData: metaData,
         ),
       );
 

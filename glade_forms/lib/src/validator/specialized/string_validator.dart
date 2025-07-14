@@ -149,6 +149,7 @@ class StringValidator extends GladeValidator<String> {
         devError: devError ?? (value) => 'Value "$value " is longer than allowed length $length',
         key: key ?? GladeErrorKeys.stringMaxLength,
         shouldValidate: shouldValidate,
+        metaData: length,
       );
 
   /// String's length has to be equal to provided [length].

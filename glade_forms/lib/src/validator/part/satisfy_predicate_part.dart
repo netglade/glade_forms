@@ -10,11 +10,15 @@ class SatisfyPredicatePart<T> extends InputValidatorPart<T> {
   // ignore: prefer-correct-callback-field-name, ok name
   final SatisfyPredicate<T> predicate;
 
+  // ignore: no-object-declaration, metaData can be any object
+  final Object? metaData;
+
   const SatisfyPredicatePart({
     required this.predicate,
     required this.devError,
     super.key,
     super.shouldValidate,
+    this.metaData,
   });
 
   @override
