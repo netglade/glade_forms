@@ -1,6 +1,10 @@
 {
   "name": "Glade Forms Documentation",
   "description": "Documentation for Glade Forms",
+  "logo": {
+    "light": "/assets/icon.png",
+    "dark": "/assets/icon.png"
+  },
   "sidebar": [
     {
       "group": "Getting Started",
