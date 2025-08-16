@@ -1,0 +1,26 @@
+---
+title: Dependencies
+description: Managing dependencies in your GladeForms project.
+---
+
+An input can depend on other inputs to enable updates based on those dependencies. To define these dependencies, use the dependencies attribute. It's essential to specify inputKey on any inputs that are intended to serve as dependencies.
+
+For instance, consider a scenario where we want the "VIP Content" option to be automatically selected when the 'ageInput' is updated and its value exceeds 18.
+
+```dart
+ ageInput = GladeIntInput(
+      value: 0,
+      inputKey: 'age-input',
+ );
+ vipInput = GladeBoolInput(
+    inputKey: 'vip-input',
+    dependencies: () => [ageInput],
+    onDependencyChange: (keys) {
+      if (keys.contains('age-input')) {
+        vipInput.value = ageInput.value >= 18;
+      }
+    },
+ );
+```
+
+![dependent-validation](/assets/depend-validation.gif)
