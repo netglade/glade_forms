@@ -1,0 +1,61 @@
+{
+  "name": "Glade Forms Documentation",
+  "description": "Documentation for Glade Forms",
+  "sidebar": [
+    {
+      "group": "Getting Started",
+      "pages": [
+        {
+          "title": "Quick Start",
+          "href": "/",
+          "icon": "gauge-high"
+        },
+        {
+          "title": "GladeInput",
+          "href": "/glade-input",
+          "icon": "pencil"
+        },
+        {
+          "title": "Validations",
+          "href": "/validation",
+          "icon": "spell-check"
+        },
+        {
+          "title": "GladeModel",
+          "href": "/glade-model",
+          "icon": "boxes-stacked"
+        },
+        {
+          "title": "Translations",
+          "href": "/translations",
+          "icon": "language"
+        },
+        {
+          "title": "Flutter widgets",
+          "href": "/widgets",
+          "icon": "flutter"
+        }
+      ]
+    },
+    {
+      "group": "Advanced Topics",
+      "pages": [
+        {
+          "title": "Dependencies",
+          "href": "/advanced/dependencies",
+          "icon": "pencil"
+        },
+        {
+          "title": "Control other inputs",
+          "href": "/advanced/control-other-inputs",
+          "icon": "network-wired"
+        },
+        {
+          "title": "Debugging",
+          "href": "/advanced/debugging",
+          "icon": "bug"
+        }
+      ]
+    }
+  ]
+}

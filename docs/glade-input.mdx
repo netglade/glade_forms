@@ -1,0 +1,76 @@
+---
+title: GladeInput
+description: Building block of your form
+---
+
+### GladeInput
+
+Each form's input is represented by instance of `GladeInput<T>`. Type `T` is value held by input.
+
+For simplicity we will interchange `input` and `GladeInput<T>`.
+
+Every input is _dirty_ or _pure_ based on whether value was updated (or not, yet).
+
+On each input we can define
+
+- **inputKey** - Unique identification of each input. Used inside listeners or in dependencies.
+- **value** - Current input's value
+- **initialValue** - Initial input's value. Used with `valueComparator` and for computing `isUnchanged`.
+- **validator** - Input's value must satisfy validation to be _valid_ input.
+- **translateError** - If there are validation errors, this function is use to translate those errors.
+- **dependencies** - Each input can depend on another inputs for listening changes.
+- **stringToValueConverter** - If input is used by TextField and `T` is not a `String`, value converter should be provided.
+- **valueComparator** - Sometimes it is handy to provide `initialValue` which will be never updated after input is mutated. `valueComparator` should be provided to compare `initialValue` and `value` if `T` is not comparable type by default. Note that GladeForms handle deep equality of collections and assumes that complex types are comparable by values.
+- **valueTransform** - transform `T` value into different `T` value. An example of usage can be sanitazation of string input (e.g.: usafe of `trim()` before value is saved).
+- **defaultTranslation** - If error's translations are simple, the default translation settings can be set instead of custom `translateError` method.
+- **textEditingController** - It is possible to provide custom instance of controller instead of default one.
+- **trackUnchanged** - Setting this to false means that `GladeModel` will not include input in the `isUnchanged` property evaluation.
+- **isRequired** - If set to true, the input must be filled in order for the form to be valid. (Consult specific variant for precise meaning of this property.)
+
+Most of the time, input is created with `.create()` factory with defined validation, translation and other properties.
+
+An overview how each input's value is updated. If needed it is converted from `string` into `T`, then transformed via `valueTransform` (if provided), after that new value is set.
+
+![input-flow-example](/assets/flow-input-chart.png)
+
+Before defining your input consider to use existing input types provided by GladeForms.
+
+## Specific input types
+
+GladeForms provides several predefined input types to cover most of the use cases. These inputs comes with built-in validation and other useful features.
+
+### GladeIntInput and GladeIntInputNullable
+
+Input that holds integer values. `GladeIntInputNullable` is a variant that allows **null** values. Provides built-in string to integer conversion.
+
+Accepts specialised variant of Validator that works with integer values. This validator provides built-in checks for common integer constraints, such as isMin(), isBetween() and more.
+
+### GladeBoolInput
+
+Input that holds boolean values. Provides built-in string to boolean conversion.
+
+<Warning>There is no GladeBoolInputNullable variant as we believe that boolean values should always have a definitive true/false state.</Warning>
+
+### GladeDateTimeInput and GladeDateTimeInputNullable
+
+Input that holds date and time values. `GladeDateTimeInputNullable` is a variant that allows **null** values. Provides built-in string to date and time conversion using standard Dart `DateTime` parsing.
+
+Accepts specialised variant of Validator that works with date and time values. This validator provides built-in checks for common date and time constraints, such as isBefore(), isAfter() and more.
+
+
+### GladeStringInput
+
+Input that holds string values. 
+
+By default uses `textEditingController` (`useTextEditingController: true`).
+
+Activating the *useTextEditingController* mode for a GladeInput results in a few behavioral modifications:
+
+- The input automatically creates a TextEditingController and incorporates its own listener.
+- Whenever TextEditingController's text changes, input will automatically update its value. If StringConverter is needed it will use it.
+- Consequently, developers are advised to provide only the controller property and a validator to the widget. 
+- While the use of updateValue (or similar methods) and `resetToInitialValue()` remains possible, be aware that these actions will override the text in the controller and reset text selection and other keyboard-related features.
+
+GladeStringInput uses specialised validator that works with string values. This validator provides built-in checks for common string constraints, such as minLength(), maxLength() and more.
+
+<Warning>There is no GladeStringInputNullable variant as we believe that string values should always have a definitive value. (No difference between null and empty string).</Warning>

@@ -1,4 +1,4 @@
-abstract class GladeErrorKeys {
+abstract final class GladeErrorKeys {
   static const String conversionError = 'value-cant-be-converted';
   static const String stringEmpty = 'string-empty-error';
   static const String stringNotUrl = 'string-not-url';

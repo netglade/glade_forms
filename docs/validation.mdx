@@ -1,0 +1,85 @@
+---
+title: Defining validation
+---
+
+Validation is defined through part methods on ValidatorFactory such as `notNull()`, `satisfy()` and other parts. 
+
+Each validation rule defines
+  - **value validation**, e.g `notNull()` defines that value can not be null. `satisfy()` defines a predicate which has to be true to be valid etc. 
+  - **devErrorMessage** - a message which will be displayed if no translation is provided. 
+  - **key** - Validation error's identification. Usable for translation. 
+
+This example defines validation that `int` value can not be null and has to be greater or equal to 18.
+
+```dart
+ageInput = GladeIntInput(
+  validator: (v) => (v
+        ..notNull()
+        ..satisfy(
+          (value) => value >= 18,
+          devError: (_, __) => 'Value must be greater or equal to 18',
+          key: _ErrorKeys.ageRestriction,
+        ))
+      .build(),
+  value: 0,
+);
+```
+
+The order of each validation part matters. By default, the first failing part stops validation. Pass `stopOnFirstError: false` on `.build()` to validate all parts simultaneously.
+
+Fields connected with `textFormFieldInputValidator` will automatically call validator and validation error (if any) is passed down to fields. By default devError is used unless translation is specified. 
+
+### Skipping Specific Validation
+To conditionally skip specific validations, use the `shouldValidate` callback. If an input should be entirely excluded from validation, consider using conditional logic in the `inputs` getter.
+
+```dart
+(v
+  ..minLength(length: 2, shouldValidate: (_) => false)
+  ..maxLength(length: 6))
+  .build();
+
+// Omit input from validation if the condition is not met
+get inputs => [if (condition) input];
+```
+
+This ensures that the `minLength` validation is always skipped, while the `maxLength` validation is applied. 
+
+If the condition is met, the input is included in the validation process.
+
+### Creating custom reusable validators
+
+You have several options to create reusable validators.
+
+Most straightforward way is to extend `GladeValidator` (or specialised variant such as `StringValidator`) and add your custom validation logic.
+
+#### Creating custom part
+
+Better way is to create a custom validation part by extending `InputValidatorPart<T>` and provide that part through `customPart(part)` method.
+
+```dart
+class AgeValidatorPart extends InputValidatorPart<int> {
+  AgeValidatorPart() : super();
+
+  @override
+  bool validate(int? value) {
+    return value != null && value >= 18;
+  }
+}
+
+// Usage
+ageInput = GladeIntInput(
+  validator: (v) => (v..customPart(AgeValidatorPart())).build(),
+  value: 0,
+);
+```
+
+### Using validators without GladeInput
+
+It is possible to use GladeValidator without associated GladeInput. 
+
+Just create instance of `GladeValidator` (or specialised variant such as `StringValidator`) and use it.
+
+```dart
+final validator = (StringValidator()..notEmpty()).build();
+final result = validator.validate(null);
+```
