@@ -1,0 +1,40 @@
+---
+title: Control other inputs
+description: Controlling other inputs in your GladeForms.
+---
+
+Sometimes, it can be handy to update some input's value based on the changed value of another input. As developer you have two options.
+
+You can listen for `onChange()` callback and update other inputs based on input's changed value. An example could be automatically updating the `Age` value based on checked `VIP Content` input (checkbox).
+
+```dart
+// In vipContent input
+onChange: (info, dependencies) {
+  if (info.value && ageInput.value < 18) {
+    ageInput.value = 18;
+  }
+}
+```
+
+![two-way-inputs-example](/assets/two-way-dependencies.gif)
+
+The second approach is to use `dependencies` and `onDependencyChange` callback and react when different dependencies are changed. Note that it works with groupEdit() as well. In that case, onDependencyChange is called once for every changed dependency.
+
+In this example, when age-input update its value (dependency), checkbox's value (vipInput) is updated.
+
+```dart
+ vipInput = GladeBoolInput(
+    inputKey: 'vip-input',
+    dependencies: () => [ageInput],
+    onChange: (info) {
+      if (info.value && ageInput.value < 18) {
+        ageInput.value = 18;
+      }
+    },
+    onDependencyChange: (key) {
+      if (key.contains('age-input')) {
+        vipInput.value = ageInput.value >= 18;
+      }
+    },
+ );
+```

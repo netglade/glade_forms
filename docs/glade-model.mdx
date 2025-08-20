@@ -1,0 +1,103 @@
+---
+title: Glade Model
+description: Wiring it together
+---
+
+GladeModel is base class for GladeForm model which holds all inputs together. 
+
+It is useful for cases where you want to sum up validations at once, 
+like disabling save button until all inputs are valid. 
+
+GladeModel is `ChangeNotifier` so all dependant widgets will be rebuilt.
+
+There are **several rules** how to define models
+
+- Each input has to be **mutable** and `late` field
+- Model has to override `initialize` method where each input field is created
+- In the end of `initialize` method, `super.initialize()` must be called to wire-up inputs with model.
+  - super.initialize() iterates over all `allInputs` property  (see below) to wire-up inputs with model.
+ 
+Model has several useful methods to manipulate inputs such as `resetToInitialValue()` or `setInputValuesAsNewInitialValues()`.
+
+## Inputs
+List all model's inputs in `inputs` getter. This getter is used to wire-up inputs with model and to compute properties such as `isValid`
+or `isUnchanged`.
+
+```dart
+class MyModel extends GladeModel {
+  late GladeStringInput name;
+  late GladeIntInput age;
+
+  @override
+  List<GladeInput<Object?>> get inputs => [name, age];
+  @override
+  void initialize() {
+    name = GladeStringInput();
+    age = GladeIntInput(value: 0, useTextEditingController: true);  
+
+    super.initialize();
+  }
+}
+```
+
+### AllInputs vs Inputs getter
+
+There are situations where it's useful to dynamically include or exclude certain inputs from the model. This is especially relevant when an input isn't constantly visible, hence not requiring validation, and more importantly, when it shouldn't be factored into GladeModel's validation and other computational processes.
+
+In that case override `allInputs` getter to list all inputs within GladeModel. 
+
+Use `inputs`  getter for dynamic behavior. By default `allInputs` equals to `inputs`.
+
+<Warning>Without properly wiring-up model, model will not be updated appropiately 
+and properties such as `isValid` or `isUnchanged` will not work. </Warning>
+
+```dart
+class MyModel extends GladeModel {
+  late GladeStringInput name;
+  late GladeIntInput age;
+  late GladeStringInput email;
+  late GladeBoolInput secretValues;
+
+  @override
+  List<GladeInput<Object?>> get inputs => [name, age, email, if(age >= 18) secretValues];
+
+  List<GladeInput<Object?>> get allInputs => [name, age, email, secretValues];
+
+  @override
+  void initialize() {
+    name = GladeStringInput();
+    age = GladeIntInput(value: 0, useTextEditingController: true);
+    email = GladeStringInput(validator: (validator) => (validator..isEmail()).build());
+    secretValues = GladeBoolInput();
+
+    super.initialize();
+  }
+}
+```
+
+## Edit multiple inputs at once
+With each update of input, via update or setting `.value` directly, listeners (if any) are triggered. Sometimes it is needed to edit multiple inputs at once and triggering listener in the end.
+
+For editing multiple values use `groupEdit()`. It takes void callback to update inputs.
+
+An example
+
+```dart
+class FormModel extends GladeModel {
+  late GladeInput<int> age;
+  late GladeInput<String> name;
+
+  // ....
+
+  groupEdit(() {
+    age.value = 18;
+    name.value = 'default john',
+  });
+}
+
+```
+
+After that listener will contain `lastUpdatedKeys` with keys of `age` and `name` inputs.
+
+----
+Looking for advanced behaviors such as controlling other inputs based on certain conditions? Check out the documentation for more information.
