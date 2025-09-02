@@ -1,4 +1,5 @@
 import 'package:glade_forms/src/core/error/convert_error.dart';
+import 'package:glade_forms/src/core/error/error_serverity.dart';
 import 'package:glade_forms/src/core/error/glade_error_keys.dart';
 import 'package:glade_forms/src/validator/validator.dart';
 
@@ -9,6 +10,8 @@ abstract class GladeInputError<T> {
 
   // ignore: no-object-declaration, error can be anything (but typically it is string)
   Object? get error;
+
+  ErrorServerity get severity;
 
   bool get isConversionError => this is ConvertError<T>;
   bool get isNullError => this is ValueNullError<T>;

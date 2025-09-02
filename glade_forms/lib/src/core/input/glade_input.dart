@@ -107,10 +107,12 @@ class GladeInput<T> {
   /// Can be dirty or pure.
   bool get isUnchanged => valueComparator?.call(initialValue, value) ?? _valueIsSameAsInitialValue;
 
-  /// Input does not have conversion error nor validation error.
+  /// Input does not have conversion error nor validation errors but can icnlude warnings.
   bool get isValid => !hasConversionError && validatorInstance.validate(value).isValid;
 
-  /// True when input is not valid.
+  bool get isValidWithoutWarnings => !hasConversionError && validatorInstance.validate(value).isValidWithoutWarnings;
+
+  /// True when input is not valid - it has errors.
   bool get isNotValid => !isValid;
 
   bool get hasConversionError => __conversionError != null;
@@ -118,6 +120,8 @@ class GladeInput<T> {
   ValidatorResult<T> get validatorResult => validatorInstance.validate(value);
 
   List<GladeInputError<T>> get validationErrors => validatorResult.errors;
+
+  List<GladeInputError<T>> get validationWarnings => validatorResult.warnings;
 
   /// String representattion of [value].
   String get stringValue => stringToValueConverter?.convertBack(value) ?? value.toString();
@@ -172,7 +176,7 @@ class GladeInput<T> {
         _value = (value ?? initialValue) as T,
         _initialValue = initialValue,
         dependenciesFactory = dependencies ?? (() => []),
-        inputKey = inputKey ?? '__${T.runtimeType}__${Random().nextInt(100000000)}',
+        inputKey = inputKey ?? '__${T.runtimeType}__${Random().nextInt(100_000_000)}',
         _valueTransform = valueTransform,
 
         // ignore: avoid_bool_literals_in_conditional_expressions, cant be simplified.
@@ -332,11 +336,22 @@ class GladeInput<T> {
     return validatorResult.isNotValid ? (_translate() ?? '') : '';
   }
 
+  String errorOrWarningFormatted({String delimiter = '.'}) {
+    // ignore: avoid-non-null-assertion, it is not null
+    if (hasConversionError) return _translateConversionError(__conversionError!);
+
+    return _translate(severity: ErrorServerity.warning, delimiter: delimiter) ?? '';
+  }
+
   /// Shorthand validator for TextFieldForm inputs.
   ///
   /// Returns translated validation message.
   /// If there are multiple errors they are concenated into one string with [delimiter].
-  String? textFormFieldInputValidatorCustom(String? value, {String delimiter = '.'}) {
+  String? textFormFieldInputValidatorCustom(
+    String? value, {
+    String delimiter = '.',
+    ErrorServerity severity = ErrorServerity.error,
+  }) {
     assert(
       TypeHelper.typesEqual<T, String>() || TypeHelper.typesEqual<T, String?>() || stringToValueConverter != null,
       'For non-string values [converter] must be provided. TInput type: $T',
@@ -347,24 +362,33 @@ class GladeInput<T> {
       final convertedValue = converter.convert(value);
       final convertedError = validatorInstance.validate(convertedValue);
 
-      return !convertedError.isValid ? _translate(delimiter: delimiter, customError: convertedError) : null;
+      return !convertedError.isValidWithSeverity(severity)
+          ? _translate(delimiter: delimiter, customError: convertedError, severity: severity)
+          : null;
     } on ConvertError<T> catch (e) {
-      return e.error != null ? _translate(delimiter: delimiter, customError: e) : e.devError(value);
+      return _translate(delimiter: delimiter, customError: e, severity: severity);
     }
   }
 
   /// Shorthand validator for TextFieldForm inputs.
   ///
   /// Returns translated validation message.
-  String? textFormFieldInputValidator(String? value) => textFormFieldInputValidatorCustom(value);
+  String? textFormFieldInputValidator(
+    String? value, {
+    ErrorServerity severity = ErrorServerity.error,
+    String delimiter = '.',
+  }) =>
+      textFormFieldInputValidatorCustom(value, severity: severity, delimiter: delimiter);
 
   /// Shorthand validator for Form field input.
   ///
   /// Returns translated validation message.
-  String? formFieldValidator(T value) {
+  String? formFieldValidator(T value, {ErrorServerity severity = ErrorServerity.error, String delimiter = '.'}) {
     final convertedError = validatorInstance.validate(value);
 
-    return convertedError.isNotValid ? _translate(customError: convertedError) : null;
+    return convertedError.isNotValid
+        ? _translate(customError: convertedError, severity: severity, delimiter: delimiter)
+        : null;
   }
 
   void updateValueWithString(String? strValue, {bool shouldTriggerOnChange = true}) {
@@ -418,7 +442,7 @@ class GladeInput<T> {
     bool shouldResetToInitialValue = false,
     bool shouldTriggerOnChange = true,
   }) {
-    this._initialValue = initialValue();
+    _initialValue = initialValue();
 
     if (shouldResetToInitialValue) {
       resetToInitialValue(shouldTriggerOnChange: shouldTriggerOnChange);
@@ -441,7 +465,7 @@ class GladeInput<T> {
       updateValue(_initialValue as T, shouldTriggerOnChange: shouldTriggerOnChange);
     }
 
-    this._isPure = true;
+    _isPure = true;
     _bindedModel?.notifyInputUpdated(this);
   }
 
@@ -481,7 +505,7 @@ class GladeInput<T> {
       valueComparator: valueComparator ?? this.valueComparator,
       validatorInstance: validatorInstance ?? this.validatorInstance,
       stringToValueConverter: stringToValueConverter ?? this.stringToValueConverter,
-      dependencies: dependencies ?? this.dependenciesFactory,
+      dependencies: dependencies ?? dependenciesFactory,
       inputKey: inputKey ?? this.inputKey,
       initialValue: initialValue ?? this.initialValue,
       translateError: translateError ?? this.translateError,
@@ -489,8 +513,8 @@ class GladeInput<T> {
       defaultTranslations: defaultTranslations ?? this.defaultTranslations,
       onChange: onChange ?? this.onChange,
       onDependencyChange: onDependencyChange ?? this.onDependencyChange,
-      textEditingController: textEditingController ?? this._textEditingController,
-      valueTransform: valueTransform ?? this._valueTransform,
+      textEditingController: textEditingController ?? _textEditingController,
+      valueTransform: valueTransform ?? _valueTransform,
       trackUnchanged: trackUnchanged ?? this.trackUnchanged,
     );
   }
@@ -572,13 +596,13 @@ class GladeInput<T> {
   // *
 
   /// Translates input's errors (validation or conversion).
-  String? _translate({String delimiter = '.', Object? customError}) {
+  String? _translate({String delimiter = '.', Object? customError, ErrorServerity severity = ErrorServerity.error}) {
     final err = customError ?? validatorResult;
 
-    if (err is ValidatorResult<T> && err.isValid) return null;
+    if (err is ValidatorResult<T> && err.isValidWithSeverity(severity)) return null;
 
     if (err is ValidatorResult<T>) {
-      return _translateGenericErrors(err, delimiter);
+      return _translateGenericErrors(err, delimiter, severity: severity);
     }
 
     if (err is ConvertError<T>) {
@@ -594,7 +618,7 @@ class GladeInput<T> {
   }
 
   String _translateConversionError(ConvertError<T> err) {
-    final defaultTranslationsTmp = this.defaultTranslations;
+    final defaultTranslationsTmp = defaultTranslations;
     final translateErrorTmp = translateError;
     final defaultConversionMessage = defaultTranslationsTmp?.defaultConversionMessage;
 
@@ -602,28 +626,36 @@ class GladeInput<T> {
       return translateErrorTmp(err, err.key, err.devErrorMessage, dependenciesFactory());
     } else if (defaultConversionMessage != null) {
       return defaultConversionMessage;
-    } else if (this._bindedModel case final model?) {
+    } else if (_bindedModel case final model?) {
       return model.defaultErrorTranslate(err, err.key, err.devErrorMessage, dependenciesFactory());
     }
 
     return err.devErrorMessage;
   }
 
-  String _translateGenericErrors(ValidatorResult<T> inputErrors, String delimiter) {
+  String _translateGenericErrors(
+    ValidatorResult<T> validatorResult,
+    String delimiter, {
+    ErrorServerity severity = ErrorServerity.error,
+  }) {
     final translateErrorTmp = translateError;
 
-    final defaultTranslationsTmp = this.defaultTranslations;
+    final results = switch (severity) {
+      ErrorServerity.error => validatorResult.errors,
+      // * Warning + Error
+      ErrorServerity.warning => validatorResult.all,
+    };
+
+    final defaultTranslationsTmp = defaultTranslations;
     if (translateErrorTmp != null) {
-      return inputErrors.errors
-          .map((e) => translateErrorTmp(e, e.key, e.devErrorMessage, dependenciesFactory()))
-          .join(delimiter);
+      return results.map((e) => translateErrorTmp(e, e.key, e.devErrorMessage, dependenciesFactory())).join(delimiter);
     }
 
-    return inputErrors.errors.map((e) {
+    return results.map((e) {
       if (defaultTranslationsTmp != null &&
           (e.isNullError || e.hasStringEmptyOrNullErrorKey || e.hasNullValueOrEmptyValueKey)) {
         return defaultTranslationsTmp.defaultValueIsNullOrEmptyMessage ?? e.toString();
-      } else if (this._bindedModel case final model?) {
+      } else if (_bindedModel case final model?) {
         return model.defaultErrorTranslate(e, e.key, e.devErrorMessage, dependenciesFactory());
       }
 

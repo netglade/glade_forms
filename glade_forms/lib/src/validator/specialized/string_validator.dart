@@ -1,3 +1,4 @@
+import 'package:glade_forms/src/core/error/error_serverity.dart';
 import 'package:glade_forms/src/core/error/glade_error_keys.dart';
 import 'package:glade_forms/src/validator/validator.dart';
 
@@ -10,16 +11,18 @@ class StringValidator extends GladeValidator<String> {
   ///
   /// Default [key] is [ GladeErrorKeys.stringEmpty].
   void notEmpty({
-    OnValidateError<String>? devError,
+    OnValidate<String>? devError,
     Object? key,
     ShouldValidateCallback<String>? shouldValidate,
     bool allowBlank = true,
+    ErrorServerity severity = ErrorServerity.error,
   }) =>
       satisfy(
         (input) => allowBlank ? input.isNotEmpty : input.trim().isNotEmpty,
         devError: devError ?? (_) => "Value can't be empty",
         key: key ?? GladeErrorKeys.stringEmpty,
         shouldValidate: shouldValidate,
+        severity: severity,
       );
 
   /// Checks that value is valid email address.
@@ -30,10 +33,11 @@ class StringValidator extends GladeValidator<String> {
   ///
   /// Default [key] is [ GladeErrorKeys.stringNotEmail].
   void isEmail({
-    OnValidateError<String>? devError,
+    OnValidate<String>? devError,
     bool allowEmpty = false,
     Object? key,
     ShouldValidateCallback<String>? shouldValidate,
+    ErrorServerity severity = ErrorServerity.error,
   }) =>
       satisfy(
         (x) {
@@ -48,6 +52,7 @@ class StringValidator extends GladeValidator<String> {
         devError: devError ?? (value) => 'Value "$value" is not in e-mail format',
         key: key ?? GladeErrorKeys.stringNotEmail,
         shouldValidate: shouldValidate,
+        severity: severity,
       );
 
   /// Checks that value is valid URL address.
@@ -56,11 +61,12 @@ class StringValidator extends GladeValidator<String> {
   ///
   /// Default [key] is [ GladeErrorKeys.stringNotUrl].
   void isUrl({
-    OnValidateError<String>? devError,
+    OnValidate<String>? devError,
     bool allowEmpty = false,
     bool requiresScheme = false,
     Object key = GladeErrorKeys.stringNotUrl,
     ShouldValidateCallback<String>? shouldValidate,
+    ErrorServerity severity = ErrorServerity.error,
   }) =>
       satisfy(
         (value) {
@@ -71,7 +77,6 @@ class StringValidator extends GladeValidator<String> {
           final quantifier = requiresScheme ? '{1}' : '?';
 
           final exp = RegExp(
-            // ignore: unnecessary_string_escapes, regex pattern.
             r'^(?:https?:\/\/)' +
                 quantifier +
                 r'(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$',
@@ -82,6 +87,7 @@ class StringValidator extends GladeValidator<String> {
         devError: devError ?? (value) => 'Value "$value" is not valid URL address',
         key: key,
         shouldValidate: shouldValidate,
+        severity: severity,
       );
 
   /// Matches provided regex [pattern].
@@ -101,9 +107,10 @@ class StringValidator extends GladeValidator<String> {
     bool caseSensitive = true,
     bool dotAll = false,
     bool unicode = false,
-    OnValidateError<String>? devError,
+    OnValidate<String>? devError,
     Object? key,
     ShouldValidateCallback<String>? shouldValidate,
+    ErrorServerity severity = ErrorServerity.error,
   }) =>
       satisfy(
         (value) {
@@ -115,6 +122,7 @@ class StringValidator extends GladeValidator<String> {
         devError: devError ?? (value) => 'Value "$value" does not match regex',
         key: key ?? GladeErrorKeys.stringPatternMatch,
         shouldValidate: shouldValidate,
+        severity: severity,
       );
 
   /// String's length has to be greater or equal to provided [length].
@@ -122,9 +130,10 @@ class StringValidator extends GladeValidator<String> {
   /// Default [key] is [ GladeErrorKeys.stringMinLength].
   void minLength({
     required int length,
-    OnValidateError<String>? devError,
+    OnValidate<String>? devError,
     Object? key,
     ShouldValidateCallback<String>? shouldValidate,
+    ErrorServerity severity = ErrorServerity.error,
   }) =>
       satisfy(
         (value) {
@@ -133,6 +142,7 @@ class StringValidator extends GladeValidator<String> {
         devError: devError ?? (value) => 'Value "$value" is shorter than allowed length $length',
         key: key ?? GladeErrorKeys.stringMinLength,
         shouldValidate: shouldValidate,
+        severity: severity,
       );
 
   /// String's length has to be less or equal to provided [length].
@@ -140,7 +150,7 @@ class StringValidator extends GladeValidator<String> {
   /// Default [key] is [ GladeErrorKeys.stringMaxLength].
   void maxLength({
     required int length,
-    OnValidateError<String>? devError,
+    OnValidate<String>? devError,
     Object? key,
     ShouldValidateCallback<String>? shouldValidate,
   }) =>
@@ -157,14 +167,16 @@ class StringValidator extends GladeValidator<String> {
   /// Default [key] is [ GladeErrorKeys.stringExactLength].
   void exactLength({
     required int length,
-    OnValidateError<String>? devError,
+    OnValidate<String>? devError,
     Object? key,
     ShouldValidateCallback<String>? shouldValidate,
+    ErrorServerity severity = ErrorServerity.error,
   }) =>
       satisfy(
         (value) => value.length == length,
         devError: devError ?? (value) => 'Value "$value " has to be $length long characters.',
         key: key ?? GladeErrorKeys.stringExactLength,
         shouldValidate: shouldValidate,
+        severity: severity,
       );
 }

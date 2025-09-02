@@ -1,6 +1,7 @@
 // ignore_for_file: prefer-single-declaration-per-file
 
-import 'package:glade_forms/src/src.dart';
+import 'package:glade_forms/src/core/error/error.dart';
+import 'package:glade_forms/src/validator/validator.dart';
 import 'package:netglade_utils/netglade_utils.dart';
 
 typedef DateTimeValidatorFactory = ValidatorInstance<DateTime> Function(DateTimeValidator validator);
@@ -17,11 +18,12 @@ class DateTimeValidator extends GladeValidator<DateTime> {
   void isBetween({
     required DateTime start,
     required DateTime end,
-    OnValidateError<DateTime>? devError,
+    OnValidate<DateTime>? devError,
     Object? key,
     ShouldValidateCallback<DateTime>? shouldValidate,
     bool inclusiveInterval = true,
     bool includeTime = true,
+    ErrorServerity severity = ErrorServerity.error,
   }) =>
       satisfy(
         (value) {
@@ -38,6 +40,7 @@ class DateTimeValidator extends GladeValidator<DateTime> {
             (value) => 'Value $value (inclusiveInterval: $inclusiveInterval) is not in between $start and $end.',
         key: key ?? GladeErrorKeys.dateTimeIsBetweenError,
         shouldValidate: shouldValidate,
+        severity: severity,
       );
 
   /// Compares given value with [start] value if it is after.
@@ -49,11 +52,12 @@ class DateTimeValidator extends GladeValidator<DateTime> {
   /// Default [key] is [ GladeErrorKeys.dateTimeIsAfterError].
   void isAfter({
     required DateTime start,
-    OnValidateError<DateTime>? devError,
+    OnValidate<DateTime>? devError,
     Object? key,
     ShouldValidateCallback<DateTime>? shouldValidate,
     bool inclusiveInterval = true,
     bool includeTime = true,
+    ErrorServerity severity = ErrorServerity.error,
   }) =>
       satisfy(
         (value) {
@@ -67,6 +71,7 @@ class DateTimeValidator extends GladeValidator<DateTime> {
         devError: devError ?? (value) => 'Value $value (inclusiveInterval: $inclusiveInterval) is not after $start',
         key: key ?? GladeErrorKeys.dateTimeIsAfterError,
         shouldValidate: shouldValidate,
+        severity: severity,
       );
 
   /// Compares given value with [end] value if it is before.
@@ -78,11 +83,12 @@ class DateTimeValidator extends GladeValidator<DateTime> {
   /// Default [key] is [ GladeErrorKeys.dateTimeIsBeforeError].
   void isBefore({
     required DateTime end,
-    OnValidateError<DateTime>? devError,
+    OnValidate<DateTime>? devError,
     Object? key,
     ShouldValidateCallback<DateTime>? shouldValidate,
     bool inclusiveInterval = true,
     bool includeTime = true,
+    ErrorServerity severity = ErrorServerity.error,
   }) =>
       satisfy(
         (value) {
@@ -96,6 +102,7 @@ class DateTimeValidator extends GladeValidator<DateTime> {
         devError: devError ?? (value) => 'Value $value (inclusiveInterval: $inclusiveInterval) is not before $end',
         key: key ?? GladeErrorKeys.dateTimeIsBeforeError,
         shouldValidate: shouldValidate,
+        severity: severity,
       );
 }
 
@@ -110,11 +117,12 @@ class DateTimeValidatorNullable extends GladeValidator<DateTime?> {
   void isBetween({
     required DateTime start,
     required DateTime end,
-    OnValidateError<DateTime?>? devError,
+    OnValidate<DateTime?>? devError,
     Object? key,
     ShouldValidateCallback<DateTime?>? shouldValidate,
     bool inclusiveInterval = true,
     bool includeTime = true,
+    ErrorServerity severity = ErrorServerity.error,
   }) =>
       satisfy(
         (value) {
@@ -134,6 +142,7 @@ class DateTimeValidatorNullable extends GladeValidator<DateTime?> {
                 'Value ${value ?? 'NULL'} (inclusiveInterval: $inclusiveInterval) is not in between $start and $end.',
         key: key ?? GladeErrorKeys.dateTimeIsBetweenError,
         shouldValidate: shouldValidate,
+        severity: severity,
       );
 
   /// Compares given value with [start] value if it is after.
@@ -145,11 +154,12 @@ class DateTimeValidatorNullable extends GladeValidator<DateTime?> {
   /// Default [key] is [ GladeErrorKeys.dateTimeIsAfterError].
   void isAfter({
     required DateTime start,
-    OnValidateError<DateTime?>? devError,
+    OnValidate<DateTime?>? devError,
     Object? key,
     ShouldValidateCallback<DateTime?>? shouldValidate,
     bool inclusiveInterval = true,
     bool includeTime = true,
+    ErrorServerity severity = ErrorServerity.error,
   }) =>
       satisfy(
         (value) {
@@ -166,6 +176,7 @@ class DateTimeValidatorNullable extends GladeValidator<DateTime?> {
             (value) => 'Value ${value ?? 'NULL'} (inclusiveInterval: $inclusiveInterval) is not after $start',
         key: key ?? GladeErrorKeys.dateTimeIsAfterError,
         shouldValidate: shouldValidate,
+        severity: severity,
       );
 
   /// Compares given value with [end] value if it is before.
@@ -175,11 +186,12 @@ class DateTimeValidatorNullable extends GladeValidator<DateTime?> {
   /// With [includeTime] set to true(default), the comparison includes time.
   void isBefore({
     required DateTime end,
-    OnValidateError<DateTime?>? devError,
+    OnValidate<DateTime?>? devError,
     Object? key,
     ShouldValidateCallback<DateTime?>? shouldValidate,
     bool inclusiveInterval = true,
     bool includeTime = true,
+    ErrorServerity severity = ErrorServerity.error,
   }) =>
       satisfy(
         (value) {
@@ -196,5 +208,6 @@ class DateTimeValidatorNullable extends GladeValidator<DateTime?> {
             (value) => 'Value ${value ?? 'NULL'} (inclusiveInterval: $inclusiveInterval) is not before $end',
         key: key ?? GladeErrorKeys.dateTimeIsBeforeError,
         shouldValidate: shouldValidate,
+        severity: severity,
       );
 }

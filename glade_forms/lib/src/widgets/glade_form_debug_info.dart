@@ -10,6 +10,9 @@ class GladeFormDebugInfo<M extends GladeModel> extends StatelessWidget {
   /// Whether to show isValid column.
   final bool showIsValid;
 
+  /// Whether to show isValidWithoutWarnings column.
+  final bool showIsValidWithoutWarnings;
+
   /// Whether to show validation error column.
   final bool showValidationError;
 
@@ -34,6 +37,7 @@ class GladeFormDebugInfo<M extends GladeModel> extends StatelessWidget {
     super.key,
     this.showIsUnchanged = true,
     this.showIsValid = true,
+    this.showIsValidWithoutWarnings = true,
     this.showValidationError = true,
     this.showConversionError = true,
     this.showValue = true,
@@ -47,6 +51,7 @@ class GladeFormDebugInfo<M extends GladeModel> extends StatelessWidget {
     super.key,
     this.showIsUnchanged = false,
     this.showIsValid = false,
+    this.showIsValidWithoutWarnings = false,
     this.showValidationError = false,
     this.showConversionError = false,
     this.showValue = false,
@@ -76,6 +81,12 @@ class GladeFormDebugInfo<M extends GladeModel> extends StatelessWidget {
                         children: [
                           const Text('IsValid:'),
                           _BoolIcon(value: model.isValid),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          const Text('isValidWithoutWarnings:'),
+                          _BoolIcon(value: model.isValidWithoutWarnings),
                         ],
                       ),
                       Row(
@@ -145,6 +156,7 @@ class GladeFormDebugInfo<M extends GladeModel> extends StatelessWidget {
                     scrollable: scrollable,
                     showIsUnchanged: showIsUnchanged,
                     showIsValid: showIsValid,
+                    showIsValidWithoutWarnings: showIsValidWithoutWarnings,
                     showValidationError: showValidationError,
                     showConversionError: showConversionError,
                     showValue: showValue,
@@ -159,6 +171,7 @@ class GladeFormDebugInfo<M extends GladeModel> extends StatelessWidget {
                   scrollable: scrollable,
                   showIsUnchanged: showIsUnchanged,
                   showIsValid: showIsValid,
+                  showIsValidWithoutWarnings: showIsValidWithoutWarnings,
                   showValidationError: showValidationError,
                   showConversionError: showConversionError,
                   showValue: showValue,
@@ -181,6 +194,7 @@ class _Table extends StatelessWidget {
   final bool scrollable;
   final bool showIsUnchanged;
   final bool showIsValid;
+  final bool showIsValidWithoutWarnings;
   final bool showValidationError;
   final bool showConversionError;
   final bool showValue;
@@ -193,6 +207,7 @@ class _Table extends StatelessWidget {
     required this.scrollable,
     required this.showIsUnchanged,
     required this.showIsValid,
+    required this.showIsValidWithoutWarnings,
     required this.showValidationError,
     required this.showConversionError,
     required this.showValue,
@@ -220,6 +235,7 @@ class _Table extends StatelessWidget {
             const _ColumnHeader('Input'),
             if (showIsUnchanged) const _ColumnHeader('isUnchanged'),
             if (showIsValid) const _ColumnHeader('isValid'),
+            if (showIsValidWithoutWarnings) const _ColumnHeader(r'isValid W\ Warnings'),
             if (showValidationError) const _ColumnHeader('Validation'),
             if (showConversionError) const _ColumnHeader('Conversion error'),
             if (showValue) const _ColumnHeader('value'),
@@ -239,7 +255,8 @@ class _Table extends StatelessWidget {
               ),
               if (showIsUnchanged) _RowValue(value: x.isUnchanged, tracked: x.trackUnchanged),
               if (showIsValid) _RowValue(value: x.isValid),
-              if (showValidationError) _RowValue(value: x.errorFormatted()),
+              if (showIsValidWithoutWarnings) _RowValue(value: x.isValidWithoutWarnings),
+              if (showValidationError) _RowValue(value: x.errorOrWarningFormatted(delimiter: '\n')),
               if (showConversionError) _RowValue(value: x.hasConversionError),
               if (showValue) _RowValue(value: x.value, colorizedValue: true),
               if (showInitialValue) _RowValue(value: x.initialValue, colorizedValue: true),

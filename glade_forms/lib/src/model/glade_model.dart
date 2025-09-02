@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:glade_forms/src/core/core.dart';
+import 'package:glade_forms/src/validator/validator_result.dart';
 import 'package:meta/meta.dart';
 
 abstract class GladeModel extends ChangeNotifier {
@@ -8,6 +9,8 @@ abstract class GladeModel extends ChangeNotifier {
 
   /// Returns true if all inputs are valid.
   bool get isValid => inputs.every((input) => input.isValid);
+
+  bool get isValidWithoutWarnings => inputs.every((input) => input.isValidWithoutWarnings);
 
   /// Returns true if any input is not valid.
   bool get isNotValid => !isValid;
@@ -44,16 +47,12 @@ abstract class GladeModel extends ChangeNotifier {
   List<String> get lastUpdatedInputKeys => _lastUpdates.map((e) => e.inputKey).toList();
 
   /// Formats errors from `inputs`.
-  String get formattedValidationErrors => inputs
-      .map((e) {
-        if (e.validatorResult.isNotValid) {
-          return e.errorFormatted();
-        }
+  String get formattedValidationErrors =>
+      inputs.map((e) => e.errorFormatted()).where((element) => element.isNotEmpty).join('\n');
 
-        return '';
-      })
-      .where((element) => element.isNotEmpty)
-      .join('\n');
+  /// Formats errors and warnings from `inputs`.
+  String get formattedValidationErrorsAndWarnings =>
+      inputs.map((e) => e.errorOrWarningFormatted()).where((element) => element.isNotEmpty).join('\n');
 
   /// Formats errors from `inputs` with debug information.
   String get debugFormattedValidationErrors => inputs.map((e) {
@@ -66,7 +65,7 @@ abstract class GladeModel extends ChangeNotifier {
         return '${e.inputKey} - VALID';
       }).join('\n');
 
-  List<Object?> get errors => inputs.map((e) => e.validatorResult).toList();
+  List<ValidatorResult<Object?>> get validatorResults => inputs.map((e) => e.validatorResult).toList();
 
   GladeModel() {
     initialize();

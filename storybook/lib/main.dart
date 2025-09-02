@@ -1,5 +1,7 @@
 // ignore_for_file: prefer-match-file-name
 
+import 'dart:ui';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:glade_forms_storybook/generated/locale_loader.g.dart';
@@ -10,6 +12,7 @@ import 'package:glade_forms_storybook/usecases/onchange/one_checkbox_deps_valida
 import 'package:glade_forms_storybook/usecases/onchange/two_way_checkbox_change.dart';
 import 'package:glade_forms_storybook/usecases/quickstart_example.dart';
 import 'package:glade_forms_storybook/usecases/regress/issue48_text_controller_example.dart';
+import 'package:glade_forms_storybook/usecases/warning_input_example.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 // ignore: prefer-static-class, ok for now
@@ -34,6 +37,17 @@ void main() async {
       child: const App(),
     ),
   );
+}
+
+class MyCustomScrollBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.trackpad,
+        PointerDeviceKind.stylus,
+        PointerDeviceKind.invertedStylus,
+      };
 }
 
 class _DebugModelApp extends StatelessWidget {
@@ -62,6 +76,7 @@ class App extends StatelessWidget {
       ],
       directories: [
         WidgetbookUseCase(name: 'Quickstart form', builder: (context) => const QuickStartExample()),
+        WidgetbookUseCase(name: 'Warning input example', builder: (context) => const WarningInputExample()),
         WidgetbookCategory(
           name: 'onChange',
           children: [

@@ -41,9 +41,7 @@ class StringToTypeConverter<T> {
     } on ConvertError<T> {
       // If _cantConvert were used -> we already thrown an Error.
       rethrow;
-    }
-    // ignore: avoid_catches_without_on_clauses, has to be generic to catch everything
-    catch (e) {
+    } catch (e) {
       // ignore: avoid-throw-in-catch-block, this method should throw custom exception
       throw onError(input, e);
     }
