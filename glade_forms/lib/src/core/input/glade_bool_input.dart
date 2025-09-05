@@ -13,7 +13,7 @@ class GladeBoolInput extends GladeInput<bool> {
     super.initialValue,
     ValidatorFactory<bool>? validator,
     super.isPure,
-    super.translateError,
+    super.validationTranslate,
     super.valueComparator,
     StringToTypeConverter<bool>? stringToValueConverter,
     super.dependencies,
@@ -22,7 +22,7 @@ class GladeBoolInput extends GladeInput<bool> {
     super.textEditingController,
     super.useTextEditingController = false,
     super.valueTransform,
-    super.defaultTranslations,
+    super.defaultValidationTranslations,
     super.trackUnchanged = true,
     bool isRequired = true,
   }) : super.internalCreate(

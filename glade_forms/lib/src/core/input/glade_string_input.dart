@@ -17,7 +17,7 @@ class GladeStringInput extends GladeInput<String> {
     String? initialValue,
     StringValidatorFactory? validator,
     super.isPure,
-    super.translateError,
+    super.validationTranslate,
     super.valueComparator,
     super.stringToValueConverter,
     super.dependencies,
@@ -26,7 +26,7 @@ class GladeStringInput extends GladeInput<String> {
     super.textEditingController,
     super.useTextEditingController = true,
     super.valueTransform,
-    super.defaultTranslations,
+    super.defaultValidationTranslations,
     super.trackUnchanged = true,
     bool isRequired = true,
   }) : super.internalCreate(

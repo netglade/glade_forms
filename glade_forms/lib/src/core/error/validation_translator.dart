@@ -18,12 +18,12 @@ typedef ValidationTranslator<T> = String Function(
   InputDependencies dependencies,
 );
 
-class DefaultTranslations {
+class DefaultValidationTranslations {
   /// Used when one of values `GladeErrorKeys.valueIsEmpty`,`GladeErrorKeys.valueIsNull`, `GladeErrorKeys.stringEmpty` is present.
   final String? defaultValueIsNullOrEmptyMessage;
   final String? defaultConversionMessage;
 
-  const DefaultTranslations({
+  const DefaultValidationTranslations({
     this.defaultValueIsNullOrEmptyMessage,
     this.defaultConversionMessage,
   });

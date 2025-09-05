@@ -23,13 +23,13 @@ class AgeRestrictedModel extends GladeModel {
   void initialize() {
     nameInput = GladeStringInput(
       inputKey: 'name-input',
-      defaultTranslations: DefaultTranslations(
+      defaultValidationTranslations: DefaultValidationTranslations(
         defaultValueIsNullOrEmptyMessage: LocaleKeys.empty.tr(),
       ),
     );
     fooInput = GladeStringInput(
       inputKey: 'foo-input',
-      defaultTranslations: DefaultTranslations(
+      defaultValidationTranslations: DefaultValidationTranslations(
         defaultValueIsNullOrEmptyMessage: LocaleKeys.empty.tr(),
       ),
       trackUnchanged: false,
@@ -43,7 +43,7 @@ class AgeRestrictedModel extends GladeModel {
       dependencies: () => [vipInput],
       stringToValueConverter: GladeTypeConverters.intConverter,
       inputKey: 'age-input',
-      translateError: (error, key, devMessage, dependencies) {
+      validationTranslate: (error, key, devMessage, dependencies) {
         if (key == _ErrorKeys.ageRestriction) return LocaleKeys.ageRestriction_under18.tr();
 
         if (error.isConversionError) return LocaleKeys.ageRestriction_ageFormat.tr();

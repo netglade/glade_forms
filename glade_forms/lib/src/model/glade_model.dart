@@ -30,7 +30,7 @@ abstract class GladeModel extends ChangeNotifier {
   /// Input is unchanged if its value is same as initial value, even if value was updated into initial value.
   bool get isUnchanged => inputs.where((input) => input.trackUnchanged).every((input) => input.isUnchanged);
 
-  ValidationTranslator<Object?> get defaultErrorTranslate => (error, key, devMessage, dependencies) => devMessage;
+  ValidationTranslator<Object?> get defaultValidationTranslate => (error, key, devMessage, dependencies) => devMessage;
 
   /// Currently tracked inputs by GladeModel.
   ///
