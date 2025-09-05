@@ -85,7 +85,6 @@ class _CodeSample extends HookWidget {
             Container(
               alignment: Alignment.topRight,
               padding: const EdgeInsets.all(8),
-            
               child: Padding(
                 padding: const EdgeInsets.all(8),
                 child: SizedBox(

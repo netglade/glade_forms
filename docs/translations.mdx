@@ -2,17 +2,17 @@
 title: Translations
 ---
 
-Each validation error (and conversion error if any) can be translated. Provide `translateError` function which accepts:
+Each validation error (and conversion error if any) can be translated. Provide `validationTranslate` function which accepts:
 
 - `error` - Error to translate
 - `key` - Error's identification if any
-- `devMessage` - Provided `devError` from validator
+- `devMessage` - Provided `devMessage` from validator
 - `dependencies` - Input's dependencies
 
 Age example translation (LocaleKeys are generated translations from [easy_localization](https://pub.dev/packages/easy_localization) package)
 
 ```dart
-translateError: (error, key, devMessage, {required dependencies}) {
+validationTranslate: (error, key, devMessage, {required dependencies}) {
   if (key == _ErrorKeys.ageRestriction) return LocaleKeys.ageRestriction_under18.tr();
 
   if (error.isConversionError) return LocaleKeys.ageRestriction_ageFormat.tr();
@@ -28,10 +28,10 @@ Use `defaultTranslation` to provide default translations for common error such a
 
 ![translation-example](/assets/translation.gif)
 
-Or use `defaultErrorTranslate` on model's level.
+Or use `defaultValidationTranslate` on model's level.
 
 Order of translation is as follows:
 
 ```dart
-translateError -> defaultTranslation -> Model.defaultErrorTranslate -> error.devMessage 
+validationTranslate -> defaultValidationTranslations -> Model.defaultValidationTranslate -> error.devMessage 
 ```

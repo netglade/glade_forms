@@ -1,6 +1,6 @@
 {
-    "name": "example",
-    "short_name": "example",
+    "name": "glade_forms_storybook",
+    "short_name": "glade_forms_storybook",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

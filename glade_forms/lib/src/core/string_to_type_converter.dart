@@ -1,5 +1,5 @@
 import 'package:glade_forms/src/core/error/convert_error.dart';
-import 'package:glade_forms/src/core/error/glade_error_keys.dart';
+import 'package:glade_forms/src/core/error/glade_validations_keys.dart';
 
 typedef OnErrorCallback<T> = ConvertError<T> Function(String? rawValue, Object error);
 
@@ -41,9 +41,7 @@ class StringToTypeConverter<T> {
     } on ConvertError<T> {
       // If _cantConvert were used -> we already thrown an Error.
       rethrow;
-    }
-    // ignore: avoid_catches_without_on_clauses, has to be generic to catch everything
-    catch (e) {
+    } catch (e) {
       // ignore: avoid-throw-in-catch-block, this method should throw custom exception
       throw onError(input, e);
     }
@@ -62,6 +60,6 @@ class StringToTypeConverter<T> {
         input: rawValue,
         formatError: onError,
         error: error,
-        key: key ?? GladeErrorKeys.conversionError,
+        key: key ?? GladeValidationsKeys.conversionError,
       );
 }

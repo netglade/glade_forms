@@ -11,7 +11,7 @@ void main() {
       final result = validator.validate('');
 
       expect(result.isValid, isFalse);
-      expect(result.errors.firstOrNull?.key, equals(GladeErrorKeys.stringEmpty));
+      expect(result.errors.firstOrNull?.key, equals(GladeValidationsKeys.stringEmpty));
     });
 
     test('When value is not empty or null, notEmpty pass', () {
@@ -30,7 +30,7 @@ void main() {
       final result = validator.validate('');
 
       expect(result.isValid, isFalse);
-      expect(result.errors.firstOrNull?.key, equals(GladeErrorKeys.stringNotEmail));
+      expect(result.errors.firstOrNull?.key, equals(GladeValidationsKeys.stringNotEmail));
     });
 
     for (final testCase in [
@@ -58,7 +58,7 @@ void main() {
       final result = validator.validate('');
 
       expect(result.isValid, isFalse);
-      expect(result.errors.firstOrNull?.key, equals(GladeErrorKeys.stringNotUrl));
+      expect(result.errors.firstOrNull?.key, equals(GladeValidationsKeys.stringNotUrl));
     });
 
     // URL, requires HTTP, expected result
@@ -99,7 +99,7 @@ void main() {
       final result = validator.validate('');
 
       expect(result.isValid, isFalse);
-      expect(result.errors.firstOrNull?.key, equals(GladeErrorKeys.stringExactLength));
+      expect(result.errors.firstOrNull?.key, equals(GladeValidationsKeys.stringExactLength));
     });
 
     test('exactLength() fails', () {
@@ -108,7 +108,7 @@ void main() {
       final result = validator.validate('asdasd');
 
       expect(result.isValid, isFalse);
-      expect(result.errors.firstOrNull?.key, equals(GladeErrorKeys.stringExactLength));
+      expect(result.errors.firstOrNull?.key, equals(GladeValidationsKeys.stringExactLength));
     });
   });
 
@@ -135,7 +135,7 @@ void main() {
       final result = validator.validate('asdasd');
 
       expect(result.isValid, isFalse);
-      expect(result.errors.firstOrNull?.key, equals(GladeErrorKeys.stringMaxLength));
+      expect(result.errors.firstOrNull?.key, equals(GladeValidationsKeys.stringMaxLength));
     });
   });
 
@@ -154,7 +154,7 @@ void main() {
       final result = validator.validate('');
 
       expect(result.isValid, isFalse);
-      expect(result.errors.firstOrNull?.key, equals(GladeErrorKeys.stringMinLength));
+      expect(result.errors.firstOrNull?.key, equals(GladeValidationsKeys.stringMinLength));
     });
 
     test('minLength() fails', () {
@@ -163,7 +163,7 @@ void main() {
       final result = validator.validate('a');
 
       expect(result.isValid, isFalse);
-      expect(result.errors.firstOrNull?.key, equals(GladeErrorKeys.stringMinLength));
+      expect(result.errors.firstOrNull?.key, equals(GladeValidationsKeys.stringMinLength));
     });
   });
 
@@ -180,7 +180,7 @@ void main() {
       expect(
         result.errors.first,
         isA<ValueSatisfyPredicateError<String>>()
-            .having((x) => x.key, 'Has proper key', equals(GladeErrorKeys.stringMinLength)),
+            .having((x) => x.key, 'Has proper key', equals(GladeValidationsKeys.stringMinLength)),
       );
     });
 
@@ -196,7 +196,7 @@ void main() {
       expect(
         result.errors.first,
         isA<ValueSatisfyPredicateError<String>>()
-            .having((x) => x.key, 'Has proper key', equals(GladeErrorKeys.stringMaxLength)),
+            .having((x) => x.key, 'Has proper key', equals(GladeValidationsKeys.stringMaxLength)),
       );
     });
 

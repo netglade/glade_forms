@@ -2,15 +2,15 @@
 
 import 'package:collection/collection.dart';
 import 'package:glade_forms/src/core/core.dart';
-import 'package:glade_forms/src/utils/object_ex.dart';
+import 'package:netglade_utils/netglade_utils.dart';
 
 typedef InputDependencies = List<GladeInput<Object?>>;
 typedef InputDependenciesFactory = InputDependencies Function();
 
 extension InputDependenciesFunctions on InputDependencies {
   /// Finds input by its key or throws.
-  GladeInput<T> byKey<T>(String key) => ObjectHelper.cast(firstWhere((x) => x.inputKey == key));
+  GladeInput<T> byKey<T>(String key) => firstWhere((x) => x.inputKey == key).as();
 
   /// Finds input by its key or returns null.
-  GladeInput<T>? byKeyOrNull<T>(String key) => ObjectHelper.castOrNull(firstWhereOrNull((x) => x.inputKey == key));
+  GladeInput<T>? byKeyOrNull<T>(String key) => firstWhereOrNull((x) => x.inputKey == key).asOrNull();
 }
