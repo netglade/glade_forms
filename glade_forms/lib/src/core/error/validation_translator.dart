@@ -1,11 +1,12 @@
 // ignore_for_file: prefer-match-file-name
 
-import 'package:glade_forms/src/core/error/glade_input_error.dart';
+import 'package:glade_forms/src/core/error/glade_input_validation.dart';
 import 'package:glade_forms/src/core/input_dependencies.dart';
 
-typedef ErrorTranslator<T> = String Function(
-  /// Error to translate.
-  GladeInputError<T> error,
+/// A function that translates a [GladeInputValidation] to a user-friendly message.
+typedef ValidationTranslator<T> = String Function(
+  /// Validation to translate.
+  GladeInputValidation<T> validation,
 
   /// An error identification.
   Object? key,

@@ -2,10 +2,20 @@ import 'package:equatable/equatable.dart';
 import 'package:glade_forms/src/core/core.dart';
 import 'package:glade_forms/src/validator/validator_result/glade_validator_result.dart';
 
+/// Complete result of validation process.
 class ValidatorResult<T> extends Equatable {
+  /// Input associated with this validation result.
   final GladeInput<T>? associatedInput;
+
+  /// All results including errors and warnings.
+  ///
+  /// Order is preserved by the order of validators in the input.
   final List<GladeValidatorResult<T>> all;
+
+  /// All warnings.
   final List<GladeValidatorResult<T>> warnings;
+
+  /// All errors.
   final List<GladeValidatorResult<T>> errors;
 
   /// Returns `true` if there are no errors.
@@ -27,10 +37,10 @@ class ValidatorResult<T> extends Equatable {
     required this.associatedInput,
   });
 
-  bool isValidWithSeverity(ErrorServerity severity) {
+  bool isValidWithSeverity(ValidationSeverity severity) {
     return switch (severity) {
-      ErrorServerity.error => isValid,
-      ErrorServerity.warning => isValidWithoutWarnings,
+      ValidationSeverity.error => isValid,
+      ValidationSeverity.warning => isValidWithoutWarnings,
     };
   }
 }

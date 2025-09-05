@@ -10,7 +10,7 @@ abstract class GladeModel extends ChangeNotifier {
   /// Returns true if all inputs are valid.
   bool get isValid => inputs.every((input) => input.isValid);
 
-  bool get isValidWithoutWarnings => inputs.every((input) => input.isValidWithoutWarnings);
+  bool get isValidWithoutWarnings => inputs.every((input) => input.isValidAndWithoutWarnings);
 
   /// Returns true if any input is not valid.
   bool get isNotValid => !isValid;
@@ -30,7 +30,7 @@ abstract class GladeModel extends ChangeNotifier {
   /// Input is unchanged if its value is same as initial value, even if value was updated into initial value.
   bool get isUnchanged => inputs.where((input) => input.trackUnchanged).every((input) => input.isUnchanged);
 
-  ErrorTranslator<Object?> get defaultErrorTranslate => (error, key, devMessage, dependencies) => devMessage;
+  ValidationTranslator<Object?> get defaultErrorTranslate => (error, key, devMessage, dependencies) => devMessage;
 
   /// Currently tracked inputs by GladeModel.
   ///

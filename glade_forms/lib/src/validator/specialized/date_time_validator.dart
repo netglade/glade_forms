@@ -14,16 +14,16 @@ class DateTimeValidator extends GladeValidator<DateTime> {
   ///
   /// With [includeTime] set to true(default), the comparison includes time.
   ///
-  /// Default [key] is [ GladeErrorKeys.dateTimeIsBetweenError].
+  /// Default [key] is [ GladeValidationsKeys.dateTimeIsBetweenError].
   void isBetween({
     required DateTime start,
     required DateTime end,
-    OnValidate<DateTime>? devError,
+    OnValidate<DateTime>? devMessage,
     Object? key,
     ShouldValidateCallback<DateTime>? shouldValidate,
     bool inclusiveInterval = true,
     bool includeTime = true,
-    ErrorServerity severity = ErrorServerity.error,
+    ValidationSeverity severity = ValidationSeverity.error,
   }) =>
       satisfy(
         (value) {
@@ -36,9 +36,9 @@ class DateTimeValidator extends GladeValidator<DateTime> {
                   comparedValue.isBeforeOrSame(endValue, includeTime: includeTime)
               : comparedValue.isAfter(startValue) && value.isBefore(endValue);
         },
-        devError: devError ??
+        devMessage: devMessage ??
             (value) => 'Value $value (inclusiveInterval: $inclusiveInterval) is not in between $start and $end.',
-        key: key ?? GladeErrorKeys.dateTimeIsBetweenError,
+        key: key ?? GladeValidationsKeys.dateTimeIsBetweenError,
         shouldValidate: shouldValidate,
         severity: severity,
       );
@@ -49,15 +49,15 @@ class DateTimeValidator extends GladeValidator<DateTime> {
   ///
   /// With [includeTime] set to true(default), the comparison includes time.
   ///
-  /// Default [key] is [ GladeErrorKeys.dateTimeIsAfterError].
+  /// Default [key] is [ GladeValidationsKeys.dateTimeIsAfterError].
   void isAfter({
     required DateTime start,
-    OnValidate<DateTime>? devError,
+    OnValidate<DateTime>? devMessage,
     Object? key,
     ShouldValidateCallback<DateTime>? shouldValidate,
     bool inclusiveInterval = true,
     bool includeTime = true,
-    ErrorServerity severity = ErrorServerity.error,
+    ValidationSeverity severity = ValidationSeverity.error,
   }) =>
       satisfy(
         (value) {
@@ -68,8 +68,8 @@ class DateTimeValidator extends GladeValidator<DateTime> {
               ? comparedValue.isAfterOrSame(startValue, includeTime: includeTime)
               : comparedValue.isAfter(startValue);
         },
-        devError: devError ?? (value) => 'Value $value (inclusiveInterval: $inclusiveInterval) is not after $start',
-        key: key ?? GladeErrorKeys.dateTimeIsAfterError,
+        devMessage: devMessage ?? (value) => 'Value $value (inclusiveInterval: $inclusiveInterval) is not after $start',
+        key: key ?? GladeValidationsKeys.dateTimeIsAfterError,
         shouldValidate: shouldValidate,
         severity: severity,
       );
@@ -80,15 +80,15 @@ class DateTimeValidator extends GladeValidator<DateTime> {
   ///
   /// With [includeTime] set to true(default), the comparison includes time.
   ///
-  /// Default [key] is [ GladeErrorKeys.dateTimeIsBeforeError].
+  /// Default [key] is [ GladeValidationsKeys.dateTimeIsBeforeError].
   void isBefore({
     required DateTime end,
-    OnValidate<DateTime>? devError,
+    OnValidate<DateTime>? devMessage,
     Object? key,
     ShouldValidateCallback<DateTime>? shouldValidate,
     bool inclusiveInterval = true,
     bool includeTime = true,
-    ErrorServerity severity = ErrorServerity.error,
+    ValidationSeverity severity = ValidationSeverity.error,
   }) =>
       satisfy(
         (value) {
@@ -99,8 +99,8 @@ class DateTimeValidator extends GladeValidator<DateTime> {
               ? comparedValue.isBeforeOrSame(endValue, includeTime: includeTime)
               : comparedValue.isBefore(endValue);
         },
-        devError: devError ?? (value) => 'Value $value (inclusiveInterval: $inclusiveInterval) is not before $end',
-        key: key ?? GladeErrorKeys.dateTimeIsBeforeError,
+        devMessage: devMessage ?? (value) => 'Value $value (inclusiveInterval: $inclusiveInterval) is not before $end',
+        key: key ?? GladeValidationsKeys.dateTimeIsBeforeError,
         shouldValidate: shouldValidate,
         severity: severity,
       );
@@ -113,16 +113,16 @@ class DateTimeValidatorNullable extends GladeValidator<DateTime?> {
   ///
   /// With [includeTime] set to true(default), the comparison includes time.
   ///
-  /// Default [key] is [ GladeErrorKeys.dateTimeIsBetweenError].
+  /// Default [key] is [ GladeValidationsKeys.dateTimeIsBetweenError].
   void isBetween({
     required DateTime start,
     required DateTime end,
-    OnValidate<DateTime?>? devError,
+    OnValidate<DateTime?>? devMessage,
     Object? key,
     ShouldValidateCallback<DateTime?>? shouldValidate,
     bool inclusiveInterval = true,
     bool includeTime = true,
-    ErrorServerity severity = ErrorServerity.error,
+    ValidationSeverity severity = ValidationSeverity.error,
   }) =>
       satisfy(
         (value) {
@@ -137,10 +137,10 @@ class DateTimeValidatorNullable extends GladeValidator<DateTime?> {
                   comparedValue.isBeforeOrSame(endValue, includeTime: includeTime)
               : comparedValue.isAfter(startValue) && value.isBefore(endValue);
         },
-        devError: devError ??
+        devMessage: devMessage ??
             (value) =>
                 'Value ${value ?? 'NULL'} (inclusiveInterval: $inclusiveInterval) is not in between $start and $end.',
-        key: key ?? GladeErrorKeys.dateTimeIsBetweenError,
+        key: key ?? GladeValidationsKeys.dateTimeIsBetweenError,
         shouldValidate: shouldValidate,
         severity: severity,
       );
@@ -151,15 +151,15 @@ class DateTimeValidatorNullable extends GladeValidator<DateTime?> {
   ///
   /// With [includeTime] set to true(default), the comparison includes time.
   ///
-  /// Default [key] is [ GladeErrorKeys.dateTimeIsAfterError].
+  /// Default [key] is [ GladeValidationsKeys.dateTimeIsAfterError].
   void isAfter({
     required DateTime start,
-    OnValidate<DateTime?>? devError,
+    OnValidate<DateTime?>? devMessage,
     Object? key,
     ShouldValidateCallback<DateTime?>? shouldValidate,
     bool inclusiveInterval = true,
     bool includeTime = true,
-    ErrorServerity severity = ErrorServerity.error,
+    ValidationSeverity severity = ValidationSeverity.error,
   }) =>
       satisfy(
         (value) {
@@ -172,9 +172,9 @@ class DateTimeValidatorNullable extends GladeValidator<DateTime?> {
               ? comparedValue.isAfterOrSame(startValue, includeTime: includeTime)
               : comparedValue.isAfter(startValue);
         },
-        devError: devError ??
+        devMessage: devMessage ??
             (value) => 'Value ${value ?? 'NULL'} (inclusiveInterval: $inclusiveInterval) is not after $start',
-        key: key ?? GladeErrorKeys.dateTimeIsAfterError,
+        key: key ?? GladeValidationsKeys.dateTimeIsAfterError,
         shouldValidate: shouldValidate,
         severity: severity,
       );
@@ -186,12 +186,12 @@ class DateTimeValidatorNullable extends GladeValidator<DateTime?> {
   /// With [includeTime] set to true(default), the comparison includes time.
   void isBefore({
     required DateTime end,
-    OnValidate<DateTime?>? devError,
+    OnValidate<DateTime?>? devMessage,
     Object? key,
     ShouldValidateCallback<DateTime?>? shouldValidate,
     bool inclusiveInterval = true,
     bool includeTime = true,
-    ErrorServerity severity = ErrorServerity.error,
+    ValidationSeverity severity = ValidationSeverity.error,
   }) =>
       satisfy(
         (value) {
@@ -204,9 +204,9 @@ class DateTimeValidatorNullable extends GladeValidator<DateTime?> {
               ? comparedValue.isBeforeOrSame(endValue, includeTime: includeTime)
               : comparedValue.isBefore(endValue);
         },
-        devError: devError ??
+        devMessage: devMessage ??
             (value) => 'Value ${value ?? 'NULL'} (inclusiveInterval: $inclusiveInterval) is not before $end',
-        key: key ?? GladeErrorKeys.dateTimeIsBeforeError,
+        key: key ?? GladeValidationsKeys.dateTimeIsBeforeError,
         shouldValidate: shouldValidate,
         severity: severity,
       );

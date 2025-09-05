@@ -5,7 +5,7 @@ abstract final class GladeTypeConverters {
   static final intConverter = StringToTypeConverter<int>(
     converter: (rawValue, cantConvert) {
       if (rawValue == null) {
-        return cantConvert('Input can not be null', rawValue: rawValue, key: GladeErrorKeys.valueIsNull);
+        return cantConvert('Input can not be null', rawValue: rawValue, key: GladeValidationsKeys.valueIsNull);
       }
 
       return int.tryParse(rawValue) ?? cantConvert('Can not convert', rawValue: rawValue);
@@ -27,7 +27,7 @@ abstract final class GladeTypeConverters {
   static final doubleConverter = StringToTypeConverter<double>(
     converter: (rawValue, cantConvert) {
       if (rawValue == null) {
-        return cantConvert('Input can not be null', rawValue: rawValue, key: GladeErrorKeys.valueIsNull);
+        return cantConvert('Input can not be null', rawValue: rawValue, key: GladeValidationsKeys.valueIsNull);
       }
 
       return double.tryParse(rawValue) ?? cantConvert('Can not convert', rawValue: rawValue);
@@ -49,7 +49,7 @@ abstract final class GladeTypeConverters {
   static final boolConverter = StringToTypeConverter<bool>(
     converter: (rawValue, cantConvert) {
       if (rawValue == null) {
-        return cantConvert('Input can not be null', rawValue: rawValue, key: GladeErrorKeys.valueIsNull);
+        return cantConvert('Input can not be null', rawValue: rawValue, key: GladeValidationsKeys.valueIsNull);
       }
 
       return bool.tryParse(rawValue) ?? cantConvert('Can not convert', rawValue: rawValue);
@@ -60,7 +60,7 @@ abstract final class GladeTypeConverters {
   static final dateTimeIso8601 = StringToTypeConverter<DateTime>(
     converter: (rawValue, cantConvert) {
       if (rawValue == null) {
-        return cantConvert('Input can not be null', rawValue: rawValue, key: GladeErrorKeys.valueIsNull);
+        return cantConvert('Input can not be null', rawValue: rawValue, key: GladeValidationsKeys.valueIsNull);
       }
 
       return DateTime.tryParse(rawValue) ?? cantConvert('Can not convert', rawValue: rawValue);

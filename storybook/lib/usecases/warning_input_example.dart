@@ -15,15 +15,15 @@ class _Model extends GladeModel {
       value: 0,
       inputKey: 'age',
       useTextEditingController: true,
-      validator: (v) => (v..isMin(min: 18, severity: ErrorServerity.warning)).build(),
+      validator: (v) => (v..isMin(min: 18, severity: ValidationSeverity.warning)).build(),
     );
     income = GladeIntInput(
       value: 0,
       inputKey: 'income',
       useTextEditingController: true,
       validator: (v) => (v
-            ..isMin(min: 18, severity: ErrorServerity.warning)
-            ..isMin(min: 25, severity: ErrorServerity.warning))
+            ..isMin(min: 18, severity: ValidationSeverity.warning)
+            ..isMin(min: 25, severity: ValidationSeverity.warning))
           .build(),
     );
 
@@ -48,18 +48,13 @@ class WarningInputExample extends StatelessWidget {
             autovalidateMode: AutovalidateMode.onUserInteraction,
             child: Column(
               children: [
-                // TextFormField(
-                //   controller: model.age.controller,
-                //   validator: model.age.textFormFieldInputValidator,
-                //   decoration: const InputDecoration(labelText: 'Age'),
-                // ),
                 const Text(
                   'This field displays warnings as part of validation. \n Warning: Income must be min 18 \n Warning: Income must be min 25',
                 ),
                 TextFormField(
                   controller: model.income.controller,
                   validator: (value) => model.income
-                      .textFormFieldInputValidator(value, severity: ErrorServerity.warning, delimiter: '\n'),
+                      .textFormFieldInputValidator(value, severity: ValidationSeverity.warning, delimiter: '\n'),
                   decoration: const InputDecoration(labelText: 'Income'),
                 ),
                 const SizedBox(height: 10),

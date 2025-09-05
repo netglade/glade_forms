@@ -58,8 +58,9 @@ void main() {
     test('success', () {
       final validator = (GladeValidator<int>()
             ..custom(
-              (v, key) =>
-                  v > 5 ? null : ValueError(value: v, devError: (value) => 'Value has to be greater than 5', key: key),
+              (v, key) => v > 5
+                  ? null
+                  : ValueError(value: v, devMessage: (value) => 'Value has to be greater than 5', key: key),
               key: 'custom-key',
             ))
           .build();
@@ -73,8 +74,9 @@ void main() {
     test('fails', () {
       final validator = (GladeValidator<int>()
             ..custom(
-              (v, key) =>
-                  v > 5 ? null : ValueError(value: v, devError: (value) => 'Value has to be greater than 5', key: key),
+              (v, key) => v > 5
+                  ? null
+                  : ValueError(value: v, devMessage: (value) => 'Value has to be greater than 5', key: key),
               key: 'custom-key',
             ))
           .build();

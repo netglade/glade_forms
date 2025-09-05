@@ -5,7 +5,7 @@ typedef SatisfyPredicate<T> = bool Function(T value);
 
 class SatisfyPredicatePart<T> extends InputValidatorPart<T> {
   // ignore: prefer-correct-callback-field-name, ok name
-  final OnValidate<T> devError;
+  final OnValidate<T> devMessage;
 
   // ignore: prefer-correct-callback-field-name, ok name
   final SatisfyPredicate<T> predicate;
@@ -15,7 +15,7 @@ class SatisfyPredicatePart<T> extends InputValidatorPart<T> {
 
   const SatisfyPredicatePart({
     required this.predicate,
-    required this.devError,
+    required this.devMessage,
     super.key,
     super.shouldValidate,
     this.metaData,
@@ -28,7 +28,7 @@ class SatisfyPredicatePart<T> extends InputValidatorPart<T> {
         ? null
         : ValueSatisfyPredicateError<T>(
             value: value,
-            devError: devError,
+            devMessage: devMessage,
             key: key,
             errorServerity: serverity,
           );

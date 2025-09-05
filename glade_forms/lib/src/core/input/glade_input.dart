@@ -39,7 +39,7 @@ class GladeInput<T> {
   final String inputKey;
 
   // ignore: prefer-correct-callback-field-name, ok name
-  final ErrorTranslator<T>? translateError;
+  final ValidationTranslator<T>? translateError;
 
   /// Validation message for conversion error.
   final DefaultTranslations? defaultTranslations;
@@ -107,21 +107,23 @@ class GladeInput<T> {
   /// Can be dirty or pure.
   bool get isUnchanged => valueComparator?.call(initialValue, value) ?? _valueIsSameAsInitialValue;
 
-  /// Input does not have conversion error nor validation errors but can icnlude warnings.
+  /// Input does not have conversion error nor validation errors but can include warnings.
   bool get isValid => !hasConversionError && validatorInstance.validate(value).isValid;
 
-  bool get isValidWithoutWarnings => !hasConversionError && validatorInstance.validate(value).isValidWithoutWarnings;
+  /// Input does not have conversion error nor validation errors nor warnings.
+  bool get isValidAndWithoutWarnings => !hasConversionError && validatorInstance.validate(value).isValidWithoutWarnings;
 
   /// True when input is not valid - it has errors.
   bool get isNotValid => !isValid;
 
+  /// True when input has conversion error.
   bool get hasConversionError => __conversionError != null;
 
   ValidatorResult<T> get validatorResult => validatorInstance.validate(value);
 
-  List<GladeInputError<T>> get validationErrors => validatorResult.errors;
+  List<GladeInputValidation<T>> get validationErrors => validatorResult.errors;
 
-  List<GladeInputError<T>> get validationWarnings => validatorResult.warnings;
+  List<GladeInputValidation<T>> get validationWarnings => validatorResult.warnings;
 
   /// String representattion of [value].
   String get stringValue => stringToValueConverter?.convertBack(value) ?? value.toString();
@@ -207,7 +209,7 @@ class GladeInput<T> {
     T? initialValue,
     ValidatorFactory<T>? validator,
     bool isPure = true,
-    ErrorTranslator<T>? translateError,
+    ValidationTranslator<T>? translateError,
     ValueComparator<T>? valueComparator,
     StringToTypeConverter<T>? stringToValueConverter,
     InputDependenciesFactory? dependencies,
@@ -247,7 +249,7 @@ class GladeInput<T> {
     T? initialValue,
     String? inputKey,
     bool pure = true,
-    ErrorTranslator<T>? translateError,
+    ValidationTranslator<T>? translateError,
     DefaultTranslations? defaultTranslations,
     ValueComparator<T>? valueComparator,
     StringToTypeConverter<T>? stringToValueConverter,
@@ -286,7 +288,7 @@ class GladeInput<T> {
     T? initialValue,
     String? inputKey,
     bool pure = true,
-    ErrorTranslator<T>? translateError,
+    ValidationTranslator<T>? translateError,
     DefaultTranslations? defaultTranslations,
     ValueComparator<T>? valueComparator,
     StringToTypeConverter<T>? stringToValueConverter,
@@ -340,7 +342,7 @@ class GladeInput<T> {
     // ignore: avoid-non-null-assertion, it is not null
     if (hasConversionError) return _translateConversionError(__conversionError!);
 
-    return _translate(severity: ErrorServerity.warning, delimiter: delimiter) ?? '';
+    return _translate(severity: ValidationSeverity.warning, delimiter: delimiter) ?? '';
   }
 
   /// Shorthand validator for TextFieldForm inputs.
@@ -350,7 +352,7 @@ class GladeInput<T> {
   String? textFormFieldInputValidatorCustom(
     String? value, {
     String delimiter = '.',
-    ErrorServerity severity = ErrorServerity.error,
+    ValidationSeverity severity = ValidationSeverity.error,
   }) {
     assert(
       TypeHelper.typesEqual<T, String>() || TypeHelper.typesEqual<T, String?>() || stringToValueConverter != null,
@@ -375,7 +377,7 @@ class GladeInput<T> {
   /// Returns translated validation message.
   String? textFormFieldInputValidator(
     String? value, {
-    ErrorServerity severity = ErrorServerity.error,
+    ValidationSeverity severity = ValidationSeverity.error,
     String delimiter = '.',
   }) =>
       textFormFieldInputValidatorCustom(value, severity: severity, delimiter: delimiter);
@@ -383,7 +385,11 @@ class GladeInput<T> {
   /// Shorthand validator for Form field input.
   ///
   /// Returns translated validation message.
-  String? formFieldValidator(T value, {ErrorServerity severity = ErrorServerity.error, String delimiter = '.'}) {
+  String? formFieldValidator(
+    T value, {
+    ValidationSeverity severity = ValidationSeverity.error,
+    String delimiter = '.',
+  }) {
     final convertedError = validatorInstance.validate(value);
 
     return convertedError.isNotValid
@@ -488,7 +494,7 @@ class GladeInput<T> {
     StringToTypeConverter<T>? stringToValueConverter,
     InputDependenciesFactory? dependencies,
     T? initialValue,
-    ErrorTranslator<T>? translateError,
+    ValidationTranslator<T>? translateError,
     T? value,
     bool? isPure,
     DefaultTranslations? defaultTranslations,
@@ -596,7 +602,11 @@ class GladeInput<T> {
   // *
 
   /// Translates input's errors (validation or conversion).
-  String? _translate({String delimiter = '.', Object? customError, ErrorServerity severity = ErrorServerity.error}) {
+  String? _translate({
+    String delimiter = '.',
+    Object? customError,
+    ValidationSeverity severity = ValidationSeverity.error,
+  }) {
     final err = customError ?? validatorResult;
 
     if (err is ValidatorResult<T> && err.isValidWithSeverity(severity)) return null;
@@ -623,32 +633,34 @@ class GladeInput<T> {
     final defaultConversionMessage = defaultTranslationsTmp?.defaultConversionMessage;
 
     if (translateErrorTmp != null) {
-      return translateErrorTmp(err, err.key, err.devErrorMessage, dependenciesFactory());
+      return translateErrorTmp(err, err.key, err.devMessage, dependenciesFactory());
     } else if (defaultConversionMessage != null) {
       return defaultConversionMessage;
     } else if (_bindedModel case final model?) {
-      return model.defaultErrorTranslate(err, err.key, err.devErrorMessage, dependenciesFactory());
+      return model.defaultErrorTranslate(err, err.key, err.devMessage, dependenciesFactory());
     }
 
-    return err.devErrorMessage;
+    return err.devMessage;
   }
 
   String _translateGenericErrors(
     ValidatorResult<T> validatorResult,
     String delimiter, {
-    ErrorServerity severity = ErrorServerity.error,
+    ValidationSeverity severity = ValidationSeverity.error,
   }) {
     final translateErrorTmp = translateError;
 
     final results = switch (severity) {
-      ErrorServerity.error => validatorResult.errors,
+      ValidationSeverity.error => validatorResult.errors,
       // * Warning + Error
-      ErrorServerity.warning => validatorResult.all,
+      ValidationSeverity.warning => validatorResult.all,
     };
 
     final defaultTranslationsTmp = defaultTranslations;
     if (translateErrorTmp != null) {
-      return results.map((e) => translateErrorTmp(e, e.key, e.devErrorMessage, dependenciesFactory())).join(delimiter);
+      return results
+          .map((e) => translateErrorTmp(e, e.key, e.devValidationMessage, dependenciesFactory()))
+          .join(delimiter);
     }
 
     return results.map((e) {
@@ -656,7 +668,7 @@ class GladeInput<T> {
           (e.isNullError || e.hasStringEmptyOrNullErrorKey || e.hasNullValueOrEmptyValueKey)) {
         return defaultTranslationsTmp.defaultValueIsNullOrEmptyMessage ?? e.toString();
       } else if (_bindedModel case final model?) {
-        return model.defaultErrorTranslate(e, e.key, e.devErrorMessage, dependenciesFactory());
+        return model.defaultErrorTranslate(e, e.key, e.devValidationMessage, dependenciesFactory());
       }
 
       return e.toString();

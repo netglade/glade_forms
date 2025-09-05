@@ -1,7 +1,5 @@
 // ignore_for_file: prefer-match-file-name
 
-import 'dart:ui';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:glade_forms_storybook/generated/locale_loader.g.dart';
@@ -37,17 +35,6 @@ void main() async {
       child: const App(),
     ),
   );
-}
-
-class MyCustomScrollBehavior extends MaterialScrollBehavior {
-  @override
-  Set<PointerDeviceKind> get dragDevices => {
-        PointerDeviceKind.touch,
-        PointerDeviceKind.mouse,
-        PointerDeviceKind.trackpad,
-        PointerDeviceKind.stylus,
-        PointerDeviceKind.invertedStylus,
-      };
 }
 
 class _DebugModelApp extends StatelessWidget {

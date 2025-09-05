@@ -3,7 +3,7 @@ import 'package:glade_forms/src/validator/validator_result/glade_validator_resul
 class ValueSatisfyPredicateError<T> extends GladeValidatorResult<T> {
   ValueSatisfyPredicateError({
     required super.value,
-    required super.devError,
+    required super.devMessage,
     required super.key,
     super.errorServerity,
   });

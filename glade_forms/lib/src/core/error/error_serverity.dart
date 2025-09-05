@@ -1,4 +1,0 @@
-enum ErrorServerity {
-  error,
-  warning,
-}

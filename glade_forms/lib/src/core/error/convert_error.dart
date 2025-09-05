@@ -1,11 +1,11 @@
 import 'package:equatable/equatable.dart';
-import 'package:glade_forms/src/core/error/error_serverity.dart';
-import 'package:glade_forms/src/core/error/glade_input_error.dart';
+import 'package:glade_forms/src/core/error/glade_input_validation.dart';
+import 'package:glade_forms/src/core/error/validation_severity.dart';
 
 /// Before validation when converer from string to prpoer type failed.
 typedef OnConvertError = String Function(String? rawInput, {Object? key});
 
-class ConvertError<T> extends GladeInputError<T> with EquatableMixin implements Exception {
+class ConvertError<T> extends GladeInputValidation<T> with EquatableMixin implements Exception {
   final OnConvertError onConvertErrorMessage;
 
   final String? input;
@@ -14,18 +14,18 @@ class ConvertError<T> extends GladeInputError<T> with EquatableMixin implements 
   final Object _convertError;
 
   @override
-  List<Object?> get props => [input, onConvertErrorMessage, error, key, _convertError];
+  List<Object?> get props => [input, onConvertErrorMessage, result, key, _convertError];
 
   String get targetType => T.runtimeType.toString();
 
-  String get devErrorMessage => onConvertErrorMessage(input, key: key);
+  String get devMessage => onConvertErrorMessage(input, key: key);
 
   @override
   // ignore: no-object-declaration, error can be any object.
-  Object get error => _convertError;
+  Object get result => _convertError;
 
   @override
-  ErrorServerity get severity => ErrorServerity.error;
+  ValidationSeverity get severity => ValidationSeverity.error;
 
   ConvertError({
     required Object error,

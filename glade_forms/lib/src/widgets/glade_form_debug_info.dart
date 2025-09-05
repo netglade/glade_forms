@@ -255,7 +255,7 @@ class _Table extends StatelessWidget {
               ),
               if (showIsUnchanged) _RowValue(value: x.isUnchanged, tracked: x.trackUnchanged),
               if (showIsValid) _RowValue(value: x.isValid),
-              if (showIsValidWithoutWarnings) _RowValue(value: x.isValidWithoutWarnings),
+              if (showIsValidWithoutWarnings) _RowValue(value: x.isValidAndWithoutWarnings),
               if (showValidationError) _RowValue(value: x.errorOrWarningFormatted(delimiter: '\n')),
               if (showConversionError) _RowValue(value: x.hasConversionError),
               if (showValue) _RowValue(value: x.value, colorizedValue: true),

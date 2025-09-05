@@ -5,7 +5,7 @@ void main() {
   test('Warning populates proper result value', () {
     final input = GladeIntInput(
       validator: (v) => (v
-            ..isBetween(min: 25, max: 50, severity: ErrorServerity.warning, key: 'between')
+            ..isBetween(min: 25, max: 50, severity: ValidationSeverity.warning, key: 'between')
             ..isMin(min: 10, key: 'min')
             ..isMax(max: 100, key: 'max'))
           .build(),
@@ -28,7 +28,7 @@ void main() {
   test('Warning does not stop validation by default', () {
     final input = GladeIntInput(
       validator: (v) => (v
-            ..isBetween(min: 25, max: 50, severity: ErrorServerity.warning, key: 'between')
+            ..isBetween(min: 25, max: 50, severity: ValidationSeverity.warning, key: 'between')
             ..isMin(min: 20, key: 'min') // * triggers
             ..isMax(max: 100, key: 'max'))
           .build(),
@@ -55,7 +55,7 @@ void main() {
   test('Warning does not stop validation even when stopOnFirstError is false', () {
     final input = GladeIntInput(
       validator: (v) => (v
-            ..isBetween(min: 25, max: 50, severity: ErrorServerity.warning, key: 'between')
+            ..isBetween(min: 25, max: 50, severity: ValidationSeverity.warning, key: 'between')
             ..isMin(min: 20, key: 'min') // * triggers
             ..isMax(max: 10, key: 'max')) // * also triggers, although in reality does not make sense
           .build(stopOnFirstError: false),
@@ -84,7 +84,7 @@ void main() {
   test('Warning stops validation when stopOnFirstErrorOrWarning is true', () {
     final input = GladeIntInput(
       validator: (v) => (v
-            ..isBetween(min: 25, max: 50, severity: ErrorServerity.warning, key: 'between')
+            ..isBetween(min: 25, max: 50, severity: ValidationSeverity.warning, key: 'between')
             ..isMin(min: 20, key: 'min') // * triggers
             ..isMax(max: 10, key: 'max')) // * also triggers, although in reality does not make sense
           .build(stopOnFirstError: false, stopOnFirstErrorOrWarning: true),
@@ -108,9 +108,9 @@ void main() {
   test('By default multiple warnigns are collected and do not stop validation', () {
     final input = GladeIntInput(
       validator: (v) => (v
-            ..isBetween(min: 25, max: 50, severity: ErrorServerity.warning, key: 'between')
+            ..isBetween(min: 25, max: 50, severity: ValidationSeverity.warning, key: 'between')
             ..isMin(min: 10, key: 'min')
-            ..isBetween(min: 23, max: 24, severity: ErrorServerity.warning, key: 'between2')
+            ..isBetween(min: 23, max: 24, severity: ValidationSeverity.warning, key: 'between2')
             ..isMax(max: 18, key: 'max')) // * triggers, although in reality does not make sense
           .build(),
       value: 20,

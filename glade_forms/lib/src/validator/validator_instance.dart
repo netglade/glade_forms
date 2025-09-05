@@ -40,7 +40,7 @@ class ValidatorInstance<T> {
       final result = part.validate(value);
 
       if (result != null) {
-        final isError = result.severity == ErrorServerity.error;
+        final isError = result.severity == ValidationSeverity.error;
 
         combined.add(result);
 

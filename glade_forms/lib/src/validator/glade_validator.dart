@@ -1,5 +1,4 @@
 import 'package:glade_forms/src/core/core.dart';
-import 'package:glade_forms/src/core/error/error_serverity.dart';
 import 'package:glade_forms/src/validator/part/custom_validation_part.dart';
 import 'package:glade_forms/src/validator/part/input_validator_part.dart';
 import 'package:glade_forms/src/validator/part/satisfy_predicate_part.dart';
@@ -38,7 +37,7 @@ class GladeValidator<T> {
     ValidateFunctionWithKey<T> onValidate, {
     Object? key,
     ShouldValidateCallback<T>? shouldValidate,
-    ErrorServerity severity = ErrorServerity.error,
+    ValidationSeverity severity = ValidationSeverity.error,
   }) {
     parts.add(
       CustomValidationPart(
@@ -55,17 +54,17 @@ class GladeValidator<T> {
 
   /// Checks that value is not null. Returns [ValueNullError] error.
   void notNull({
-    OnValidate<T>? devError,
+    OnValidate<T>? devMessage,
     Object? key,
     ShouldValidateCallback<T>? shouldValidate,
-    ErrorServerity severity = ErrorServerity.error,
+    ValidationSeverity severity = ValidationSeverity.error,
   }) =>
       _customInternal(
         (value) => value == null
             ? ValueNullError<T>(
                 value: value,
-                devError: devError,
-                key: key ?? GladeErrorKeys.valueIsNull,
+                devMessage: devMessage,
+                key: key ?? GladeValidationsKeys.valueIsNull,
                 errorServerity: severity,
               )
             : null,
@@ -76,16 +75,16 @@ class GladeValidator<T> {
   /// Value must satisfy given [predicate]. Returns [ValueSatisfyPredicateError].
   void satisfy(
     SatisfyPredicate<T> predicate, {
-    OnValidate<T>? devError,
+    OnValidate<T>? devMessage,
     Object? key,
     ShouldValidateCallback<T>? shouldValidate,
     Object? metaData,
-    ErrorServerity severity = ErrorServerity.error,
+    ValidationSeverity severity = ValidationSeverity.error,
   }) =>
       parts.add(
         SatisfyPredicatePart(
           predicate: predicate,
-          devError: devError ?? (value) => 'Value ${value ?? 'NULL'} does not satisfy given predicate.',
+          devMessage: devMessage ?? (value) => 'Value ${value ?? 'NULL'} does not satisfy given predicate.',
           key: key,
           shouldValidate: shouldValidate,
           metaData: metaData,
@@ -96,7 +95,7 @@ class GladeValidator<T> {
   /// Checks value with custom validation function.
   void _customInternal(
     ValidateFunction<T> onValidate, {
-    required ErrorServerity severity,
+    required ValidationSeverity severity,
     Object? key,
     ShouldValidateCallback<T>? shouldValidate,
   }) =>
