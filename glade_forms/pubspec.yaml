@@ -5,7 +5,7 @@ repository: https://github.com/netglade/glade_forms
 issue_tracker: https://github.com/netglade/glade_forms/issues
 screenshots:
   - description: The glade_forms package logo.
-    path: doc/icon.png
+    path: docs/assets/icon.png
 
 environment:
   sdk: ^3.6.0
