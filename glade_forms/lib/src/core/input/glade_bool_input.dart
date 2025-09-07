@@ -1,4 +1,4 @@
-import 'package:glade_forms/src/converters/glade_type_converters.dart';
+import 'package:glade_forms/src/converters/converters.dart';
 import 'package:glade_forms/src/core/input/input.dart';
 import 'package:glade_forms/src/core/string_to_type_converter.dart';
 import 'package:glade_forms/src/validator/validator.dart';
@@ -13,7 +13,7 @@ class GladeBoolInput extends GladeInput<bool> {
     super.initialValue,
     ValidatorFactory<bool>? validator,
     super.isPure,
-    super.translateError,
+    super.validationTranslate,
     super.valueComparator,
     StringToTypeConverter<bool>? stringToValueConverter,
     super.dependencies,
@@ -22,7 +22,7 @@ class GladeBoolInput extends GladeInput<bool> {
     super.textEditingController,
     super.useTextEditingController = false,
     super.valueTransform,
-    super.defaultTranslations,
+    super.defaultValidationTranslations,
     super.trackUnchanged = true,
     bool isRequired = true,
   }) : super.internalCreate(

@@ -6,8 +6,9 @@ Validation is defined through part methods on ValidatorFactory such as `notNull(
 
 Each validation rule defines
   - **value validation**, e.g `notNull()` defines that value can not be null. `satisfy()` defines a predicate which has to be true to be valid etc. 
-  - **devErrorMessage** - a message which will be displayed if no translation is provided. 
+  - **devMessage** - a message which will be displayed if no translation is provided. 
   - **key** - Validation error's identification. Usable for translation. 
+  - **severity** - Severity of validation. By default it is `ValidationSeverity.error`.
 
 This example defines validation that `int` value can not be null and has to be greater or equal to 18.
 
@@ -17,7 +18,7 @@ ageInput = GladeIntInput(
         ..notNull()
         ..satisfy(
           (value) => value >= 18,
-          devError: (_, __) => 'Value must be greater or equal to 18',
+          devMessage: (_, __) => 'Value must be greater or equal to 18',
           key: _ErrorKeys.ageRestriction,
         ))
       .build(),
@@ -25,9 +26,66 @@ ageInput = GladeIntInput(
 );
 ```
 
-The order of each validation part matters. By default, the first failing part stops validation. Pass `stopOnFirstError: false` on `.build()` to validate all parts simultaneously.
 
-Fields connected with `textFormFieldInputValidator` will automatically call validator and validation error (if any) is passed down to fields. By default devError is used unless translation is specified. 
+The order of each validation part matters. By default, the first failing part with severity `error` stops validation. You can control this behavior using the following options on `.build()`:
+
+- `stopOnFirstError` (default: `true`): Stops validation on the first error. Set to `false` to validate all parts, collecting all errors and warnings.
+- `stopOnFirstErrorOrWarning` (default: `false`): If set to `true`, validation stops on the first error or warning encountered.
+
+Example:
+
+```dart
+ageInput = GladeIntInput(
+  validator: (v) => (v
+        ..notNull(
+          devMessage: (_, __) => 'Value is required',
+          severity: ValidationSeverity.error,
+        )
+        ..satisfy(
+          (value) => value >= 18,
+          devMessage: (_, __) => 'Recommended age is 18 or above',
+          severity: ValidationSeverity.warning,
+        ))
+      .build(stopOnFirstError: false, stopOnFirstErrorOrWarning: false),
+  value: 0,
+);
+```
+
+In this example, all validation parts are checked, and both errors and warnings are collected. Adjust these options to fit your validation flow.
+
+Fields connected with `textFormFieldInputValidator` will automatically call validator and validation error (if any) is passed down to fields. By default `devMessage` is used unless translation is specified. 
+
+## Validation severity
+
+Each validation rule can specify a **severity** using the `ValidationSeverity` enum. This allows you to distinguish between errors (which typically block form submission) and warnings (which inform the user but do not block submission).
+
+The available severities are:
+
+- `ValidationSeverity.error` – Indicates a validation error. This is the default and usually prevents form submission.
+- `ValidationSeverity.warning` – Indicates a warning. Warnings are shown to the user but do not block form submission.
+
+You can set the severity for each validation part:
+
+```dart
+ageInput = GladeIntInput(
+  validator: (v) => (v
+        ..notNull(
+          devMessage: (_, __) => 'Value is required',
+          severity: ValidationSeverity.error,
+        )
+        ..satisfy(
+          (value) => value >= 18,
+          devMessage: (_, __) => 'Recommended age is 18 or above',
+          severity: ValidationSeverity.warning,
+        ))
+      .build(),
+  value: 0,
+);
+```
+
+In this example, if the value is null, an error is shown and form submission is blocked. If the value is less than 18, a warning is shown, but the user can still submit the form.
+
+---
 
 ### Skipping Specific Validation
 To conditionally skip specific validations, use the `shouldValidate` callback. If an input should be entirely excluded from validation, consider using conditional logic in the `inputs` getter.

@@ -13,7 +13,7 @@ class LocalizationAddonCustom extends WidgetbookAddon<Locale> {
   @override
   List<Field> get fields {
     return [
-      ListField<Locale>(
+      ObjectDropdownField<Locale>(
         name: 'name',
         values: locales,
         // TODO(widgetbook): update deprecated
@@ -21,7 +21,7 @@ class LocalizationAddonCustom extends WidgetbookAddon<Locale> {
         initialValue: initialSetting,
         labelBuilder: (locale) => locale.toLanguageTag(),
         // TODO(widgetbook): update deprecated
-        // ignore: deprecated_member_use, ok for now
+        // ignore: deprecated_member_use, ok for now, avoid-deprecated-usage
         onChanged: (context, locale) => locale != null ? onChange(locale) : null,
       ),
     ];
@@ -43,7 +43,7 @@ class LocalizationAddonCustom extends WidgetbookAddon<Locale> {
         super(
           name: 'Locale',
           // TODO(widgetbook): update deprecated
-          // ignore: deprecated_member_use, ok for now, avoid-unsafe-collection-methods, ok here
+          // ignore: deprecated_member_use, ok for now, avoid-unsafe-collection-methods, ok here, avoid-deprecated-usage
           initialSetting: initialLocale ?? locales.first,
         );
 

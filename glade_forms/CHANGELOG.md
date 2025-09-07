@@ -1,3 +1,22 @@
+## Unreleased
+
+**Breaking change release**
+
+In order to introduce support for warning level validations, several breaking changes were made:
+- `GladeInputError` was renamed to `GladeInputValidation` to better reflect its purpose.
+- `GladeErrorKeys` was renamed to `GladeValidationsKeys`
+- `ErrorTranslator` was renamed to `ValidationTranslator` to align with the new naming conventions
+- `devError` parameter in `GladeValidator` methods was renamed to `devMessage` to maintain consistency.
+- `translateError` parameter was renamed to `validationTranslate` in both `GladeInput` and `GladeModel` to better represent its functionality.
+- `DefaultTranslations` was renamed to `DefaultValidationTranslations` to clarify its role in the validation process.
+- Rename `defaultErrorTranslate` to `defaultValidationTranslate` in `GladeModel` for consistency with other renamings.
+
+New features:
+- `GladeInputValidation` now includes an `errorSeverity` property, which can be either `error` or `warning`.
+- The `GladeValidator` class was updated to support warning level validations.
+- The `GladeInput` class was modified to handle warning level validations appropriately
+- The `GladeModel` class was also updated to manage warning level validations effectively.
+
 ## 4.2.0
 - Upgrade dependencies
 - Upgrade to Flutter SDK 3.35.0

@@ -10,6 +10,7 @@ import 'package:glade_forms_storybook/usecases/onchange/one_checkbox_deps_valida
 import 'package:glade_forms_storybook/usecases/onchange/two_way_checkbox_change.dart';
 import 'package:glade_forms_storybook/usecases/quickstart_example.dart';
 import 'package:glade_forms_storybook/usecases/regress/issue48_text_controller_example.dart';
+import 'package:glade_forms_storybook/usecases/warning_input_example.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 // ignore: prefer-static-class, ok for now
@@ -62,6 +63,7 @@ class App extends StatelessWidget {
       ],
       directories: [
         WidgetbookUseCase(name: 'Quickstart form', builder: (context) => const QuickStartExample()),
+        WidgetbookUseCase(name: 'Warning input example', builder: (context) => const WarningInputExample()),
         WidgetbookCategory(
           name: 'onChange',
           children: [

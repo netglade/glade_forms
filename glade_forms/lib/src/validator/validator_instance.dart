@@ -1,12 +1,17 @@
 import 'package:collection/collection.dart';
 import 'package:glade_forms/src/core/core.dart';
 import 'package:glade_forms/src/validator/part/input_validator_part.dart';
-import 'package:glade_forms/src/validator/validator_error/glade_validator_error.dart';
 import 'package:glade_forms/src/validator/validator_result.dart';
+import 'package:glade_forms/src/validator/validator_result/glade_validator_result.dart';
 
 class ValidatorInstance<T> {
   /// Stops validation on first error.
+  ///
+  /// Continues on warning.
   final bool stopOnFirstError;
+
+  /// Stop validation on first error or warning.
+  final bool stopOnFirstErrorOrWarning;
 
   GladeInput<T>? _input;
 
@@ -15,6 +20,7 @@ class ValidatorInstance<T> {
   ValidatorInstance({
     required List<InputValidatorPart<T>> parts,
     required this.stopOnFirstError,
+    required this.stopOnFirstErrorOrWarning,
   }) : _parts = parts;
 
   // ignore: use_setters_to_change_properties, this is ok
@@ -22,23 +28,39 @@ class ValidatorInstance<T> {
 
   /// Performs validation on given [value].
   ValidatorResult<T> validate(T value) {
-    final errors = <GladeValidatorError<T>>[];
+    final errors = <GladeValidatorResult<T>>[];
+    final warnings = <GladeValidatorResult<T>>[];
+    final combined = <GladeValidatorResult<T>>[];
 
     for (final part in _parts) {
       final shouldValidate = part.shouldValidate?.call(value) ?? true;
 
       if (!shouldValidate) continue;
 
-      final error = part.validate(value);
+      final result = part.validate(value);
 
-      if (error != null) {
-        errors.add(error);
+      if (result != null) {
+        final isError = result.severity == ValidationSeverity.error;
 
-        if (stopOnFirstError) return ValidatorResult(errors: errors, associatedInput: _input);
+        combined.add(result);
+
+        if (isError) {
+          errors.add(result);
+        } else {
+          warnings.add(result);
+        }
+
+        if (stopOnFirstError && isError) {
+          return ValidatorResult(all: combined, errors: errors, warnings: warnings, associatedInput: _input);
+        }
+
+        if (stopOnFirstErrorOrWarning) {
+          return ValidatorResult(all: combined, errors: errors, warnings: warnings, associatedInput: _input);
+        }
       }
     }
 
-    return ValidatorResult(errors: errors, associatedInput: _input);
+    return ValidatorResult(all: combined, errors: errors, warnings: warnings, associatedInput: _input);
   }
 
   InputValidatorPart<T>? tryFindValidatorPart(Object key) {
