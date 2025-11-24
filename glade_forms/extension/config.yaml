@@ -4,7 +4,7 @@
 name: glade_forms
 description: Inspect and debug glade_forms models and inputs in your Flutter application.
 version: 1.0.0
-materialIconCodePoint: '0xe86d'
+materialIconCodePoint: '0xe86d' # assignment icon (Icons.assignment)
 
 # The path to the extension's devtools build output.
 # This is relative to the parent directory of this config file.

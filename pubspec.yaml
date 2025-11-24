@@ -70,6 +70,8 @@ melos:
       run: |
         cd glade_forms_devtools_extension
         flutter build web --wasm --release
+        # Ensure parent directory exists, then clean and copy build output
+        mkdir -p ../glade_forms/extension/devtools
         rm -rf ../glade_forms/extension/devtools/build
         cp -r build/web ../glade_forms/extension/devtools/build
       description: Build the DevTools extension for glade_forms and copy to extension directory.
