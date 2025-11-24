@@ -8,4 +8,4 @@ materialIconCodePoint: '0xe86d'
 
 # The path to the extension's devtools build output.
 # This is relative to the parent directory of this config file.
-devtoolsExtensionPath: devtools/build/web/
+devtoolsExtensionPath: devtools/build/
