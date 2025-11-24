@@ -99,5 +99,29 @@ class FormModel extends GladeModel {
 
 After that listener will contain `lastUpdatedKeys` with keys of `age` and `name` inputs.
 
+## Debug metadata
+GladeModel can hold debug metadata via `fillDebugMetadata()` method. Override this method to provide metadata as key-value pairs.
+
+```dartdart
+class MyModel extends GladeModel {
+  late GladeStringInput name;
+  late GladeIntInput age;
+
+  bool get isAdult => age.value >= 18;
+  bool get hasNameAtLeast5Chars => name.value.length >= 5;
+
+  // ... 
+  @override
+  Map<String, Object> fillDebugMetadata() {
+    return {
+      'isAdult': isAdult,
+      'hasNameAtLeast5Chars': hasNameAtLeast5Chars,      
+    };
+  }
+}
+```
+
+These metadata will be visible in `GladeFormDebugInfo` widget under model's section.
+
 ----
 Looking for advanced behaviors such as controlling other inputs based on certain conditions? Check out the documentation for more information.
