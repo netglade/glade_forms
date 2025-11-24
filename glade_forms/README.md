@@ -16,6 +16,7 @@ A universal way to define form validators with support of translations.
 
 - [👀 What is this?](#-what-is-this)
 - [🚀 Getting started](#-getting-started)
+- [🔍 DevTools Extension](#-devtools-extension)
 - [📖 Documentation](#-documentation)
 
 ## 👀 What is this?
@@ -94,6 +95,16 @@ GladeFormBuilder(
 ![quick_start_example](https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/docs/assets/quickstart.gif)
 
 Interactive examples can be found in [📖 Glade Forms Widgetbook][storybook_demo_link].
+
+## 🔍 DevTools Extension
+
+Glade Forms includes a Flutter DevTools extension to help you inspect and debug your forms during development. The extension shows:
+- Active `GladeModel` instances
+- Input values and validation states
+- Form dirty/pure states
+- Real-time updates as you interact with your app
+
+No additional setup required - the extension is automatically available when you use `glade_forms` in your project!
 
 ## 📖 Documentation
 Want to learn more? 
