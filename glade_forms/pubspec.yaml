@@ -25,3 +25,4 @@ dependencies:
 dev_dependencies:
   netglade_analysis: ^18.0.0
   test: ^1.25.8
+  yaml: ^3.1.2
