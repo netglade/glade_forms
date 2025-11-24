@@ -1,0 +1,11 @@
+# Configuration for the glade_forms DevTools extension.
+# Learn more: https://docs.flutter.dev/tools/devtools/extensions
+
+name: glade_forms
+description: Inspect and debug glade_forms models and inputs in your Flutter application.
+version: 1.0.0
+materialIconCodePoint: '0xe86d'
+
+# The path to the extension's devtools build output.
+# This is relative to the parent directory of this config file.
+devtoolsExtensionPath: devtools/build/web/

@@ -7,6 +7,7 @@ environment:
 workspace:
   - glade_forms
   - glade_forms/example
+  - glade_forms_devtools_extension
   - storybook
 
 dev_dependencies:
@@ -63,3 +64,12 @@ melos:
         melos exec -- fvm flutter pub run easy_localization:generate -S "assets/translations" --skip-unnecessary-keys -f keys -o locale_keys.g.dart
       packageFilters:
         dependsOn: easy_localization
+
+    # DevTools Extension
+    build:extension:
+      run: |
+        cd glade_forms_devtools_extension
+        flutter build web --wasm --release
+        rm -rf ../glade_forms/extension/devtools/build
+        cp -r build/web ../glade_forms/extension/devtools/build
+      description: Build the DevTools extension for glade_forms and copy to extension directory.

@@ -1,0 +1,62 @@
+---
+title: DevTools Extension
+description: Use Flutter DevTools to inspect and debug your glade_forms models
+---
+
+# DevTools Extension
+
+The glade_forms package includes a Flutter DevTools extension that helps you inspect and debug your form models during development.
+
+## Features
+
+The glade_forms DevTools extension provides:
+
+- **View Active Models**: See all active `GladeModel` instances in your application
+- **Inspect Inputs**: View the current values and validation states of all form inputs
+- **Monitor State**: Track whether forms are dirty, pure, valid, or invalid in real-time
+- **Real-time Updates**: Watch as forms change while you interact with your application
+
+## Installation
+
+The DevTools extension is automatically available when you add `glade_forms` to your project. No additional setup is required.
+
+## Using the Extension
+
+1. Run your Flutter application in debug mode
+2. Open Flutter DevTools
+3. Navigate to the "Glade Forms" tab
+4. Interact with your app to see form states update in real-time
+
+## What You Can See
+
+### Form Models
+View all `GladeModel` instances that are currently active in your application, including:
+- Model type and instance ID
+- Overall validation state (valid/invalid)
+- Dirty/pure state
+
+### Input Fields
+For each model, inspect individual inputs:
+- Input key and type
+- Current value
+- Validation state and error messages
+- Whether the input has been modified
+
+### Validation Results
+See detailed validation information:
+- Active validation errors
+- Warning messages
+- Conversion errors
+
+## Benefits for Development
+
+The DevTools extension makes it easier to:
+- Debug form validation issues
+- Understand form state at any point in time
+- Test validation rules without writing temporary debug code
+- Identify which inputs are causing validation failures
+
+## Learn More
+
+- [Flutter DevTools Documentation](https://docs.flutter.dev/tools/devtools)
+- [DevTools Extensions](https://docs.flutter.dev/tools/devtools/extensions)
