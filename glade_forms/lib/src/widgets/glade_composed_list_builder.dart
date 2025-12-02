@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:glade_forms/src/model/composed_glade_model.dart';
+import 'package:glade_forms/src/model/glade_composed_model.dart';
 import 'package:glade_forms/src/model/glade_model.dart';
 import 'package:glade_forms/src/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 
-typedef GladeComposedListItemBuilder<C extends ComposedGladeModel<M>, M extends GladeModel> = Widget Function(
+typedef GladeComposedListItemBuilder<C extends GladeComposedModel<M>, M extends GladeModel> = Widget Function(
   BuildContext context,
   C composedModel,
   M itemModel,
@@ -13,7 +13,7 @@ typedef GladeComposedListItemBuilder<C extends ComposedGladeModel<M>, M extends 
 
 typedef Builder = Widget Function(BuildContext context);
 
-class GladeComposedListBuilder<C extends ComposedGladeModel<M>, M extends GladeModel> extends StatelessWidget {
+class GladeComposedListBuilder<C extends GladeComposedModel<M>, M extends GladeModel> extends StatelessWidget {
   // ignore: prefer-correct-callback-field-name, ok name
   final CreateComposedModelFunction<C>? create;
   final C? value;
@@ -118,7 +118,7 @@ class GladeComposedListBuilder<C extends ComposedGladeModel<M>, M extends GladeM
   }
 }
 
-class _GladeComposedFormList<C extends ComposedGladeModel<M>, M extends GladeModel> extends StatelessWidget {
+class _GladeComposedFormList<C extends GladeComposedModel<M>, M extends GladeModel> extends StatelessWidget {
   final Axis scrollDirection;
   final ScrollPhysics? physics;
   final bool shrinkWrap;

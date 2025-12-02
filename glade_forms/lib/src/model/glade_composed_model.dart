@@ -3,7 +3,7 @@ import 'package:glade_forms/src/src.dart';
 
 import 'package:glade_forms/src/validator/validator_result.dart';
 
-abstract class ComposedGladeModel<M extends GladeModel> extends ChangeNotifier {
+abstract class GladeComposedModel<M extends GladeModel> extends ChangeNotifier {
   final List<M> _models = [];
 
   /// Returns true if all models are valid.
@@ -30,7 +30,7 @@ abstract class ComposedGladeModel<M extends GladeModel> extends ChangeNotifier {
         for (final e in models) ...e.validatorResults,
       ];
 
-  ComposedGladeModel([List<M>? initialModels]) {
+  GladeComposedModel([List<M>? initialModels]) {
     if (initialModels != null) {
       for (final model in initialModels) {
         addModel(model);
@@ -40,13 +40,17 @@ abstract class ComposedGladeModel<M extends GladeModel> extends ChangeNotifier {
 
   void addModel(M model) {
     _models.add(model);
-    model.addListener(notifyListeners);
+    model
+      ..addListener(notifyListeners)
+      ..bindToComposedModel(this);
     notifyListeners();
   }
 
   void removeModel(M model) {
-    model.removeListener(notifyListeners);
     final _ = _models.remove(model);
+    model
+      ..removeListener(notifyListeners)
+      ..bindToComposedModel(null);
     notifyListeners();
   }
 }

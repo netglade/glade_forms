@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:glade_forms/src/src.dart';
 import 'package:provider/provider.dart';
 
-typedef GladeComposedWidgetBuilder<C extends ComposedGladeModel> = Widget Function(
+typedef GladeComposedWidgetBuilder<C extends GladeComposedModel> = Widget Function(
   BuildContext context,
   C model,
   Widget? child,
 );
 
-class GladeComposedFormBuilder<C extends ComposedGladeModel> extends StatelessWidget {
+class GladeComposedFormBuilder<C extends GladeComposedModel> extends StatelessWidget {
   // ignore: prefer-correct-callback-field-name, ok name
   final CreateComposedModelFunction<C>? create;
   final C? value;

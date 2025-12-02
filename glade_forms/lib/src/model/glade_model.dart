@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:glade_forms/src/core/core.dart';
 import 'package:glade_forms/src/src.dart';
 import 'package:glade_forms/src/validator/validator_result.dart';
 import 'package:meta/meta.dart';
@@ -7,7 +6,7 @@ import 'package:meta/meta.dart';
 abstract class GladeModel extends ChangeNotifier {
   List<GladeInput<Object?>> _lastUpdates = [];
   bool _groupEdit = false;
-  ComposedGladeModel? _bindedComposeModel = null;
+  GladeComposedModel? _bindedComposeModel = null;
 
   /// Returns true if all inputs are valid.
   bool get isValid => inputs.every((input) => input.isValid);
@@ -71,6 +70,12 @@ abstract class GladeModel extends ChangeNotifier {
 
   GladeModel() {
     initialize();
+  }
+
+  /// Binds current model to compose model.
+  // ignore: use_setters_to_change_properties, ok here
+  void bindToComposedModel(GladeComposedModel? model) {
+    _bindedComposeModel = model;
   }
 
   /// Initialize model's inputs.
