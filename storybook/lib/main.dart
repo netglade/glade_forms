@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:glade_forms_storybook/generated/locale_loader.g.dart';
 import 'package:glade_forms_storybook/localization_addon_custom.dart';
 import 'package:glade_forms_storybook/usecases/complex_object_mapping_example.dart';
+import 'package:glade_forms_storybook/usecases/composed/composed_example.dart';
 import 'package:glade_forms_storybook/usecases/dependencies/checkbox_dependency_change.dart';
 import 'package:glade_forms_storybook/usecases/onchange/one_checkbox_deps_validation.dart';
 import 'package:glade_forms_storybook/usecases/onchange/two_way_checkbox_change.dart';
@@ -92,6 +93,15 @@ class App extends StatelessWidget {
             WidgetbookUseCase(
               name: 'Complex objects & converters',
               builder: (context) => const ComplexObjectMappingExample(),
+            ),
+          ],
+        ),
+        WidgetbookCategory(
+          name: 'Composed forms',
+          children: [
+            WidgetbookUseCase(
+              name: 'Adding, removing forms',
+              builder: (context) => const ComposedExample(),
             ),
           ],
         ),
