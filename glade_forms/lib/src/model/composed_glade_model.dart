@@ -26,11 +26,6 @@ abstract class ComposedGladeModel<M extends GladeModel> extends ChangeNotifier {
 
   List<M> get models => _models;
 
-  /// All models registered in ComposedGladeModel.
-  ///
-  /// By default equals to [models].
-  List<M> get allModels => models;
-
   List<ValidatorResult<Object?>> get validatorResults => [
         for (final e in models) ...e.validatorResults,
       ];
@@ -46,6 +41,12 @@ abstract class ComposedGladeModel<M extends GladeModel> extends ChangeNotifier {
   void addModel(M model) {
     _models.add(model);
     model.addListener(notifyListeners);
+    notifyListeners();
+  }
+
+  void removeModel(M model) {
+    model.removeListener(notifyListeners);
+    final _ = _models.remove(model);
     notifyListeners();
   }
 }

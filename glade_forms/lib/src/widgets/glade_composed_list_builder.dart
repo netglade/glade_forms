@@ -4,74 +4,75 @@ import 'package:glade_forms/src/model/glade_model.dart';
 import 'package:glade_forms/src/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 
-typedef ComposedGladeListItemBuilder<M extends GladeModel> = Widget Function(
+typedef GladeComposedListItemBuilder<C extends ComposedGladeModel<M>, M extends GladeModel> = Widget Function(
   BuildContext context,
+  C composedModel,
   M itemModel,
   int index,
 );
 
 typedef Builder = Widget Function(BuildContext context);
 
-class ComposedGladeFormBuilder<C extends ComposedGladeModel<M>, M extends GladeModel> extends StatelessWidget {
+class GladeComposedListBuilder<C extends ComposedGladeModel<M>, M extends GladeModel> extends StatelessWidget {
   // ignore: prefer-correct-callback-field-name, ok name
   final CreateComposedModelFunction<C>? create;
   final C? value;
-  final ComposedGladeListItemBuilder<M> itemBuilder;
-  final Builder? bottomBuilder;
+  final GladeComposedListItemBuilder<C, M> itemBuilder;
+  final Widget? child;
   final ScrollPhysics? physics;
   final Axis scrollDirection;
   final bool shrinkWrap;
 
-  factory ComposedGladeFormBuilder({
-    required ComposedGladeListItemBuilder<M> itemBuilder,
+  factory GladeComposedListBuilder({
+    required GladeComposedListItemBuilder<C, M> itemBuilder,
     Key? key,
-    Builder? bottomBuilder,
+    Widget? child,
   }) =>
-      ComposedGladeFormBuilder._(itemBuilder: itemBuilder, key: key, bottomBuilder: bottomBuilder);
+      GladeComposedListBuilder._(itemBuilder: itemBuilder, key: key, child: child);
 
-  factory ComposedGladeFormBuilder.create({
+  factory GladeComposedListBuilder.create({
     required CreateComposedModelFunction<C> create,
-    required ComposedGladeListItemBuilder<M> itemBuilder,
-    Builder? bottomBuilder,
+    required GladeComposedListItemBuilder<C, M> itemBuilder,
+    Widget? child,
     ScrollPhysics? physics,
     Axis scrollDirection = Axis.vertical,
     bool shrinkWrap = false,
     Key? key,
   }) {
-    return ComposedGladeFormBuilder._(
+    return GladeComposedListBuilder._(
       create: create,
       itemBuilder: itemBuilder,
       physics: physics,
       scrollDirection: scrollDirection,
       shrinkWrap: shrinkWrap,
       key: key,
-      bottomBuilder: bottomBuilder,
+      child: child,
     );
   }
 
-  factory ComposedGladeFormBuilder.value({
+  factory GladeComposedListBuilder.value({
     required C value,
-    required ComposedGladeListItemBuilder<M> itemBuilder,
-    Builder? bottomBuilder,
+    required GladeComposedListItemBuilder<C, M> itemBuilder,
+    Widget? child,
     ScrollPhysics? physics,
     Axis scrollDirection = Axis.vertical,
     bool shrinkWrap = false,
     Key? key,
   }) {
-    return ComposedGladeFormBuilder._(
+    return GladeComposedListBuilder._(
       value: value,
       itemBuilder: itemBuilder,
       physics: physics,
       scrollDirection: scrollDirection,
       shrinkWrap: shrinkWrap,
       key: key,
-      bottomBuilder: bottomBuilder,
+      child: child,
     );
   }
 
-  const ComposedGladeFormBuilder._({
+  const GladeComposedListBuilder._({
     required this.itemBuilder,
-    this.bottomBuilder,
+    this.child,
     this.create,
     this.value,
     this.physics,
@@ -84,53 +85,53 @@ class ComposedGladeFormBuilder<C extends ComposedGladeModel<M>, M extends GladeM
   Widget build(BuildContext context) {
     // choose provider style: create/value
     if (create case final createFn?) {
-      return ComposedGladeModelProvider<C, M>(
+      return GladeComposedModelProvider<C, M>(
         create: createFn,
-        child: _ComposedGladeFormList<C, M>(
+        child: _GladeComposedFormList<C, M>(
           scrollDirection: scrollDirection,
           physics: physics,
           shrinkWrap: shrinkWrap,
           itemBuilder: itemBuilder,
-          bottomBuilder: bottomBuilder,
+          child: child,
         ),
       );
     } else if (value case final modelValue?) {
-      return ComposedGladeModelProvider<C, M>.value(
+      return GladeComposedModelProvider<C, M>.value(
         value: modelValue,
-        child: _ComposedGladeFormList<C, M>(
+        child: _GladeComposedFormList<C, M>(
           scrollDirection: scrollDirection,
           physics: physics,
           shrinkWrap: shrinkWrap,
           itemBuilder: itemBuilder,
-          bottomBuilder: bottomBuilder,
+          child: child,
         ),
       );
     }
 
-    return _ComposedGladeFormList<C, M>(
+    return _GladeComposedFormList<C, M>(
       scrollDirection: scrollDirection,
       physics: physics,
       shrinkWrap: shrinkWrap,
       itemBuilder: itemBuilder,
-      bottomBuilder: bottomBuilder,
+      child: child,
     );
   }
 }
 
-class _ComposedGladeFormList<C extends ComposedGladeModel<M>, M extends GladeModel> extends StatelessWidget {
+class _GladeComposedFormList<C extends ComposedGladeModel<M>, M extends GladeModel> extends StatelessWidget {
   final Axis scrollDirection;
   final ScrollPhysics? physics;
   final bool shrinkWrap;
-  final ComposedGladeListItemBuilder<M> itemBuilder;
-  final Builder? bottomBuilder;
+  final GladeComposedListItemBuilder<C, M> itemBuilder;
+  final Widget? child;
 
-  const _ComposedGladeFormList({
+  const _GladeComposedFormList({
     required this.itemBuilder,
     super.key,
     this.scrollDirection = Axis.vertical,
     this.physics,
     this.shrinkWrap = false,
-    this.bottomBuilder,
+    this.child,
   });
 
   @override
@@ -153,19 +154,14 @@ class _ComposedGladeFormList<C extends ComposedGladeModel<M>, M extends GladeMod
                   return GladeModelProvider<M>.value(
                     value: itemModel,
                     child: Consumer<M>(
-                      builder: (context, model, _) => itemBuilder(context, model, index),
+                      builder: (context, model, _) => itemBuilder(context, composedModel, model, index),
                     ),
                   );
                 },
                 childCount: models.length,
               ),
             ),
-            if (bottomBuilder != null)
-              SliverToBoxAdapter(
-                child: Consumer<C>(
-                  builder: (context, _, __) => bottomBuilder?.call(context) ?? const SizedBox.shrink(),
-                ),
-              ),
+            if (child != null) SliverToBoxAdapter(child: child),
           ],
         );
       },

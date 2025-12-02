@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:glade_forms/glade_forms.dart';
 import 'package:glade_forms_storybook/shared/usecase_container.dart';
-import 'package:provider/provider.dart';
 
-class _ComposedModelImpl extends ComposedGladeModel<_ModelImpl> {
-  _ComposedModelImpl([super.initialModels]);
+class _ComposedModel extends ComposedGladeModel<_Model> {
+  _ComposedModel([super.initialModels]);
 }
 
-class _ModelImpl extends GladeModel {
+class _Model extends GladeModel {
   late GladeBoolInput adult;
   late GladeStringInput name;
 
@@ -37,46 +36,53 @@ class ComposedExample extends StatelessWidget {
   Widget build(BuildContext context) {
     return UsecaseContainer(
       shortDescription: 'Composed forms',
-      child: ComposedGladeFormBuilder<_ComposedModelImpl, _ModelImpl>.create(
-        // ignore: avoid-undisposed-instances, handled by GladeFormBuilder
-        create: (context) => _ComposedModelImpl([_ModelImpl()]),
-        itemBuilder: (context, model, index) => _Form(model),
-        bottomBuilder: (context) {
-          final composedModel = context.read<_ComposedModelImpl>();
-
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: Column(
-              children: [
-                Text(
-                  composedModel.isValid ? 'Everything is valid' : 'Not all models are valid',
-                  style: TextStyle(
-                    color: composedModel.isValid ? Colors.lightGreen : Colors.red,
-                  ),
-                ),
-                FloatingActionButton(
-                  heroTag: GlobalKey(),
-                  tooltip: 'add-form',
-                  // ignore: prefer-extracting-callbacks, ok here
-                  onPressed: () {
-                    // ignore: avoid-undisposed-instances, handled by GladeFormBuilder
-                    composedModel.addModel(_ModelImpl());
-                  },
-                  child: const Text('+', style: TextStyle(fontSize: 26)),
-                ),
-              ],
+      child: GladeComposedModelProvider(
+        // ignore: avoid-undisposed-instances, handled pro provider
+        create: (context) => _ComposedModel([_Model()]),
+        child: Column(
+          children: [
+            Expanded(
+              child: GladeComposedListBuilder<_ComposedModel, _Model>(
+                itemBuilder: (context, composedModel, model, index) => _Form(composedModel, model),
+              ),
             ),
-          );
-        },
+            GladeComposedFormBuilder<_ComposedModel>(
+              builder: (context, model, child) => Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Column(
+                  children: [
+                    Text(
+                      model.isValid ? 'Everything is valid' : 'Not all models are valid',
+                      style: TextStyle(
+                        color: model.isValid ? Colors.lightGreen : Colors.red,
+                      ),
+                    ),
+                    FloatingActionButton(
+                      heroTag: GlobalKey(),
+                      tooltip: 'add-form',
+                      // ignore: prefer-extracting-callbacks, ok here
+                      onPressed: () {
+                        // ignore: avoid-undisposed-instances, handled by GladeFormBuilder
+                        model.addModel(_Model());
+                      },
+                      child: const Text('+', style: TextStyle(fontSize: 26)),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 class _Form extends StatelessWidget {
-  final _ModelImpl model;
+  final _ComposedModel composedModel;
+  final _Model model;
 
-  const _Form(this.model);
+  const _Form(this.composedModel, this.model);
 
   @override
   Widget build(BuildContext context) {
@@ -95,6 +101,7 @@ class _Form extends StatelessWidget {
                   ),
                 ),
                 Switch(value: model.adult.value, onChanged: (v) => model.adult.updateValue(v)),
+                IconButton(onPressed: () => composedModel.removeModel(model), icon: const Icon(Icons.remove)),
               ],
             ),
             Row(

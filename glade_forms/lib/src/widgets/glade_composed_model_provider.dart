@@ -6,32 +6,32 @@ typedef CreateComposedModelFunction<C extends ComposedGladeModel> = C Function(
   BuildContext context,
 );
 
-class ComposedGladeModelProvider<C extends ComposedGladeModel<M>, M extends GladeModel> extends StatelessWidget {
+class GladeComposedModelProvider<C extends ComposedGladeModel<M>, M extends GladeModel> extends StatelessWidget {
   // ignore: prefer-correct-callback-field-name, ok name
   final CreateComposedModelFunction<C>? create;
   final C? value;
   final Widget child;
 
-  factory ComposedGladeModelProvider({
+  factory GladeComposedModelProvider({
     required CreateComposedModelFunction<C> create,
     required Widget child,
     Key? key,
   }) =>
-      ComposedGladeModelProvider._(create: create, key: key, child: child);
+      GladeComposedModelProvider._(create: create, key: key, child: child);
 
-  const ComposedGladeModelProvider._({
+  const GladeComposedModelProvider._({
     required this.child,
     this.create,
     this.value,
     super.key,
   });
 
-  factory ComposedGladeModelProvider.value({
+  factory GladeComposedModelProvider.value({
     required C value,
     required Widget child,
     Key? key,
   }) =>
-      ComposedGladeModelProvider._(value: value, key: key, child: child);
+      GladeComposedModelProvider._(value: value, key: key, child: child);
 
   @override
   Widget build(BuildContext context) {
