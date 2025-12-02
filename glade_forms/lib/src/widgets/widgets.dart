@@ -1,5 +1,6 @@
 export 'glade_composed_form_builder.dart';
 export 'glade_composed_list_builder.dart';
+export 'glade_composed_model_listener.dart';
 export 'glade_composed_model_provider.dart';
 export 'glade_form_builder.dart';
 export 'glade_form_consumer.dart';

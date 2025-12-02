@@ -2,23 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:glade_forms/src/src.dart';
 import 'package:provider/provider.dart';
 
-typedef ComposedGladeModelListenerFn<C extends ComposedGladeModel> = void Function(
+typedef GladeComposedModelListenerFn<C extends ComposedGladeModel> = void Function(
   BuildContext context,
   C model,
 );
 
-class ComposedGladeModelListener<C extends ComposedGladeModel> extends StatefulWidget {
+class GladeComposedModelListener<C extends ComposedGladeModel> extends StatefulWidget {
   final Widget child;
   // ignore: prefer-correct-callback-field-name, ok name
-  final ComposedGladeModelListenerFn<C> listener;
+  final GladeComposedModelListenerFn<C> listener;
 
-  const ComposedGladeModelListener({required this.child, required this.listener, super.key});
+  const GladeComposedModelListener({required this.child, required this.listener, super.key});
 
   @override
-  State<ComposedGladeModelListener<C>> createState() => _ComposedGladeModelListenerState();
+  State<GladeComposedModelListener<C>> createState() => _GladeComposedModelListenerState();
 }
 
-class _ComposedGladeModelListenerState<C extends ComposedGladeModel> extends State<ComposedGladeModelListener<C>> {
+class _GladeComposedModelListenerState<C extends ComposedGladeModel> extends State<GladeComposedModelListener<C>> {
   C? _model;
 
   @override
