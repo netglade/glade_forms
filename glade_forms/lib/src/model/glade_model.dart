@@ -6,7 +6,7 @@ import 'package:meta/meta.dart';
 abstract class GladeModel extends ChangeNotifier {
   List<GladeInput<Object?>> _lastUpdates = [];
   bool _groupEdit = false;
-  GladeComposedModel? _bindedComposeModel;
+  final List<GladeComposedModel> _bindedComposeModels = [];
 
   /// Returns true if all inputs are valid.
   bool get isValid => inputs.every((input) => input.isValid);
@@ -73,9 +73,13 @@ abstract class GladeModel extends ChangeNotifier {
   }
 
   /// Binds current model to compose model.
-  // ignore: use_setters_to_change_properties, ok here
-  void bindToComposedModel(GladeComposedModel? model) {
-    _bindedComposeModel = model;
+  void bindToComposedModel(GladeComposedModel model) {
+    _bindedComposeModels.add(model);
+  }
+
+  /// Unbinds current model from compose model.
+  bool unbindFromComposedModel(GladeComposedModel model) {
+    return _bindedComposeModels.remove(model);
   }
 
   /// Initialize model's inputs.
@@ -174,7 +178,10 @@ abstract class GladeModel extends ChangeNotifier {
 
   @override
   void dispose() {
-    _bindedComposeModel?.removeModel(this);
+    for (final composeModel in _bindedComposeModels) {
+      composeModel.removeModel(this);
+    }
+
     super.dispose();
   }
 }

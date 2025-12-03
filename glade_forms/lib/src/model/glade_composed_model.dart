@@ -56,7 +56,7 @@ abstract class GladeComposedModel<M extends GladeModel> extends ChangeNotifier {
     final _ = _models.remove(model);
     model
       ..removeListener(notifyListeners)
-      ..bindToComposedModel(null);
+      ..unbindFromComposedModel(this);
     notifyListeners();
   }
 }
