@@ -2,7 +2,6 @@
 - **[Add]**: Add `GladeModel.fillDebugMetadata()` method to provide debug metadata as key-value pairs.
   - This metadata is displayed in `GladeModelDebugInfo` widget.
 
-
 ## 5.0.0
 
 **Breaking change release**

@@ -330,15 +330,11 @@ class _GladeModelMetadataTable extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 5),
                     child: _RowValue(value: entry.key),
                   ),
-                  // if (entry.value case final GladeMetaData metadata)
-                  //   _RowValue(value: metadata.toString(), center: false, colorizedValue: metadata.showAsError)
-                  // else
                   _RowValue(
                     value: entry.value,
                     colorizedValue: entry.value is String ||
                         (entry.value is GladeMetaData && (entry.value as GladeMetaData).shouldIndicateStringValue),
                   ),
-
                   const _RowValue(value: ''),
                 ],
               ),
