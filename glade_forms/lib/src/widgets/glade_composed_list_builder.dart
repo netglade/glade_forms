@@ -105,7 +105,9 @@ class GladeComposedListBuilder<C extends GladeComposedModel<M>, M extends GladeM
           child: child,
         ),
       );
-    } else if (value case final modelValue?) {
+    }
+
+    if (value case final modelValue?) {
       return GladeComposedModelProvider<C, M>.value(
         value: modelValue,
         child: _GladeComposedFormList<C, M>(
