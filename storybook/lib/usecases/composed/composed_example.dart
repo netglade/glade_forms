@@ -7,24 +7,25 @@ class _ComposedModel extends GladeComposedModel<_Model> {
 }
 
 class _Model extends GladeModel {
-  late GladeBoolInput adult;
-  late GladeStringInput name;
+  late GladeStringInput firstName;
+  late GladeStringInput lastName;
 
   @override
-  List<GladeInput<Object?>> get inputs => [adult, name];
+  List<GladeInput<Object?>> get inputs => [firstName, lastName];
 
   @override
   void initialize() {
-    adult = GladeBoolInput(
-      initialValue: false,
-      validator: (v) => (v..satisfy((value) => value)).build(),
-      validationTranslate: (_, __, ___, ____) => adult.value ? '' : 'Adulthood must be true',
-    );
-    name = GladeStringInput(
+    firstName = GladeStringInput(
       initialValue: '',
       validator: (v) => (v..satisfy((value) => value.isNotEmpty)).build(),
-      validationTranslate: (_, __, ___, ____) => name.value.isEmpty ? 'Name cannot be empty' : '',
+      validationTranslate: (_, __, ___, ____) => firstName.value.isEmpty ? 'First name cannot be empty' : '',
     );
+    lastName = GladeStringInput(
+      initialValue: '',
+      validator: (v) => (v..satisfy((value) => value.isNotEmpty)).build(),
+      validationTranslate: (_, __, ___, ____) => lastName.value.isEmpty ? 'Last name cannot be empty' : '',
+    );
+
     super.initialize();
   }
 }
@@ -41,9 +42,14 @@ class ComposedExample extends StatelessWidget {
         create: (context) => _ComposedModel([_Model()]),
         child: Column(
           children: [
-            Expanded(
+            Flexible(
               child: GladeComposedListBuilder<_ComposedModel, _Model>(
-                itemBuilder: (context, composedModel, model, index) => _Form(composedModel, model),
+                shrinkWrap: true,
+                itemBuilder: (context, composedModel, model, index) => _Form(
+                  composedModel: composedModel,
+                  model: model,
+                  index: index,
+                ),
               ),
             ),
             GladeComposedFormBuilder<_ComposedModel>(
@@ -52,7 +58,7 @@ class ComposedExample extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      model.isValid ? 'Everything is valid' : 'Not all models are valid',
+                      model.isValid ? 'Everything is filled' : 'Something is missing',
                       style: TextStyle(
                         color: model.isValid ? Colors.lightGreen : Colors.red,
                       ),
@@ -81,45 +87,63 @@ class ComposedExample extends StatelessWidget {
 class _Form extends StatelessWidget {
   final _ComposedModel composedModel;
   final _Model model;
+  final int index;
 
-  const _Form(this.composedModel, this.model);
+  const _Form({required this.composedModel, required this.model, required this.index});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Form(
-        child: Column(
-          children: [
-            Row(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Form(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: TextFormField(
-                    controller: model.name.controller,
-                    validator: model.name.textFormFieldInputValidator,
-                    decoration: const InputDecoration(labelText: 'Name'),
-                  ),
+                Text('Person #${index + 1}'),
+                Row(
+                  spacing: 16,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextFormField(
+                            controller: model.firstName.controller,
+                            validator: model.firstName.textFormFieldInputValidator,
+                            decoration: const InputDecoration(labelText: 'First name'),
+                          ),
+                          Text(
+                            model.firstName.translate() ?? '',
+                            style: const TextStyle(color: Colors.red),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextFormField(
+                            controller: model.lastName.controller,
+                            validator: model.lastName.textFormFieldInputValidator,
+                            decoration: const InputDecoration(labelText: 'Last name'),
+                          ),
+                          Text(
+                            model.lastName.translate() ?? '',
+                            style: const TextStyle(color: Colors.red),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(onPressed: () => composedModel.removeModel(model), icon: const Icon(Icons.remove)),
+                  ],
                 ),
-                Switch(value: model.adult.value, onChanged: (v) => model.adult.updateValue(v)),
-                IconButton(onPressed: () => composedModel.removeModel(model), icon: const Icon(Icons.remove)),
               ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  model.name.translate() ?? '',
-                  style: const TextStyle(color: Colors.red),
-                ),
-                Text(
-                  model.adult.translate() ?? '',
-                  style: const TextStyle(color: Colors.red),
-                ),
-              ],
-            ),
-            const Divider(),
-            const SizedBox(height: 16),
-          ],
+          ),
         ),
       ),
     );

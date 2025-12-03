@@ -6,7 +6,7 @@ import 'package:meta/meta.dart';
 abstract class GladeModel extends ChangeNotifier {
   List<GladeInput<Object?>> _lastUpdates = [];
   bool _groupEdit = false;
-  GladeComposedModel? _bindedComposeModel = null;
+  GladeComposedModel? _bindedComposeModel;
 
   /// Returns true if all inputs are valid.
   bool get isValid => inputs.every((input) => input.isValid);

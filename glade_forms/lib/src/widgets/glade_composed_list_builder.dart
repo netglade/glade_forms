@@ -26,9 +26,19 @@ class GladeComposedListBuilder<C extends GladeComposedModel<M>, M extends GladeM
   factory GladeComposedListBuilder({
     required GladeComposedListItemBuilder<C, M> itemBuilder,
     Key? key,
+    ScrollPhysics? physics,
+    Axis scrollDirection = Axis.vertical,
+    bool shrinkWrap = false,
     Widget? child,
   }) =>
-      GladeComposedListBuilder._(itemBuilder: itemBuilder, key: key, child: child);
+      GladeComposedListBuilder._(
+        itemBuilder: itemBuilder,
+        key: key,
+        physics: physics,
+        scrollDirection: scrollDirection,
+        shrinkWrap: shrinkWrap,
+        child: child,
+      );
 
   factory GladeComposedListBuilder.create({
     required CreateComposedModelFunction<C> create,
@@ -143,6 +153,7 @@ class _GladeComposedFormList<C extends GladeComposedModel<M>, M extends GladeMod
         return CustomScrollView(
           physics: physics,
           scrollDirection: scrollDirection,
+          shrinkWrap: shrinkWrap,
           slivers: [
             SliverList(
               delegate: SliverChildBuilderDelegate(

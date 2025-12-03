@@ -24,12 +24,14 @@ abstract class GladeComposedModel<M extends GladeModel> extends ChangeNotifier {
   /// Input is unchanged if its value is same as initial value, even if value was updated into initial value.
   bool get isUnchanged => models.every((model) => model.isUnchanged);
 
+  /// Models that this composed model is currently listening to.
   List<M> get models => _models;
 
   List<ValidatorResult<Object?>> get validatorResults => [
         for (final e in models) ...e.validatorResults,
       ];
 
+  /// Constructor can take form models to start with.
   GladeComposedModel([List<M>? initialModels]) {
     if (initialModels != null) {
       for (final model in initialModels) {
@@ -38,6 +40,8 @@ abstract class GladeComposedModel<M extends GladeModel> extends ChangeNotifier {
     }
   }
 
+  /// Adds model to `models` list.
+  /// Whenever form model changes, it triggers also change on this composed model.
   void addModel(M model) {
     _models.add(model);
     model
@@ -46,6 +50,8 @@ abstract class GladeComposedModel<M extends GladeModel> extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Removes model from `models` list.
+  /// Also unregisters from listening to its changes.
   void removeModel(M model) {
     final _ = _models.remove(model);
     model

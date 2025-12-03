@@ -1,0 +1,40 @@
+---
+title: Composed forms
+description: Building dynamic lists of forms
+---
+
+Composed forms are ideal when you need to manage multiple instances of the same form. The number of forms doesn’t need to be known in advance — new instances can be added or removed at any time.
+
+The core building block of this system is the `GladeComposedModel`, which maintains and manages a list of individual `GladeModel` instances contained within the composed form.
+
+Because `GladeComposedModel` extends `ChangeNotifier`, any dependent widgets automatically rebuild when the model changes.
+
+**Using a composed model**
+
+Composed models behave just like ordinary `GladeModel` objects — they can be provided using `GladeComposedModelProvider` and consumed with `GladeComposedFormBuilder`:
+
+```dart
+GladeComposedModelProvider(
+  create: (context) => MyComposedModel([MyFormModel()]),
+  child: GladeComposedFormBuilder<MyComposedModel>(
+    builder: (context, composedModel, child) => ...
+  ),
+)
+```
+
+**Managing contained models**
+
+You can dynamically add or remove form models:
+
+```dart
+composedModel.addModel(model);
+composedModel.removeModel(model);
+```
+
+Whenever any contained form model changes — or a model is added or removed — the entire composed form builder rebuilds to reflect the updated list.
+
+**Rendering multiple identical forms**
+
+Since all form models within a composed model share the same type, it's often helpful to automatically generate the same form widget for each model. This is where `GladeComposedListBuilder` comes in. It iterates through all models and builds the appropriate form widget for each one.
+
+![composed-example](/assets/composed-model.gif)
