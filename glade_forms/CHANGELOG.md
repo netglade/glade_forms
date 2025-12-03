@@ -1,8 +1,10 @@
 ## 5.1.0
-- **[Add]**: Add `ComposedGladeModel` to allow multi-forms creation
-- **[Add]**: Add `ComposedGladeFormBuilder` to rebuild on `ComposedGladeModel` change
-- **[Add]**: Add `ComposedGladeModelProvider` to provide`ComposedGladeModel`
-- **[Add]**: Add `ComposedExample` to demonstrate `ComposedGladeModel` functionality
+- **[Add]**: Add `GladeComposedModel` to allow multi-forms creation
+- **[Add]**: Add `GladeComposedFormBuilder` to rebuild on `GladeComposedModel` change
+- **[Add]**: Add `GladeComposedFormListener` to react on `GladeComposedModel` change
+- **[Add]**: Add `GladeComposedFormConsumer`
+- **[Add]**: Add `GladeComposedModelProvider` to provide `GladeComposedModel`
+- **[Add]**: Add `ComposedExample` to demonstrate `GladeComposedModel` functionality
 
 ## 5.0.0
 
