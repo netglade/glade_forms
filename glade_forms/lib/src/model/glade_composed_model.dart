@@ -1,32 +1,34 @@
-import 'package:flutter/material.dart';
 import 'package:glade_forms/src/src.dart';
 
 import 'package:glade_forms/src/validator/validator_result.dart';
 
-abstract class GladeComposedModel<M extends GladeModel> extends ChangeNotifier {
+abstract class GladeComposedModel<M extends GladeModelBase> extends GladeModelBase {
   final List<M> _models = [];
 
   /// Returns true if all models are valid.
+  @override
   bool get isValid => models.every((model) => model.isValid);
 
+  @override
   bool get isValidWithoutWarnings => models.every((model) => model.isValidWithoutWarnings);
 
-  /// Returns true if any model is not valid.
-  bool get isNotValid => !isValid;
-
+  @override
   bool get isPure => models.every((model) => model.isPure);
 
   /// Returns true if model is not pure.
+  @override
   bool get isDirty => !isPure;
 
   /// Returns true if all models have unchanged inputs.
   ///
   /// Input is unchanged if its value is same as initial value, even if value was updated into initial value.
+  @override
   bool get isUnchanged => models.every((model) => model.isUnchanged);
 
   /// Models that this composed model is currently listening to.
   List<M> get models => _models;
 
+  @override
   List<ValidatorResult<Object?>> get validatorResults => [
         for (final e in models) ...e.validatorResults,
       ];

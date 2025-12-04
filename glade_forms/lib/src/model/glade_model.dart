@@ -3,32 +3,33 @@ import 'package:glade_forms/src/src.dart';
 import 'package:glade_forms/src/validator/validator_result.dart';
 import 'package:meta/meta.dart';
 
-abstract class GladeModel extends ChangeNotifier {
+abstract class GladeModel extends GladeModelBase {
   List<GladeInput<Object?>> _lastUpdates = [];
   bool _groupEdit = false;
-  final List<GladeComposedModel> _bindedComposeModels = [];
 
   /// Returns true if all inputs are valid.
+  @override
   bool get isValid => inputs.every((input) => input.isValid);
 
+  @override
   bool get isValidWithoutWarnings => inputs.every((input) => input.isValidAndWithoutWarnings);
-
-  /// Returns true if any input is not valid.
-  bool get isNotValid => !isValid;
 
   /// Returns true if all inputs are pure.
   ///
   /// Input is pure if its value is same as initial value and value was never updated.
   ///
   /// Pure can be reset when [setInputValuesAsNewInitialValues] or [resetToInitialValue] on model or its inputs are called.
+  @override
   bool get isPure => inputs.every((input) => input.isPure);
 
   /// Returns true if model is not pure.
+  @override
   bool get isDirty => !isPure;
 
   /// Returns true if all inputs are unchanged.
   ///
   /// Input is unchanged if its value is same as initial value, even if value was updated into initial value.
+  @override
   bool get isUnchanged => inputs.where((input) => input.trackUnchanged).every((input) => input.isUnchanged);
 
   ValidationTranslator<Object?> get defaultValidationTranslate => (error, key, devMessage, dependencies) => devMessage;
@@ -44,8 +45,6 @@ abstract class GladeModel extends ChangeNotifier {
   ///
   /// By default equals to [inputs].
   List<GladeInput<Object?>> get allInputs => inputs;
-
-  List<String> get lastUpdatedInputKeys => _lastUpdates.map((e) => e.inputKey).toList();
 
   /// Formats errors from `inputs`.
   String get formattedValidationErrors =>
@@ -66,6 +65,7 @@ abstract class GladeModel extends ChangeNotifier {
         return '${e.inputKey} - VALID';
       }).join('\n');
 
+  @override
   List<ValidatorResult<Object?>> get validatorResults => inputs.map((e) => e.validatorResult).toList();
 
   /// Returns true if model has any debug metadata.
@@ -73,16 +73,6 @@ abstract class GladeModel extends ChangeNotifier {
 
   GladeModel() {
     initialize();
-  }
-
-  /// Binds current model to compose model.
-  void bindToComposedModel(GladeComposedModel model) {
-    _bindedComposeModels.add(model);
-  }
-
-  /// Unbinds current model from compose model.
-  bool unbindFromComposedModel(GladeComposedModel model) {
-    return _bindedComposeModels.remove(model);
   }
 
   /// Initialize model's inputs.
@@ -185,13 +175,5 @@ abstract class GladeModel extends ChangeNotifier {
   /// By default returns empty map.
   Map<String, Object> fillDebugMetadata() {
     return {};
-  }
-
-  @override
-  void dispose() {
-    for (final composeModel in _bindedComposeModels) {
-      composeModel.removeModel(this);
-    }
-    super.dispose();
   }
 }

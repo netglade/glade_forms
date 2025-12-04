@@ -1,10 +1,7 @@
 ## 5.1.0
 - **[Add]**: Add `GladeComposedModel` to allow multi-forms creation
-- **[Add]**: Add `GladeComposedFormBuilder` to rebuild on `GladeComposedModel` change
-- **[Add]**: Add `GladeComposedFormListener` to react on `GladeComposedModel` change
-- **[Add]**: Add `GladeComposedFormConsumer`
-- **[Add]**: Add `GladeComposedModelProvider` to provide `GladeComposedModel`
 - **[Add]**: Add `ComposedExample` to demonstrate `GladeComposedModel` functionality
+- **[Add]**: Add `NestedComposedExample` to demonstrate nested `GladeComposedModel` functionality
 - **[Add]**: Add `GladeModel.fillDebugMetadata()` method to provide debug metadata as key-value pairs.
   - This metadata is displayed in `GladeModelDebugInfo` widget.
 

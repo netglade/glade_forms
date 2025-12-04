@@ -37,7 +37,7 @@ class ComposedExample extends StatelessWidget {
   Widget build(BuildContext context) {
     return UsecaseContainer(
       shortDescription: 'Composed forms',
-      child: GladeComposedModelProvider(
+      child: GladeModelProvider(
         // ignore: avoid-undisposed-instances, handled pro provider
         create: (context) => _ComposedModel([_Model()]),
         child: Column(
@@ -52,7 +52,7 @@ class ComposedExample extends StatelessWidget {
                 ),
               ),
             ),
-            GladeComposedFormBuilder<_ComposedModel>(
+            GladeFormConsumer<_ComposedModel>(
               builder: (context, model, child) => Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: Column(
@@ -65,7 +65,7 @@ class ComposedExample extends StatelessWidget {
                     ),
                     FloatingActionButton(
                       heroTag: GlobalKey(),
-                      tooltip: 'add-form',
+                      tooltip: 'Add person',
                       // ignore: prefer-extracting-callbacks, ok here
                       onPressed: () {
                         // ignore: avoid-undisposed-instances, handled by GladeFormBuilder
