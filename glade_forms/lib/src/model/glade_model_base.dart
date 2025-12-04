@@ -3,7 +3,7 @@ import 'package:glade_forms/src/src.dart';
 import 'package:glade_forms/src/validator/validator_result.dart';
 
 abstract class GladeModelBase extends ChangeNotifier {
-  final List<GladeInput<Object?>> _lastUpdates = [];
+  List<GladeInput<Object?>> lastUpdates = [];
   final List<GladeComposedModel> _bindedComposeModels = [];
 
   bool get isValid;
@@ -20,7 +20,7 @@ abstract class GladeModelBase extends ChangeNotifier {
 
   bool get isDirty => !isPure;
 
-  List<String> get lastUpdatedInputKeys => _lastUpdates.map((e) => e.inputKey).toList();
+  List<String> get lastUpdatedInputKeys => lastUpdates.map((e) => e.inputKey).toList();
 
   /// Binds current model to compose model.
   void bindToComposedModel(GladeComposedModel model) {

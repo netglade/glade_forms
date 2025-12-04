@@ -4,7 +4,6 @@ import 'package:glade_forms/src/validator/validator_result.dart';
 import 'package:meta/meta.dart';
 
 abstract class GladeModel extends GladeModelBase {
-  List<GladeInput<Object?>> _lastUpdates = [];
   bool _groupEdit = false;
 
   /// Returns true if all inputs are valid.
@@ -107,7 +106,7 @@ abstract class GladeModel extends GladeModelBase {
   void updateInput<INPUT extends GladeInput<T?>, T>(INPUT input, T value) {
     if (input.value == value) return;
 
-    _lastUpdates = [input];
+    lastUpdates = [input];
 
     input.value = value;
     notifyListeners();
@@ -116,9 +115,9 @@ abstract class GladeModel extends GladeModelBase {
   @internal
   void notifyInputUpdated(GladeInput<Object?> input) {
     if (_groupEdit) {
-      _lastUpdates.add(input);
+      lastUpdates.add(input);
     } else {
-      _lastUpdates = [input];
+      lastUpdates = [input];
       notifyDependencies();
       notifyListeners();
     }
@@ -139,7 +138,7 @@ abstract class GladeModel extends GladeModelBase {
 
   /// Notifies dependant inputs about changes.
   void notifyDependencies() {
-    final updatedKeys = _lastUpdates.map((e) => e.inputKey).toSet();
+    final updatedKeys = lastUpdates.map((e) => e.inputKey).toSet();
     for (final input in inputs) {
       final updatedKeysExceptInputItself = updatedKeys.difference({input.inputKey});
       final union = input.dependencies.map((e) => e.inputKey).toSet().intersection(updatedKeysExceptInputItself);
