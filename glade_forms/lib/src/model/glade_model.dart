@@ -68,6 +68,9 @@ abstract class GladeModel extends ChangeNotifier {
 
   List<ValidatorResult<Object?>> get validatorResults => inputs.map((e) => e.validatorResult).toList();
 
+  /// Returns true if model has any debug metadata.
+  bool get hasDebugMetadata => fillDebugMetadata().isNotEmpty;
+
   GladeModel() {
     initialize();
   }
@@ -176,12 +179,19 @@ abstract class GladeModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Fills debug metadata for the model.
+  ///
+  /// Override to provide metadata.
+  /// By default returns empty map.
+  Map<String, Object> fillDebugMetadata() {
+    return {};
+  }
+
   @override
   void dispose() {
     for (final composeModel in _bindedComposeModels) {
       composeModel.removeModel(this);
     }
-
     super.dispose();
   }
 }

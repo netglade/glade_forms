@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:glade_forms/src/model/glade_model.dart';
+import 'package:glade_forms/src/model/model.dart';
 import 'package:glade_forms/src/widgets/glade_form_builder.dart';
+import 'package:netglade_flutter_utils/netglade_flutter_utils.dart';
 
 /// Provides debug table displaying model's inputs and validation errors.
-class GladeFormDebugInfo<M extends GladeModel> extends StatelessWidget {
+class GladeFormDebugInfo<M extends GladeModel> extends StatefulWidget {
   /// Whether to show isUnchanged column.
   final bool showIsUnchanged;
 
@@ -62,9 +63,18 @@ class GladeFormDebugInfo<M extends GladeModel> extends StatelessWidget {
   });
 
   @override
+  State<GladeFormDebugInfo<M>> createState() => _GladeFormDebugInfoState<M>();
+}
+
+class _GladeFormDebugInfoState<M extends GladeModel> extends State<GladeFormDebugInfo<M>> {
+  bool _showMetadata = true;
+
+  @override
   Widget build(BuildContext context) {
     return GladeFormBuilder<M>(
       builder: (context, model, _) {
+        final hasMetadata = model.hasDebugMetadata;
+
         return Padding(
           padding: const EdgeInsets.all(8),
           child: Column(
@@ -98,6 +108,16 @@ class GladeFormDebugInfo<M extends GladeModel> extends StatelessWidget {
                     ],
                   ),
                   const Spacer(),
+                  if (hasMetadata)
+                    Flexible(
+                      child: SwitchListTile(
+                        title: Text('Show metadata table (${hasMetadata ? 'available' : 'none'})'),
+                        value: _showMetadata,
+                        dense: true,
+                        visualDensity: VisualDensity.compact,
+                        onChanged: (value) => setState(() => _showMetadata = value),
+                      ),
+                    ),
                   IconButton(
                     // ignore: prefer-extracting-callbacks, its ok.
                     onPressed: () {
@@ -149,38 +169,39 @@ class GladeFormDebugInfo<M extends GladeModel> extends StatelessWidget {
 
               const SizedBox(height: 5),
 
-              if (scrollable)
-                SingleChildScrollView(
+              ConditionalWrap(
+                condition: widget.scrollable,
+                wrapper: (context, child) => SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  child: _Table(
-                    scrollable: scrollable,
-                    showIsUnchanged: showIsUnchanged,
-                    showIsValid: showIsValid,
-                    showIsValidWithoutWarnings: showIsValidWithoutWarnings,
-                    showValidationError: showValidationError,
-                    showConversionError: showConversionError,
-                    showValue: showValue,
-                    showInitialValue: showInitialValue,
-                    showControllerText: showControllerText,
-                    hiddenKeys: hiddenKeys,
-                    model: model,
-                  ),
-                )
-              else
-                _Table(
-                  scrollable: scrollable,
-                  showIsUnchanged: showIsUnchanged,
-                  showIsValid: showIsValid,
-                  showIsValidWithoutWarnings: showIsValidWithoutWarnings,
-                  showValidationError: showValidationError,
-                  showConversionError: showConversionError,
-                  showValue: showValue,
-                  showInitialValue: showInitialValue,
-                  showControllerText: showControllerText,
-                  hiddenKeys: hiddenKeys,
-                  model: model,
+                  child: child,
                 ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _GladeInputsTable(
+                      scrollable: widget.scrollable,
+                      showIsUnchanged: widget.showIsUnchanged,
+                      showIsValid: widget.showIsValid,
+                      showIsValidWithoutWarnings: widget.showIsValidWithoutWarnings,
+                      showValidationError: widget.showValidationError,
+                      showConversionError: widget.showConversionError,
+                      showValue: widget.showValue,
+                      showInitialValue: widget.showInitialValue,
+                      showControllerText: widget.showControllerText,
+                      hiddenKeys: widget.hiddenKeys,
+                      model: model,
+                    ),
+                    if (hasMetadata && _showMetadata) ...[
+                      const SizedBox(height: 20),
+                      _GladeModelMetadataTable(model: model, scrollable: widget.scrollable),
+                    ],
+                  ],
+                ),
+              ),
+
               const SizedBox(height: 10),
+
               const _DangerStrips(color1: Colors.black, color2: Colors.red, gap: 5),
             ],
           ),
@@ -190,7 +211,7 @@ class GladeFormDebugInfo<M extends GladeModel> extends StatelessWidget {
   }
 }
 
-class _Table extends StatelessWidget {
+class _GladeInputsTable extends StatelessWidget {
   final bool scrollable;
   final bool showIsUnchanged;
   final bool showIsValid;
@@ -203,7 +224,7 @@ class _Table extends StatelessWidget {
   final GladeModel model;
   final List<String> hiddenKeys;
 
-  const _Table({
+  const _GladeInputsTable({
     required this.scrollable,
     required this.showIsUnchanged,
     required this.showIsValid,
@@ -241,6 +262,7 @@ class _Table extends StatelessWidget {
             if (showValue) const _ColumnHeader('value'),
             if (showInitialValue) const _ColumnHeader('initialValue'),
             if (showControllerText) const _ColumnHeader('controller.text'),
+            const _ColumnHeader(''),
           ],
         ),
         for (final (index, x) in inputs.indexed)
@@ -261,8 +283,63 @@ class _Table extends StatelessWidget {
               if (showValue) _RowValue(value: x.value, colorizedValue: true),
               if (showInitialValue) _RowValue(value: x.initialValue, colorizedValue: true),
               if (showControllerText) _RowValue(value: x.controller?.text, colorizedValue: true),
+
+              // * Empty space
+              const _RowValue(value: ''),
             ],
           ),
+      ],
+    );
+  }
+}
+
+class _GladeModelMetadataTable extends StatelessWidget {
+  final GladeModel model;
+  final bool scrollable;
+
+  const _GladeModelMetadataTable({
+    required this.model,
+    required this.scrollable,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final rowColor = Theme.of(context).colorScheme.surface;
+    final alternativeRowColor =
+        MediaQuery.platformBrightnessOf(context) == Brightness.dark ? rowColor.lighten() : rowColor.darken();
+
+    return Column(
+      children: [
+        Text('Model Metadata', style: Theme.of(context).textTheme.titleMedium),
+        Table(
+          defaultColumnWidth: scrollable ? const IntrinsicColumnWidth() : const FlexColumnWidth(),
+          border: const TableBorder.symmetric(outside: BorderSide()),
+          children: [
+            TableRow(
+              decoration:
+                  BoxDecoration(color: Theme.of(context).canvasColor, border: const Border(bottom: BorderSide())),
+              children: const [_ColumnHeader('Key'), _ColumnHeader('Value'), _ColumnHeader('')],
+            ),
+            for (final (index, entry) in model.fillDebugMetadata().entries.indexed)
+              TableRow(
+                decoration: BoxDecoration(
+                  color: index.isEven ? rowColor : alternativeRowColor,
+                ),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 5),
+                    child: _RowValue(value: entry.key),
+                  ),
+                  _RowValue(
+                    value: entry.value,
+                    colorizedValue: entry.value is String ||
+                        (entry.value is GladeMetaData && (entry.value as GladeMetaData).shouldIndicateStringValue),
+                  ),
+                  const _RowValue(value: ''),
+                ],
+              ),
+          ],
+        ),
       ],
     );
   }
@@ -427,27 +504,5 @@ class _DangerStrips extends StatelessWidget {
     }
 
     return stripes;
-  }
-}
-
-extension _PrivateColorEx on Color {
-  /// Returns color darkened by [amount].
-  Color darken([double amount = 0.1]) {
-    assert(amount >= 0 && amount <= 1, 'amount must be between 0 and 1');
-
-    final hsl = HSLColor.fromColor(this);
-    final hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
-
-    return hslDark.toColor();
-  }
-
-  /// Returns color lightened by [amount].
-  Color lighten([double amount = 0.1]) {
-    assert(amount >= 0 && amount <= 1, 'amount must be between 0 and 1');
-
-    final hsl = HSLColor.fromColor(this);
-    final hslLight = hsl.withLightness((hsl.lightness + amount).clamp(0.0, 1.0));
-
-    return hslLight.toColor();
   }
 }
