@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:glade_forms/src/model/glade_model.dart';
+import 'package:glade_forms/src/src.dart';
 import 'package:provider/provider.dart';
 
-typedef GladeFormListenerFn<M extends GladeModel> = void Function(
+typedef GladeFormListenerFn<M extends GladeModelBase> = void Function(
   BuildContext context,
   M model,
   List<String> lastUpdatedInputKey,
 );
 
-class GladeFormListener<M extends GladeModel> extends StatefulWidget {
+class GladeFormListener<M extends GladeModelBase> extends StatefulWidget {
   final Widget child;
   // ignore: prefer-correct-callback-field-name, ok name
   final GladeFormListenerFn<M> listener;
@@ -23,7 +23,7 @@ class GladeFormListener<M extends GladeModel> extends StatefulWidget {
   State<GladeFormListener<M>> createState() => _GladeFormListenerState<M>();
 }
 
-class _GladeFormListenerState<M extends GladeModel> extends State<GladeFormListener<M>> {
+class _GladeFormListenerState<M extends GladeModelBase> extends State<GladeFormListener<M>> {
   M? _model;
 
   @override

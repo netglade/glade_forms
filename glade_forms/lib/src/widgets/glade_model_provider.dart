@@ -1,10 +1,10 @@
 import 'package:flutter/widgets.dart';
-import 'package:glade_forms/src/model/glade_model.dart';
+import 'package:glade_forms/src/src.dart';
 import 'package:provider/provider.dart';
 
-typedef CreateModelFunction<M extends GladeModel> = M Function(BuildContext context);
+typedef CreateModelFunction<M extends GladeModelBase> = M Function(BuildContext context);
 
-class GladeModelProvider<M extends GladeModel> extends StatelessWidget {
+class GladeModelProvider<M extends GladeModelBase> extends StatelessWidget {
   // ignore: prefer-correct-callback-field-name, ok name
   final CreateModelFunction<M>? create;
   final M? value;
