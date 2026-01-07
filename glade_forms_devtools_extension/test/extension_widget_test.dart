@@ -11,23 +11,20 @@ void main() {
     expect(find.text('Glade Forms Inspector'), findsOneWidget);
   });
 
-  testWidgets('Extension screen shows features list', (WidgetTester tester) async {
+  testWidgets('Extension shows service unavailable message when not connected',
+      (WidgetTester tester) async {
     await tester.pumpWidget(const GladeFormsDevToolsExtension());
     await tester.pumpAndSettle();
 
-    // Verify feature descriptions are present
-    expect(find.text('Features:'), findsOneWidget);
-    expect(find.text('View active GladeModel instances'), findsOneWidget);
-    expect(find.text('Inspect input values and validation states'), findsOneWidget);
-    expect(find.text('Monitor form dirty/pure states'), findsOneWidget);
-    expect(find.text('Real-time updates as forms change'), findsOneWidget);
+    // Should show service unavailable message
+    expect(find.text('Service Not Available'), findsOneWidget);
   });
 
-  testWidgets('Extension has proper branding', (WidgetTester tester) async {
+  testWidgets('Extension has refresh button', (WidgetTester tester) async {
     await tester.pumpWidget(const GladeFormsDevToolsExtension());
     await tester.pumpAndSettle();
 
-    expect(find.text('Glade Forms DevTools Extension'), findsOneWidget);
-    expect(find.text('Inspect and debug your glade_forms models'), findsOneWidget);
+    // Find refresh button
+    expect(find.byIcon(Icons.refresh), findsOneWidget);
   });
 }
