@@ -55,6 +55,11 @@
           "icon": "network-wired"
         },
         {
+          "title": "Composed model",
+          "href": "/advanced/composed-model",
+          "icon": "box-open"
+        },
+        {
           "title": "Debugging",
           "href": "/advanced/debugging",
           "icon": "bug"

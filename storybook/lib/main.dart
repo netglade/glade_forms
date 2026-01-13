@@ -5,7 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:glade_forms_storybook/generated/locale_loader.g.dart';
 import 'package:glade_forms_storybook/localization_addon_custom.dart';
 import 'package:glade_forms_storybook/usecases/complex_object_mapping_example.dart';
+import 'package:glade_forms_storybook/usecases/composed/composed_example.dart';
+import 'package:glade_forms_storybook/usecases/composed/nested_composed_example.dart';
 import 'package:glade_forms_storybook/usecases/dependencies/checkbox_dependency_change.dart';
+import 'package:glade_forms_storybook/usecases/metadata_descriptor_example.dart';
 import 'package:glade_forms_storybook/usecases/onchange/one_checkbox_deps_validation.dart';
 import 'package:glade_forms_storybook/usecases/onchange/two_way_checkbox_change.dart';
 import 'package:glade_forms_storybook/usecases/quickstart_example.dart';
@@ -63,6 +66,7 @@ class App extends StatelessWidget {
       ],
       directories: [
         WidgetbookUseCase(name: 'Quickstart form', builder: (context) => const QuickStartExample()),
+        WidgetbookUseCase(name: 'Metadata descriptor example', builder: (context) => const MetadataDescriptorExample()),
         WidgetbookUseCase(name: 'Warning input example', builder: (context) => const WarningInputExample()),
         WidgetbookCategory(
           name: 'onChange',
@@ -92,6 +96,19 @@ class App extends StatelessWidget {
             WidgetbookUseCase(
               name: 'Complex objects & converters',
               builder: (context) => const ComplexObjectMappingExample(),
+            ),
+          ],
+        ),
+        WidgetbookCategory(
+          name: 'Composed forms',
+          children: [
+            WidgetbookUseCase(
+              name: 'Adding, removing forms',
+              builder: (context) => const ComposedExample(),
+            ),
+            WidgetbookUseCase(
+              name: 'Nested composed forms',
+              builder: (context) => const NestedComposedExample(),
             ),
           ],
         ),

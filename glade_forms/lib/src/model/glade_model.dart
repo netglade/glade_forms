@@ -1,35 +1,36 @@
 import 'package:flutter/foundation.dart';
-import 'package:glade_forms/src/core/core.dart';
 import 'package:glade_forms/src/devtools/devtools_registry.dart';
+import 'package:glade_forms/src/src.dart';
 import 'package:glade_forms/src/validator/validator_result.dart';
 import 'package:meta/meta.dart';
 
-abstract class GladeModel extends ChangeNotifier {
-  List<GladeInput<Object?>> _lastUpdates = [];
+abstract class GladeModel extends GladeModelBase {
   bool _groupEdit = false;
   String? _devtoolsId;
 
   /// Returns true if all inputs are valid.
+  @override
   bool get isValid => inputs.every((input) => input.isValid);
 
+  @override
   bool get isValidWithoutWarnings => inputs.every((input) => input.isValidAndWithoutWarnings);
-
-  /// Returns true if any input is not valid.
-  bool get isNotValid => !isValid;
 
   /// Returns true if all inputs are pure.
   ///
   /// Input is pure if its value is same as initial value and value was never updated.
   ///
   /// Pure can be reset when [setInputValuesAsNewInitialValues] or [resetToInitialValue] on model or its inputs are called.
+  @override
   bool get isPure => inputs.every((input) => input.isPure);
 
   /// Returns true if model is not pure.
+  @override
   bool get isDirty => !isPure;
 
   /// Returns true if all inputs are unchanged.
   ///
   /// Input is unchanged if its value is same as initial value, even if value was updated into initial value.
+  @override
   bool get isUnchanged => inputs.where((input) => input.trackUnchanged).every((input) => input.isUnchanged);
 
   ValidationTranslator<Object?> get defaultValidationTranslate => (error, key, devMessage, dependencies) => devMessage;
@@ -45,8 +46,6 @@ abstract class GladeModel extends ChangeNotifier {
   ///
   /// By default equals to [inputs].
   List<GladeInput<Object?>> get allInputs => inputs;
-
-  List<String> get lastUpdatedInputKeys => _lastUpdates.map((e) => e.inputKey).toList();
 
   /// Formats errors from `inputs`.
   String get formattedValidationErrors =>
@@ -67,7 +66,11 @@ abstract class GladeModel extends ChangeNotifier {
         return '${e.inputKey} - VALID';
       }).join('\n');
 
+  @override
   List<ValidatorResult<Object?>> get validatorResults => inputs.map((e) => e.validatorResult).toList();
+
+  /// Returns true if model has any debug metadata.
+  bool get hasDebugMetadata => fillDebugMetadata().isNotEmpty;
 
   GladeModel() {
     initialize();
@@ -106,7 +109,7 @@ abstract class GladeModel extends ChangeNotifier {
   void updateInput<INPUT extends GladeInput<T?>, T>(INPUT input, T value) {
     if (input.value == value) return;
 
-    _lastUpdates = [input];
+    lastUpdates = [input];
 
     input.value = value;
     notifyListeners();
@@ -115,9 +118,9 @@ abstract class GladeModel extends ChangeNotifier {
   @internal
   void notifyInputUpdated(GladeInput<Object?> input) {
     if (_groupEdit) {
-      _lastUpdates.add(input);
+      lastUpdates.add(input);
     } else {
-      _lastUpdates = [input];
+      lastUpdates = [input];
       notifyDependencies();
       notifyListeners();
     }
@@ -138,7 +141,7 @@ abstract class GladeModel extends ChangeNotifier {
 
   /// Notifies dependant inputs about changes.
   void notifyDependencies() {
-    final updatedKeys = _lastUpdates.map((e) => e.inputKey).toSet();
+    final updatedKeys = lastUpdates.map((e) => e.inputKey).toSet();
     for (final input in inputs) {
       final updatedKeysExceptInputItself = updatedKeys.difference({input.inputKey});
       final union = input.dependencies.map((e) => e.inputKey).toSet().intersection(updatedKeysExceptInputItself);
@@ -168,10 +171,12 @@ abstract class GladeModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _registerWithDevTools() {
-    if (!kDebugMode) return;
-    _devtoolsId = '${runtimeType}_${identityHashCode(this)}';
-    GladeFormsDevToolsRegistry().registerModel(_devtoolsId!, this);
+  /// Fills debug metadata for the model.
+  ///
+  /// Override to provide metadata.
+  /// By default returns empty map.
+  Map<String, Object> fillDebugMetadata() {
+    return {};
   }
 
   @override
@@ -180,5 +185,11 @@ abstract class GladeModel extends ChangeNotifier {
       GladeFormsDevToolsRegistry().unregisterModel(_devtoolsId!);
     }
     super.dispose();
+  }
+
+  void _registerWithDevTools() {
+    if (!kDebugMode) return;
+    _devtoolsId = '${runtimeType}_${identityHashCode(this)}';
+    GladeFormsDevToolsRegistry().registerModel(_devtoolsId!, this);
   }
 }

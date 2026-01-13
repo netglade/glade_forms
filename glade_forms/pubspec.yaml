@@ -1,6 +1,6 @@
 name: glade_forms
 description: A universal way to define form validators with support of translations.
-version: 5.0.0
+version: 5.1.0
 repository: https://github.com/netglade/glade_forms
 issue_tracker: https://github.com/netglade/glade_forms/issues
 screenshots:
@@ -19,6 +19,7 @@ dependencies:
   flutter:
     sdk: flutter
   meta: ^1.9.1
+  netglade_flutter_utils: ^1.3.0
   netglade_utils: ^2.4.1
   provider: ^6.0.5
 
