@@ -1,3 +1,9 @@
+## 5.2.0
+- **[Add]**: Add **DevTools** extennsion!
+  - Allows to inspect Glade Forms models in Flutter DevTools
+- **[Add]**: Add `debugKey` property for developer friendly unique identification of models.
+  - `debugKey` is a string that identifies the model in a human-readable way.
+
 ## 5.1.0
 - **[Add]**: Add `GladeComposedModel` to allow multi-forms creation
 - **[Add]**: Add `ComposedExample` to demonstrate `GladeComposedModel` functionality

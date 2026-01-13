@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:glade_forms_devtools_extension/src/models/form_model_data.dart';
+import 'package:glade_forms_devtools_extension/src/models/glade_model_description.dart';
 
 /// Widget to display a single GladeModel instance
 class ModelCard extends StatelessWidget {
-  final FormModelData model;
+  final GladeModelDescription model;
   final VoidCallback? onTap;
   final bool isSelected;
 
@@ -17,7 +17,7 @@ class ModelCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Card(
       elevation: isSelected ? 4 : 1,
       color: isSelected ? theme.colorScheme.primaryContainer : null,
@@ -32,18 +32,31 @@ class ModelCard extends StatelessWidget {
               Row(
                 children: [
                   Icon(
-                    Icons.assignment,
+                    model.isComposed ? Icons.account_tree : Icons.assignment,
                     size: 20,
                     color: theme.colorScheme.primary,
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: Text(
-                      model.type,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                      overflow: TextOverflow.ellipsis,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          model.type,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if (model.isComposed)
+                          Text(
+                            'Composed Model',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.primary,
+                              fontSize: 11,
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                   _StatusChip(
@@ -68,11 +81,18 @@ class ModelCard extends StatelessWidget {
                       color: Colors.grey,
                       small: true,
                     ),
-                  _StatusChip(
-                    label: '${model.inputs.length} inputs',
-                    color: Colors.grey,
-                    small: true,
-                  ),
+                  if (model.isComposed)
+                    _StatusChip(
+                      label: '${model.childModels.length} models',
+                      color: theme.colorScheme.primary,
+                      small: true,
+                    )
+                  else
+                    _StatusChip(
+                      label: '${model.inputs.length} inputs',
+                      color: Colors.grey,
+                      small: true,
+                    ),
                 ],
               ),
               if (model.formattedErrors.isNotEmpty) ...[

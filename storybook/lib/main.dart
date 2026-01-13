@@ -2,6 +2,7 @@
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:glade_forms/glade_forms.dart';
 import 'package:glade_forms_storybook/generated/locale_loader.g.dart';
 import 'package:glade_forms_storybook/localization_addon_custom.dart';
 import 'package:glade_forms_storybook/usecases/complex_object_mapping_example.dart';
@@ -21,6 +22,7 @@ final GlobalKey<NavigatorState> storyNavigatorKey = GlobalKey(debugLabel: 'story
 
 void main() async {
   final _ = WidgetsFlutterBinding.ensureInitialized();
+  GladeForms.initialize();
   await EasyLocalization.ensureInitialized();
 
   const isDebugModel = String.fromEnvironment('DEBUG_MODEL', defaultValue: 'false') == 'true';

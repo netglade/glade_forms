@@ -104,13 +104,28 @@ Glade Forms includes a Flutter DevTools extension to help you inspect and debug 
 - Form dirty/pure states
 - Real-time updates as you interact with your app
 
+**Setup (required for early DevTools access):**
+
+To ensure the DevTools extension is available immediately when you open DevTools (even before creating any forms), add this to your app's `main()` function:
+
+```dart
+import 'package:glade_forms/glade_forms.dart';
+
+void main() {
+  // Initialize GladeForms to enable DevTools integration
+  GladeForms.initialize();
+  
+  runApp(MyApp());
+}
+```
+
+Without this initialization, the extension will only become available after you navigate to a screen that creates a `GladeModel` instance.
+
 **How to access:**
 1. Run your app in debug mode: `flutter run`
 2. Open DevTools (in VS Code: `Cmd+Shift+P` → "Dart: Open DevTools")
 3. Navigate to the **"Glade Forms"** tab
 4. Interact with your forms to see live updates!
-
-No additional setup required - the extension is automatically available when you use `glade_forms` in your project!
 
 [Learn more about debugging with DevTools →][devtools_docs]
 

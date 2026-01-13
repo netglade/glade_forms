@@ -1,12 +1,10 @@
 import 'package:flutter/foundation.dart';
-import 'package:glade_forms/src/devtools/devtools_registry.dart';
 import 'package:glade_forms/src/src.dart';
 import 'package:glade_forms/src/validator/validator_result.dart';
 import 'package:meta/meta.dart';
 
 abstract class GladeModel extends GladeModelBase {
   bool _groupEdit = false;
-  String? _devtoolsId;
 
   /// Returns true if all inputs are valid.
   @override
@@ -74,7 +72,7 @@ abstract class GladeModel extends GladeModelBase {
 
   GladeModel() {
     initialize();
-    _registerWithDevTools();
+    registerWithDevTools();
   }
 
   /// Initialize model's inputs.
@@ -177,19 +175,5 @@ abstract class GladeModel extends GladeModelBase {
   /// By default returns empty map.
   Map<String, Object> fillDebugMetadata() {
     return {};
-  }
-
-  @override
-  void dispose() {
-    if (_devtoolsId != null) {
-      GladeFormsDevToolsRegistry().unregisterModel(_devtoolsId!);
-    }
-    super.dispose();
-  }
-
-  void _registerWithDevTools() {
-    if (!kDebugMode) return;
-    _devtoolsId = '${runtimeType}_${identityHashCode(this)}';
-    GladeFormsDevToolsRegistry().registerModel(_devtoolsId!, this);
   }
 }

@@ -2,37 +2,56 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 
 import 'package:flutter/foundation.dart';
-import 'package:glade_forms/src/core/core.dart';
-import 'package:glade_forms/src/model/glade_model.dart';
+import 'package:glade_forms/src/devtools/devtools_serialization.dart';
+import 'package:glade_forms/src/model/glade_composed_model.dart';
+import 'package:glade_forms/src/model/glade_model_base.dart';
 
-/// Registry to track active GladeModel instances for DevTools inspection
+/// Registry to track active GladeModel instances for DevTools inspection.
+// ignore: prefer-match-file-name, keep name as is
 class GladeFormsDevToolsRegistry {
-  static final GladeFormsDevToolsRegistry _instance = GladeFormsDevToolsRegistry._();
+  static GladeFormsDevToolsRegistry? _instance;
 
-  final Map<String, GladeModel> _models = {};
+  final Map<String, GladeModelBase> _models = {};
+  final Set<String> _childModelIds = {};
 
-  /// Get all registered models
-  Map<String, GladeModel> get models => Map.unmodifiable(_models);
+  /// Get all registered models (excluding child models of composed models).
+  Map<String, GladeModelBase> get models => Map.unmodifiable(
+        Map.fromEntries(_models.entries.where((e) => !_childModelIds.contains(e.key))),
+      );
 
-  factory GladeFormsDevToolsRegistry() => _instance;
+  factory GladeFormsDevToolsRegistry() {
+    if (_instance == null) {
+      throw StateError(
+        'GladeForms.initialize() must be called before using GladeModel. Add GladeForms.initialize() in your main() method.',
+      );
+    }
+
+    // ignore: avoid-non-null-assertion, checked above
+    return _instance!;
+  }
 
   GladeFormsDevToolsRegistry._() {
     _registerServiceExtension();
   }
 
-  /// Register a GladeModel instance
-  void registerModel(String id, GladeModel model) {
+  /// Initialize the registry and register DevTools service extension.
+  static void initialize() {
+    _instance ??= GladeFormsDevToolsRegistry._();
+  }
+
+  /// Register a GladeModel instance.
+  void registerModel(String id, GladeModelBase model) {
     _models[id] = model;
   }
 
-  /// Unregister a GladeModel instance
+  /// Unregister a GladeModel instance.
   void unregisterModel(String id) {
-    _models.remove(id);
+    final _ = _models.remove(id);
   }
 
   void _registerServiceExtension() {
     if (kReleaseMode) {
-      return; // Only available in debug mode
+      return; // DevTools integration only available in debug mode.
     }
 
     developer.registerExtension(
@@ -56,55 +75,39 @@ class GladeFormsDevToolsRegistry {
           );
         }
 
-        if (methodParam == 'getModel') {
-          final id = parameters['id'];
-          if (id == null || !_models.containsKey(id)) {
-            return developer.ServiceExtensionResponse.error(
-              developer.ServiceExtensionResponse.invalidParams,
-              'Model not found',
-            );
-          }
-
-          final modelData = _serializeModel(id, _models[id]!);
-
-          return developer.ServiceExtensionResponse.result(
-            json.encode({'model': modelData}),
-          );
-        }
-
         return developer.ServiceExtensionResponse.error(
           developer.ServiceExtensionResponse.invalidParams,
-          'Unknown method: $methodParam',
+          'Unknown method: ${methodParam ?? "null"}',
         );
       },
     );
   }
 
-  Map<String, dynamic> _serializeModel(String id, GladeModel model) {
+  Map<String, dynamic> _serializeModel(String id, GladeModelBase model) {
+    final isComposed = model is GladeComposedModel;
+    final baseData = model.toDevToolsJson();
+
+    // Clear child model IDs when starting a new serialization
+    _childModelIds.clear();
+
     return {
-      'formattedErrors': model.formattedValidationErrors,
+      ...baseData,
       'id': id,
-      'inputs': model.inputs.map(_serializeInput).toList(),
-      'isDirty': model.isDirty,
-      'isPure': model.isPure,
-      'isUnchanged': model.isUnchanged,
-      'isValid': model.isValid,
-      'type': model.runtimeType.toString(),
+      'isComposed': isComposed,
+      'childModels': isComposed
+          ? model.models.asMap().entries.map((entry) {
+              return _serializeChildModel(entry.key, entry.value);
+            }).toList()
+          : <Map<String, dynamic>>[],
     };
   }
 
-  Map<String, dynamic> _serializeInput(GladeInput<dynamic> input) {
-    return {
-      'errors': input.validationErrors.map((e) => e.toString()).toList(),
-      'hasConversionError': input.hasConversionError,
-      'initialValue': input.initialValue?.toString(),
-      'isPure': input.isPure,
-      'isUnchanged': input.isUnchanged,
-      'isValid': input.isValid,
-      'key': input.inputKey,
-      'type': input.runtimeType.toString(),
-      'value': input.stringValue,
-      'warnings': input.validationWarnings.map((e) => e.toString()).toList(),
-    };
+  Map<String, dynamic> _serializeChildModel(int index, GladeModelBase model) {
+    final childId = '${model.runtimeType}_${identityHashCode(model)}';
+    final _ = _childModelIds.add(childId);
+
+    final baseData = model.toDevToolsJson();
+
+    return {...baseData, 'id': childId, 'index': index};
   }
 }

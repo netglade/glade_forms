@@ -1,5 +1,4 @@
 import 'package:glade_forms/src/src.dart';
-
 import 'package:glade_forms/src/validator/validator_result.dart';
 
 abstract class GladeComposedModel<M extends GladeModelBase> extends GladeModelBase {
@@ -40,6 +39,7 @@ abstract class GladeComposedModel<M extends GladeModelBase> extends GladeModelBa
         addModel(model);
       }
     }
+    registerWithDevTools();
   }
 
   /// Adds model to `models` list.
