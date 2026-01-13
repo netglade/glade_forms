@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:glade_forms_devtools_extension/main.dart';
 
@@ -11,8 +12,7 @@ void main() {
     expect(find.text('Glade Forms Inspector'), findsOneWidget);
   });
 
-  testWidgets('Extension shows service unavailable message when not connected',
-      (WidgetTester tester) async {
+  testWidgets('Extension shows service unavailable message when not connected', (WidgetTester tester) async {
     await tester.pumpWidget(const GladeFormsDevToolsExtension());
     await tester.pumpAndSettle();
 

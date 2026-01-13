@@ -19,6 +19,15 @@
                 "--dart-define",
                 "DEBUG_MODEL=true"
             ]
+        },
+        {
+             "name": "devtools_extension + simulated environment",
+            "cwd": "glade_forms/extension",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--dart-define=use_simulated_environment=true"
+            ],
         }
     ]
 }

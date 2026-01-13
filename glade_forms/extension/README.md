@@ -4,8 +4,9 @@ This directory contains the configuration and build output for the glade_forms D
 
 ## Structure
 
-- `config.yaml` - Extension configuration for Flutter DevTools
+- `devtools/config.yaml` - Extension configuration for Flutter DevTools
 - `devtools/build/` - Built extension output (copied from glade_forms_devtools_extension package)
+- `devtools/.pubignore` - Ensures build directory is included when publishing despite being gitignored
 
 ## Building the Extension
 

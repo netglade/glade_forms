@@ -1,7 +1,6 @@
 import 'dart:async';
-import 'dart:convert';
 
-import 'package:devtools_extensions/devtools_extensions.dart';
+import 'package:devtools_extensions/devtools_extensions.dart' as serviceConnection;
 import 'package:glade_forms_devtools_extension/src/models/form_model_data.dart';
 
 /// Service to communicate with the running Flutter app to get glade_forms data
@@ -29,9 +28,7 @@ class GladeFormsService {
         return [];
       }
 
-      return data
-          .map((e) => FormModelData.fromJson(e as Map<String, dynamic>))
-          .toList();
+      return data.map((e) => FormModelData.fromJson(e as Map<String, dynamic>)).toList();
     } catch (e) {
       // Service extension might not be registered yet
       return [];

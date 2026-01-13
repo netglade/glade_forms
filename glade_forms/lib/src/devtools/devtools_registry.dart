@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert';
 import 'dart:developer' as developer;
 
@@ -8,16 +7,18 @@ import 'package:glade_forms/src/model/glade_model.dart';
 
 /// Registry to track active GladeModel instances for DevTools inspection
 class GladeFormsDevToolsRegistry {
-  static final GladeFormsDevToolsRegistry _instance =
-      GladeFormsDevToolsRegistry._();
+  static final GladeFormsDevToolsRegistry _instance = GladeFormsDevToolsRegistry._();
+
+  final Map<String, GladeModel> _models = {};
+
+  /// Get all registered models
+  Map<String, GladeModel> get models => Map.unmodifiable(_models);
 
   factory GladeFormsDevToolsRegistry() => _instance;
 
   GladeFormsDevToolsRegistry._() {
     _registerServiceExtension();
   }
-
-  final Map<String, GladeModel> _models = {};
 
   /// Register a GladeModel instance
   void registerModel(String id, GladeModel model) {
@@ -29,9 +30,6 @@ class GladeFormsDevToolsRegistry {
     _models.remove(id);
   }
 
-  /// Get all registered models
-  Map<String, GladeModel> get models => Map.unmodifiable(_models);
-
   void _registerServiceExtension() {
     if (kReleaseMode) {
       return; // Only available in debug mode
@@ -39,7 +37,7 @@ class GladeFormsDevToolsRegistry {
 
     developer.registerExtension(
       'ext.glade_forms.inspector',
-      (String method, Map<String, String> parameters) async {
+      (method, parameters) async {
         final methodParam = parameters['method'];
 
         if (methodParam == 'ping') {
@@ -68,6 +66,7 @@ class GladeFormsDevToolsRegistry {
           }
 
           final modelData = _serializeModel(id, _models[id]!);
+
           return developer.ServiceExtensionResponse.result(
             json.encode({'model': modelData}),
           );
@@ -83,33 +82,29 @@ class GladeFormsDevToolsRegistry {
 
   Map<String, dynamic> _serializeModel(String id, GladeModel model) {
     return {
-      'id': id,
-      'type': model.runtimeType.toString(),
-      'isValid': model.isValid,
-      'isPure': model.isPure,
-      'isDirty': model.isDirty,
-      'isUnchanged': model.isUnchanged,
       'formattedErrors': model.formattedValidationErrors,
+      'id': id,
       'inputs': model.inputs.map(_serializeInput).toList(),
+      'isDirty': model.isDirty,
+      'isPure': model.isPure,
+      'isUnchanged': model.isUnchanged,
+      'isValid': model.isValid,
+      'type': model.runtimeType.toString(),
     };
   }
 
   Map<String, dynamic> _serializeInput(GladeInput<dynamic> input) {
     return {
+      'errors': input.validationErrors.map((e) => e.toString()).toList(),
+      'hasConversionError': input.hasConversionError,
+      'initialValue': input.initialValue?.toString(),
+      'isPure': input.isPure,
+      'isUnchanged': input.isUnchanged,
+      'isValid': input.isValid,
       'key': input.inputKey,
       'type': input.runtimeType.toString(),
       'value': input.stringValue,
-      'initialValue': input.initialValue?.toString(),
-      'isValid': input.isValid,
-      'isPure': input.isPure,
-      'isUnchanged': input.isUnchanged,
-      'hasConversionError': input.hasConversionError,
-      'errors': input.validationErrors
-          .map((e) => e.translatedOrDevMessage ?? e.devMessage)
-          .toList(),
-      'warnings': input.validationWarnings
-          .map((e) => e.translatedOrDevMessage ?? e.devMessage)
-          .toList(),
+      'warnings': input.validationWarnings.map((e) => e.toString()).toList(),
     };
   }
 }
