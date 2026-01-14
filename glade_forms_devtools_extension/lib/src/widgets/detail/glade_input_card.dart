@@ -30,6 +30,7 @@ class GladeInputCard extends StatelessWidget {
             Text('Value: '),
             InputValue(
               value: input.value,
+              hasBackgroundWhitespaceIndicator: true,
             ),
           ],
         ),
@@ -47,12 +48,11 @@ class GladeInputCard extends StatelessWidget {
                   value: input.value,
                   hasBackgroundWhitespaceIndicator: true,
                 ),
-                if (input.initialValue != null)
-                  InfoRow(
-                    label: 'Initial Value',
-                    value: input.initialValue!,
-                    hasBackgroundWhitespaceIndicator: true,
-                  ),
+                InfoRow(
+                  label: 'Initial Value',
+                  value: input.initialValue,
+                  hasBackgroundWhitespaceIndicator: true,
+                ),
                 const Divider(height: 16),
                 InfoRow(
                   label: 'Valid',

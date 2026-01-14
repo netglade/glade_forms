@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:glade_forms_devtools_extension/src/constants.dart';
 import 'package:glade_forms_devtools_extension/src/models/glade_input_description.dart';
 import 'package:glade_forms_devtools_extension/src/widgets/common/input_value.dart';
+import 'package:netglade_flutter_utils/netglade_flutter_utils.dart';
 
 class ComposedChildModelInputSummary extends StatelessWidget {
   final GladeInputDescription input;
 
-  const ComposedChildModelInputSummary({required this.input});
+  const ComposedChildModelInputSummary({super.key, required this.input});
 
   @override
   Widget build(BuildContext context) {
@@ -40,11 +41,9 @@ class ComposedChildModelInputSummary extends StatelessWidget {
               children: [
                 Text(
                   input.key,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: theme.textTheme.bodySmall?.bold,
                 ),
-                InputValue(value: input.value),
+                InputValue(value: input.value, hasBackgroundWhitespaceIndicator: true),
               ],
             ),
           ),

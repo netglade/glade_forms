@@ -21,7 +21,7 @@ class InputValue extends StatelessWidget {
     final textTheme = theme.textTheme;
 
     if (value == null) {
-      return const Text('null');
+      return Text('null', style: textTheme.bodySmall?.semiBold);
     }
 
     if (value is bool) {

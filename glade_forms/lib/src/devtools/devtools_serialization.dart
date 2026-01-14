@@ -12,13 +12,13 @@ extension DevToolsSerialization<T> on GladeInput<T> {
     return {
       'errors': validationErrors.map((e) => e.toString()).toList(),
       'hasConversionError': hasConversionError,
-      'initialValue': initialValue?.toString() ?? '',
+      'initialValue': initialValue,
       'isPure': isPure,
       'isUnchanged': isUnchanged,
       'isValid': isValid,
       'key': inputKey,
       'strValue': strVal,
-      // ignore: no_runtimetype_tostring, keep
+      // ignore: no_runtimetype_tostring, keep as is.
       'type': runtimeType.toString(),
       'value': _encodeValue(value), // Smart encoding for JSON
       'warnings': validationWarnings.map((e) => e.toString()).toList(),
