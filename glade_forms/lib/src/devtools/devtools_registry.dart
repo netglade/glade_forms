@@ -42,10 +42,6 @@ class GladeFormsDevToolsRegistry {
   /// Register a GladeModel instance.
   void registerModel(String id, GladeModelBase model) {
     _models[id] = model;
-    developer.log(
-      'Model registered: $id (total: ${_models.length})',
-      name: 'GladeFormsDevTools',
-    );
   }
 
   /// Unregister a GladeModel instance.
@@ -70,12 +66,6 @@ class GladeFormsDevToolsRegistry {
         }
 
         if (methodParam == 'getModels') {
-          // Debug: Log registered models
-          developer.log(
-            'getModels called: ${_models.length} total models registered',
-            name: 'GladeFormsDevTools',
-          );
-
           // Clear and rebuild child model IDs
           _childModelIds.clear();
 
@@ -83,25 +73,8 @@ class GladeFormsDevToolsRegistry {
           final allModelsData = _models.entries.map((entry) => _serializeModel(entry.key, entry.value)).toList();
 
           // Second pass: filter out child models
+          // ignore: avoid-collection-methods-with-unrelated-types, should be ok
           final modelsData = allModelsData.where((modelData) => !_childModelIds.contains(modelData['id'])).toList();
-
-          developer.log(
-            'Returning ${modelsData.length} models (${_childModelIds.length} child models filtered)',
-            name: 'GladeFormsDevTools',
-          );
-
-          // Debug: Check what's actually in the data before encoding
-          for (final model in modelsData) {
-            final inputs = model['inputs'] as List?;
-            if (inputs != null && inputs.isNotEmpty) {
-              for (final input in inputs) {
-                final strValue = input['strValue'];
-                print(
-                  '[DevToolsRegistry] Input "${input['key']}": strValue type=${strValue.runtimeType}, value="$strValue"',
-                );
-              }
-            }
-          }
 
           return developer.ServiceExtensionResponse.result(
             json.encode({'models': modelsData}),

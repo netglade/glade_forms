@@ -64,8 +64,6 @@ abstract class GladeComposedModel<M extends GladeModelBase> extends GladeModelBa
 
   @override
   void dispose() {
-    print('Disposing GladeComposedModel: $debugKey');
-
     // Iterate over a copy to avoid concurrent modification
     for (final model in _models.toList()) {
       model

@@ -1,4 +1,7 @@
-## 5.2.0
+## 6.0.0
+- **Breaking**: You need to call `GladeForms.initialize()` in order to use Glade Forms DevTools extension.
+  - This is required to setup DevTools extension properly.
+  - Can be called only in debug mode, but does nothing in release mode.
 - **[Add]**: Add **DevTools** extennsion!
   - Allows to inspect Glade Forms models in Flutter DevTools
 - **[Add]**: Add `debugKey` property for developer friendly unique identification of models.

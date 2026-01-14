@@ -6,3 +6,5 @@
 *
 !.gitignore
 !README.md
+!config.yaml
+!.pubignore

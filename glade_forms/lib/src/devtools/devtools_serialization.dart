@@ -18,6 +18,7 @@ extension DevToolsSerialization<T> on GladeInput<T> {
       'isValid': isValid,
       'key': inputKey,
       'strValue': strVal,
+      // ignore: no_runtimetype_tostring, keep
       'type': runtimeType.toString(),
       'value': _encodeValue(value), // Smart encoding for JSON
       'warnings': validationWarnings.map((e) => e.toString()).toList(),
@@ -25,6 +26,7 @@ extension DevToolsSerialization<T> on GladeInput<T> {
   }
 
   /// Encode value for JSON - keep primitives as-is, convert complex objects to strings.
+  // ignore: no-object-declaration, keep object
   Object? _encodeValue(T? val) {
     if (val == null) return null;
 

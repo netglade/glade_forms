@@ -58,33 +58,24 @@ class _GladeFormsExtensionScreenState extends State<GladeFormsExtensionScreen> {
   }
 
   Future<void> _checkServiceAndLoadData({bool forceRefresh = true}) async {
-    print('[GladeFormsExtension] _checkServiceAndLoadData called');
-
     setState(() {
       if (forceRefresh) {
-        print('[GladeFormsExtension] FORCE REFRESH');
         _isLoading = true;
-        _error = null; // Only clear error on manual refresh
+        _error = null;
       }
     });
 
     try {
-      print('[GladeFormsExtension] Checking service availability...');
       final available = await _service.isServiceAvailable();
-      print('[GladeFormsExtension] Service available: $available');
 
       setState(() {
         _serviceAvailable = available;
       });
 
       if (available) {
-        print('[GladeFormsExtension] Service is available, loading models...');
         await _loadModels();
-      } else {
-        print('[GladeFormsExtension] Service not available, skipping model load');
       }
     } catch (e) {
-      print('[GladeFormsExtension] Error in _checkServiceAndLoadData: $e');
       setState(() {
         _error = 'Error checking service: $e';
         _serviceAvailable = false;
@@ -93,16 +84,12 @@ class _GladeFormsExtensionScreenState extends State<GladeFormsExtensionScreen> {
       setState(() {
         _isLoading = false;
       });
-      print('[GladeFormsExtension] _checkServiceAndLoadData completed');
     }
   }
 
   Future<void> _loadModels() async {
-    print('[GladeFormsExtension] _loadModels called');
     try {
-      print('[GladeFormsExtension] Calling service.fetchModels()...');
       final models = await _service.fetchModels();
-      print('[GladeFormsExtension] Received ${models.length} models from service');
       if (mounted) {
         setState(() {
           _models = models;
@@ -115,10 +102,8 @@ class _GladeFormsExtensionScreenState extends State<GladeFormsExtensionScreen> {
             );
           }
         });
-        print('[GladeFormsExtension] State updated with ${_models.length} models');
       }
     } catch (e) {
-      print('[GladeFormsExtension] Error in _loadModels: $e');
       if (mounted) {
         setState(() {
           _error = 'Error loading models: $e';

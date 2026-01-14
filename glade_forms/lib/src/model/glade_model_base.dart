@@ -50,8 +50,6 @@ abstract class GladeModelBase extends ChangeNotifier {
 
   @override
   void dispose() {
-    print('Disposing GladeModelBase: $debugKey');
-
     if (_devtoolsId != null) {
       GladeFormsDevToolsRegistry().unregisterModel(_devtoolsId!);
     }

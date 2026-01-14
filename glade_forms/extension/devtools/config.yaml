@@ -1,0 +1,8 @@
+# Configuration for the glade_forms DevTools extension.
+# Learn more: https://docs.flutter.dev/tools/devtools/extensions
+
+name: glade_forms
+issueTracker: https://github.com/netglade/glade_forms/issues
+version: 1.0.0
+materialIconCodePoint: "0xe146"
+requiresConnection: true

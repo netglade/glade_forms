@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:glade_forms/src/devtools/devtools_registry.dart';
 
 /// Main API for Glade Forms package.
+// ignore: prefer-match-file-name, keep name as is
 abstract final class GladeForms {
   /// Initialize the Glade Forms package.
   ///
@@ -15,6 +17,6 @@ abstract final class GladeForms {
   /// }
   /// ```
   static void initialize() {
-    GladeFormsDevToolsRegistry.initialize();
+    if (kDebugMode) GladeFormsDevToolsRegistry.initialize();
   }
 }
