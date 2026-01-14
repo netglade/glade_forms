@@ -10,6 +10,7 @@ import 'package:glade_forms_devtools_extension/src/widgets/detail/model_detail_v
 import 'package:glade_forms_devtools_extension/src/widgets/list/models_sidebar.dart';
 import 'package:glade_forms_devtools_extension/src/widgets/views/empty_models_view.dart';
 import 'package:glade_forms_devtools_extension/src/widgets/views/error_view.dart';
+import 'package:glade_forms_devtools_extension/src/widgets/views/loading_view.dart';
 import 'package:glade_forms_devtools_extension/src/widgets/views/service_unavailable_view.dart';
 import 'package:multi_split_view/multi_split_view.dart';
 
@@ -45,10 +46,7 @@ class _GladeFormsExtensionScreenState extends State<GladeFormsExtensionScreen> {
     } else {
       _checkServiceAndLoadData();
       _refreshTimer = Timer.periodic(GladeFormsConstants.refreshInterval, (_) {
-        _checkServiceAndLoadData();
-        if (mounted && _serviceAvailable) {
-          _loadModels();
-        }
+        _checkServiceAndLoadData(forceRefresh: false);
       });
     }
   }
@@ -59,22 +57,34 @@ class _GladeFormsExtensionScreenState extends State<GladeFormsExtensionScreen> {
     super.dispose();
   }
 
-  Future<void> _checkServiceAndLoadData() async {
+  Future<void> _checkServiceAndLoadData({bool forceRefresh = true}) async {
+    print('[GladeFormsExtension] _checkServiceAndLoadData called');
+
     setState(() {
-      _isLoading = true;
-      _error = null;
+      if (forceRefresh) {
+        print('[GladeFormsExtension] FORCE REFRESH');
+        _isLoading = true;
+        _error = null; // Only clear error on manual refresh
+      }
     });
 
     try {
+      print('[GladeFormsExtension] Checking service availability...');
       final available = await _service.isServiceAvailable();
+      print('[GladeFormsExtension] Service available: $available');
+
       setState(() {
         _serviceAvailable = available;
       });
 
       if (available) {
+        print('[GladeFormsExtension] Service is available, loading models...');
         await _loadModels();
+      } else {
+        print('[GladeFormsExtension] Service not available, skipping model load');
       }
     } catch (e) {
+      print('[GladeFormsExtension] Error in _checkServiceAndLoadData: $e');
       setState(() {
         _error = 'Error checking service: $e';
         _serviceAvailable = false;
@@ -83,12 +93,16 @@ class _GladeFormsExtensionScreenState extends State<GladeFormsExtensionScreen> {
       setState(() {
         _isLoading = false;
       });
+      print('[GladeFormsExtension] _checkServiceAndLoadData completed');
     }
   }
 
   Future<void> _loadModels() async {
+    print('[GladeFormsExtension] _loadModels called');
     try {
+      print('[GladeFormsExtension] Calling service.fetchModels()...');
       final models = await _service.fetchModels();
+      print('[GladeFormsExtension] Received ${models.length} models from service');
       if (mounted) {
         setState(() {
           _models = models;
@@ -101,8 +115,10 @@ class _GladeFormsExtensionScreenState extends State<GladeFormsExtensionScreen> {
             );
           }
         });
+        print('[GladeFormsExtension] State updated with ${_models.length} models');
       }
     } catch (e) {
+      print('[GladeFormsExtension] Error in _loadModels: $e');
       if (mounted) {
         setState(() {
           _error = 'Error loading models: $e';
@@ -260,16 +276,7 @@ class _ExtensionBodyState extends State<_ExtensionBody> {
   @override
   Widget build(BuildContext context) {
     if (widget.isLoading) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: GladeFormsConstants.spacing16),
-            Text(GladeFormsConstants.loadingMessage),
-          ],
-        ),
-      );
+      return LoadingView();
     }
 
     if (!widget.serviceAvailable) {

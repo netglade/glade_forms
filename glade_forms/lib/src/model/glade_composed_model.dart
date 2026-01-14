@@ -61,4 +61,18 @@ abstract class GladeComposedModel<M extends GladeModelBase> extends GladeModelBa
       ..unbindFromComposedModel(this);
     notifyListeners();
   }
+
+  @override
+  void dispose() {
+    print('Disposing GladeComposedModel: $debugKey');
+
+    // Iterate over a copy to avoid concurrent modification
+    for (final model in _models.toList()) {
+      model
+        ..removeListener(notifyListeners)
+        ..dispose();
+    }
+    _models.clear();
+    super.dispose();
+  }
 }

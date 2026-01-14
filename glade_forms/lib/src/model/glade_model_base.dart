@@ -39,23 +39,28 @@ abstract class GladeModelBase extends ChangeNotifier {
     return _bindedComposeModels.remove(model);
   }
 
-  /// Registers this model with DevTools for inspection
+  /// Registers this model with DevTools for inspection.
   void registerWithDevTools() {
-    if (!kReleaseMode) {
-      final devtoolsId = '${runtimeType}_${identityHashCode(this)}';
-      _devtoolsId = devtoolsId;
-      GladeFormsDevToolsRegistry().registerModel(devtoolsId, this);
-    }
+    if (kReleaseMode) return;
+
+    final devtoolsId = '${runtimeType}_${identityHashCode(this)}';
+    _devtoolsId = devtoolsId;
+    GladeFormsDevToolsRegistry().registerModel(devtoolsId, this);
   }
 
   @override
   void dispose() {
+    print('Disposing GladeModelBase: $debugKey');
+
     if (_devtoolsId != null) {
       GladeFormsDevToolsRegistry().unregisterModel(_devtoolsId!);
     }
-    for (final composeModel in _bindedComposeModels) {
+
+    // Iterate over a copy to avoid concurrent modification
+    for (final composeModel in _bindedComposeModels.toList()) {
       composeModel.removeModel(this);
     }
+
     super.dispose();
   }
 }

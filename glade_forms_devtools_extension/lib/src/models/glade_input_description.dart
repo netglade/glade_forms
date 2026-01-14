@@ -87,19 +87,25 @@ class GladeInputDescription {
   }
 
   factory GladeInputDescription.fromJson(Map<String, dynamic> json) {
-    return GladeInputDescription(
-      key: json['key'] as String,
-      type: json['type'] as String,
-      strValue: json['strValue'] as String,
-      value: json['value'] as Object?,
-      initialValue: json['initialValue'] as Object?,
-      isValid: json['isValid'] as bool,
-      isPure: json['isPure'] as bool,
-      isUnchanged: json['isUnchanged'] as bool,
-      hasConversionError: json['hasConversionError'] as bool,
-      errors: (json['errors'] as List<dynamic>).cast<String>(),
-      warnings: (json['warnings'] as List<dynamic>).cast<String>(),
-    );
+    try {
+      return GladeInputDescription(
+        key: json['key'] as String,
+        type: json['type'] as String,
+        strValue: json['strValue']?.toString() ?? '', // Force toString to handle any type
+        value: json['value'] as Object?,
+        initialValue: json['initialValue'] as Object?,
+        isValid: json['isValid'] as bool,
+        isPure: json['isPure'] as bool,
+        isUnchanged: json['isUnchanged'] as bool,
+        hasConversionError: json['hasConversionError'] as bool,
+        errors: (json['errors'] as List<dynamic>).cast<String>(),
+        warnings: (json['warnings'] as List<dynamic>).cast<String>(),
+      );
+    } catch (e) {
+      print('[GladeInputDescription.fromJson] Error parsing input: $e');
+      print('[GladeInputDescription.fromJson] JSON: $json');
+      rethrow;
+    }
   }
 
   Map<String, dynamic> toJson() {
