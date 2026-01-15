@@ -42,6 +42,8 @@ class _ModeWithDependencies extends GladeModel {
 }
 
 void main() {
+  setUp(GladeForms.initialize);
+
   test('When updating [a] onDependencyChange is called for a', () {
     final model = _ModeWithDependencies();
 

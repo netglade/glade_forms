@@ -55,6 +55,8 @@ class _ModeWithDependencies extends GladeModel {
 }
 
 void main() {
+  setUp(GladeForms.initialize);
+
   test('When updating [a] listener is called', () {
     final model = _Model();
     var listenerCount = 0;
