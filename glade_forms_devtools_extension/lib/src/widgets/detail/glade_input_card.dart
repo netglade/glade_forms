@@ -40,6 +40,10 @@ class GladeInputCard extends StatelessWidget {
               children: [
                 InfoRow(label: 'Type', value: input.type),
                 InfoRow(label: 'Input key', value: input.key),
+                InfoRow(
+                  label: 'Dependencies',
+                  value: input.dependencies.isNotEmpty ? '[${input.dependencies.join(', ')}] ' : 'None',
+                ),
                 const Divider(height: 16),
                 InfoRow(
                   label: 'Current Value',

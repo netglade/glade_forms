@@ -3,6 +3,7 @@ import 'package:glade_forms/src/model/glade_model.dart';
 import 'package:glade_forms/src/model/glade_model_base.dart';
 
 /// Extension providing DevTools serialization for GladeModelBase.
+// ignore: prefer-match-file-name, keep in same file.
 extension GladeModelBaseDevToolsSerialization on GladeModelBase {
   /// Serialize this model to a JSON map for DevTools.
   Map<String, dynamic> toDevToolsJson() {

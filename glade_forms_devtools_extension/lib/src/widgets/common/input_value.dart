@@ -25,10 +25,11 @@ class InputValue extends StatelessWidget {
       return Text('null', style: textTheme.bodySmall?.semiBold);
     }
 
-    if (value case final boolValue?) {
+    // ignore: prefer-boolean-prefixes, ok naming
+    if (value case final bool boolValue) {
       final color = shouldInverseBoolColors
-          ? (boolValue == true ? Constants.invalidColor : Constants.validColor)
-          : (boolValue == true ? Constants.validColor : Constants.invalidColor);
+          ? (boolValue ? Constants.invalidColor : Constants.validColor)
+          : (boolValue ? Constants.validColor : Constants.invalidColor);
 
       return Text(
         boolValue.toString(),

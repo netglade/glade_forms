@@ -57,6 +57,7 @@ abstract final class MockDataProvider {
           hasConversionError: false,
           errors: const [],
           warnings: const [],
+          dependencies: [],
         ),
         GladeInputDescription(
           key: 'username',
@@ -70,6 +71,7 @@ abstract final class MockDataProvider {
           hasConversionError: false,
           errors: const [],
           warnings: const [],
+          dependencies: ['email'],
         ),
         GladeInputDescription(
           key: 'age',
@@ -83,6 +85,7 @@ abstract final class MockDataProvider {
           hasConversionError: false,
           errors: isValid ? [] : ['Age must be between 18 and 100'],
           warnings: const [],
+          dependencies: ['email', 'username'],
         ),
         const GladeInputDescription(
           key: 'newsletter',
@@ -96,6 +99,7 @@ abstract final class MockDataProvider {
           hasConversionError: false,
           errors: [],
           warnings: [],
+          dependencies: [],
         ),
       ],
       formattedErrors: isValid ? '' : 'Age must be between 18 and 100',
@@ -124,6 +128,7 @@ abstract final class MockDataProvider {
           hasConversionError: false,
           errors: [],
           warnings: [],
+          dependencies: [],
         ),
         GladeInputDescription(
           key: 'totalAmount',
@@ -137,6 +142,7 @@ abstract final class MockDataProvider {
           hasConversionError: false,
           errors: [],
           warnings: [],
+          dependencies: [],
         ),
       ],
       formattedErrors: 'Shipping address is required',
@@ -164,6 +170,7 @@ abstract final class MockDataProvider {
               hasConversionError: false,
               errors: [],
               warnings: [],
+              dependencies: [],
             ),
             GladeInputDescription(
               key: 'city',
@@ -176,6 +183,7 @@ abstract final class MockDataProvider {
               isUnchanged: false,
               hasConversionError: false,
               errors: [],
+              dependencies: ['street'],
               warnings: [],
             ),
             GladeInputDescription(
@@ -189,6 +197,7 @@ abstract final class MockDataProvider {
               isUnchanged: true,
               hasConversionError: false,
               errors: [],
+              dependencies: ['street', 'city'],
               warnings: [],
             ),
           ],
@@ -215,6 +224,7 @@ abstract final class MockDataProvider {
               hasConversionError: false,
               errors: ['Street is required'],
               warnings: [],
+              dependencies: [],
             ),
             GladeInputDescription(
               key: 'street-empty',
@@ -228,6 +238,7 @@ abstract final class MockDataProvider {
               hasConversionError: false,
               errors: ['Street is required'],
               warnings: [],
+              dependencies: [],
             ),
             GladeInputDescription(
               key: 'city',
@@ -241,6 +252,7 @@ abstract final class MockDataProvider {
               hasConversionError: false,
               errors: [],
               warnings: [],
+              dependencies: [],
             ),
             GladeInputDescription(
               key: 'zipCode',
@@ -254,6 +266,7 @@ abstract final class MockDataProvider {
               hasConversionError: false,
               errors: [],
               warnings: [],
+              dependencies: [],
             ),
           ],
           formattedErrors: 'Street is required',
@@ -280,6 +293,7 @@ abstract final class MockDataProvider {
               hasConversionError: false,
               errors: [],
               warnings: [],
+              dependencies: [],
             ),
             GladeInputDescription(
               key: 'expiryDate',
@@ -291,6 +305,7 @@ abstract final class MockDataProvider {
               isPure: true,
               isUnchanged: true,
               hasConversionError: false,
+              dependencies: ['cardNumber'],
               errors: [],
               warnings: [],
             ),
@@ -304,6 +319,7 @@ abstract final class MockDataProvider {
               isPure: true,
               isUnchanged: true,
               hasConversionError: false,
+              dependencies: ['cardNumber', 'expiryDate'],
               errors: [],
               warnings: [],
             ),

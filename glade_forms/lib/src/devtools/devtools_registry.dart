@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 
 import 'package:flutter/foundation.dart';
-import 'package:glade_forms/src/devtools/devtools_serialization.dart';
+import 'package:glade_forms/src/devtools/glade_model_devtools_serialization.dart';
 import 'package:glade_forms/src/model/glade_composed_model.dart';
 import 'package:glade_forms/src/model/glade_model_base.dart';
 

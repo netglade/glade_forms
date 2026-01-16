@@ -17,6 +17,7 @@ class GladeInputDescription {
   final bool hasConversionError;
   final List<String> errors;
   final List<String> warnings;
+  final List<String> dependencies;
 
   // UI Domain Logic
 
@@ -86,6 +87,7 @@ class GladeInputDescription {
     required this.hasConversionError,
     required this.errors,
     required this.warnings,
+    required this.dependencies,
     this.initialValue,
   });
 
@@ -100,15 +102,15 @@ class GladeInputDescription {
       isPure: json['isPure'] as bool,
       isUnchanged: json['isUnchanged'] as bool,
       hasConversionError: json['hasConversionError'] as bool,
-      // ignore: avoid-dynamic, can be anything
-      errors: (json['errors'] as List<dynamic>).cast(),
-      // ignore: avoid-dynamic, can be anything
-      warnings: (json['warnings'] as List<dynamic>).cast(),
+      dependencies: json['dependencies'] != null ? (json['dependencies'] as List<String>) : [],
+      errors: json['errors'] as List<String>,
+      warnings: json['warnings'] as List<String>,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
+      'dependencies': dependencies,
       'errors': errors,
       'hasConversionError': hasConversionError,
       'initialValue': initialValue,
