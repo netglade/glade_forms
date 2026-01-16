@@ -2,12 +2,14 @@ import 'dart:ui';
 
 import 'package:glade_forms_devtools_extension/src/constants.dart';
 
-/// Data model representing a GladeInput for DevTools display
+/// Data model representing a GladeInput for DevTools display.
 class GladeInputDescription {
   final String key;
   final String type;
   final String strValue;
+  // ignore: no-object-declaration, can be anything
   final Object? value;
+  // ignore: no-object-declaration, can be anything
   final Object? initialValue;
   final bool isValid;
   final bool isPure;
@@ -16,56 +18,42 @@ class GladeInputDescription {
   final List<String> errors;
   final List<String> warnings;
 
-  const GladeInputDescription({
-    required this.key,
-    required this.type,
-    required this.strValue,
-    required this.value,
-    this.initialValue,
-    required this.isValid,
-    required this.isPure,
-    required this.isUnchanged,
-    required this.hasConversionError,
-    required this.errors,
-    required this.warnings,
-  });
-
   // UI Domain Logic
 
-  /// Label for validation state
+  /// Label for validation state.
   String get validityLabel => isValid ? 'Valid' : 'Invalid';
 
-  /// Color for validation state
-  Color get validityColor => isValid ? GladeFormsConstants.validColor : GladeFormsConstants.invalidColor;
+  /// Color for validation state.
+  Color get validityColor => isValid ? Constants.validColor : Constants.invalidColor;
 
-  /// Label for purity state
+  /// Label for purity state.
   String get purityLabel => isPure ? 'Pure' : 'Dirty';
 
-  /// Color for purity state
-  Color get purityColor => isPure ? GladeFormsConstants.pureColor : GladeFormsConstants.dirtyColor;
+  /// Color for purity state.
+  Color get purityColor => isPure ? Constants.pureColor : Constants.dirtyColor;
 
-  /// Label for change state
+  /// Label for change state.
   String get changeLabel => isUnchanged ? 'Unchanged' : 'Modified';
 
-  /// Color for change state
-  Color get changeColor => isUnchanged ? GladeFormsConstants.unchangedColor : GladeFormsConstants.modifiedColor;
+  /// Color for change state.
+  Color get changeColor => isUnchanged ? Constants.unchangedColor : Constants.modifiedColor;
 
-  /// Label for conversion error state
+  /// Label for conversion error state.
   String get conversionLabel => hasConversionError ? 'Conversion Error' : 'OK';
 
-  /// Color for conversion error state
-  Color get conversionColor => hasConversionError ? GladeFormsConstants.errorColor : GladeFormsConstants.successColor;
+  /// Color for conversion error state.
+  Color get conversionColor => hasConversionError ? Constants.errorColor : Constants.successColor;
 
-  /// Returns true if the input has any errors
+  /// Returns true if the input has any errors.
   bool get hasErrors => errors.isNotEmpty || hasConversionError;
 
-  /// Returns true if the input has any warnings
+  /// Returns true if the input has any warnings.
   bool get hasWarnings => warnings.isNotEmpty;
 
-  /// Returns true if the input has been modified
+  /// Returns true if the input has been modified.
   bool get isModified => !isUnchanged;
 
-  /// Badge text for errors and warnings count
+  /// Badge text for errors and warnings count.
   String? get issuesBadge {
     final errorCount = errors.length;
     final warningCount = warnings.length;
@@ -79,12 +67,27 @@ class GladeInputDescription {
     return parts.join(', ');
   }
 
-  /// Color for issues badge
+  /// Color for issues badge.
   Color get issuesBadgeColor {
-    if (errors.isNotEmpty) return GladeFormsConstants.errorColor;
-    if (warnings.isNotEmpty) return GladeFormsConstants.warningColor;
-    return GladeFormsConstants.successColor;
+    if (errors.isNotEmpty) return Constants.errorColor;
+    if (warnings.isNotEmpty) return Constants.warningColor;
+
+    return Constants.successColor;
   }
+
+  const GladeInputDescription({
+    required this.key,
+    required this.type,
+    required this.strValue,
+    required this.value,
+    required this.isValid,
+    required this.isPure,
+    required this.isUnchanged,
+    required this.hasConversionError,
+    required this.errors,
+    required this.warnings,
+    this.initialValue,
+  });
 
   factory GladeInputDescription.fromJson(Map<String, dynamic> json) {
     return GladeInputDescription(
@@ -97,22 +100,24 @@ class GladeInputDescription {
       isPure: json['isPure'] as bool,
       isUnchanged: json['isUnchanged'] as bool,
       hasConversionError: json['hasConversionError'] as bool,
-      errors: (json['errors'] as List<dynamic>).cast<String>(),
-      warnings: (json['warnings'] as List<dynamic>).cast<String>(),
+      // ignore: avoid-dynamic, can be anything
+      errors: (json['errors'] as List<dynamic>).cast(),
+      // ignore: avoid-dynamic, can be anything
+      warnings: (json['warnings'] as List<dynamic>).cast(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
+      'errors': errors,
+      'hasConversionError': hasConversionError,
+      'initialValue': initialValue,
+      'isPure': isPure,
+      'isUnchanged': isUnchanged,
+      'isValid': isValid,
       'key': key,
       'type': type,
       'value': value,
-      'initialValue': initialValue,
-      'isValid': isValid,
-      'isPure': isPure,
-      'isUnchanged': isUnchanged,
-      'hasConversionError': hasConversionError,
-      'errors': errors,
       'warnings': warnings,
     };
   }

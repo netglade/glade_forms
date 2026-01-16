@@ -1,5 +1,9 @@
-include: package:flutter_lints/flutter.yaml
+include: package:netglade_analysis/lints.yaml
 
-linter:
+dart_code_metrics:
+  extends:
+    - package:netglade_analysis/dcm.yaml
+  pubspec-rules:
+    prefer-publish-to-none: false
   rules:
-    avoid_web_libraries_in_flutter: false
+    avoid-commented-out-code: false # code examples in comments

@@ -66,7 +66,7 @@ class GladeInput<T> {
 
   TextEditingController? _textEditingController;
 
-  final StringToTypeConverter<T> _defaultConverter = StringToTypeConverter<T>(converter: (x, _) => x as T);
+  final StringToTypeConverter<T> _defaultConverter = StringToTypeConverter(converter: (x, _) => x as T);
 
   /// Current input's value.
   T _value;
@@ -170,21 +170,22 @@ class GladeInput<T> {
     ValueTransform<T>? valueTransform,
     this.defaultValidationTranslations,
     this.trackUnchanged = true,
-  })  : assert(
-          value != null || initialValue != null || TypeHelper.typeIsNullable<T>(),
-          'If type is not nullable, at least one of value or initialValue must be set (affected input: $inputKey)',
-        ),
-        _isPure = isPure,
-        _value = (value ?? initialValue) as T,
-        _initialValue = initialValue,
-        dependenciesFactory = dependencies ?? (() => []),
-        inputKey = inputKey ?? '__${T.runtimeType}__${Random().nextInt(100_000_000)}',
-        _valueTransform = valueTransform,
+  }) : assert(
+         value != null || initialValue != null || TypeHelper.typeIsNullable<T>(),
+         'If type is not nullable, at least one of value or initialValue must be set (affected input: $inputKey)',
+       ),
+       _isPure = isPure,
+       _value = (value ?? initialValue) as T,
+       _initialValue = initialValue,
+       dependenciesFactory = dependencies ?? (() => []),
+       inputKey = inputKey ?? '__${T.runtimeType}__${Random().nextInt(100_000_000)}',
+       _valueTransform = valueTransform,
 
-        // ignore: avoid_bool_literals_in_conditional_expressions, cant be simplified.
-        _useTextEditingController = textEditingController != null ? true : useTextEditingController {
+       // ignore: avoid_bool_literals_in_conditional_expressions, cant be simplified.
+       _useTextEditingController = textEditingController != null ? true : useTextEditingController {
     final defaultValue = (value ?? initialValue) as T;
-    _textEditingController = textEditingController ??
+    _textEditingController =
+        textEditingController ??
         (useTextEditingController
             ? TextEditingController(
                 text: switch (defaultValue) {
@@ -220,25 +221,24 @@ class GladeInput<T> {
     ValueTransform<T>? valueTransform,
     DefaultValidationTranslations? defaultTranslations,
     bool trackUnchanged = true,
-  }) =>
-      GladeInput.internalCreate(
-        validatorInstance: validator?.call(GladeValidator()) ?? GladeValidator<T>().build(),
-        inputKey: inputKey,
-        value: value,
-        initialValue: initialValue,
-        isPure: isPure,
-        validationTranslate: validationTranslate,
-        valueComparator: valueComparator,
-        stringToValueConverter: stringToValueConverter,
-        dependencies: dependencies,
-        onChange: onChange,
-        onDependencyChange: onDependencyChange,
-        textEditingController: textEditingController,
-        useTextEditingController: useTextEditingController,
-        valueTransform: valueTransform,
-        defaultValidationTranslations: defaultTranslations,
-        trackUnchanged: trackUnchanged,
-      );
+  }) => GladeInput.internalCreate(
+    validatorInstance: validator?.call(GladeValidator()) ?? GladeValidator<T>().build(),
+    inputKey: inputKey,
+    value: value,
+    initialValue: initialValue,
+    isPure: isPure,
+    validationTranslate: validationTranslate,
+    valueComparator: valueComparator,
+    stringToValueConverter: stringToValueConverter,
+    dependencies: dependencies,
+    onChange: onChange,
+    onDependencyChange: onDependencyChange,
+    textEditingController: textEditingController,
+    useTextEditingController: useTextEditingController,
+    valueTransform: valueTransform,
+    defaultValidationTranslations: defaultTranslations,
+    trackUnchanged: trackUnchanged,
+  );
 
   ///
   /// Useful for input which allows null value without additional validations.
@@ -260,25 +260,24 @@ class GladeInput<T> {
     bool useTextEditingController = false,
     ValueTransform<T>? valueTransform,
     bool trackUnchanged = true,
-  }) =>
-      GladeInput.create(
-        validator: (v) => v.build(),
-        value: value ?? initialValue,
-        initialValue: initialValue,
-        validationTranslate: validationTranslate,
-        defaultTranslations: defaultTranslations,
-        valueComparator: valueComparator,
-        stringToValueConverter: stringToValueConverter,
-        inputKey: inputKey,
-        isPure: pure,
-        dependencies: dependencies,
-        onChange: onChange,
-        onDependencyChange: onDependencyChange,
-        textEditingController: textEditingController,
-        useTextEditingController: useTextEditingController,
-        valueTransform: valueTransform,
-        trackUnchanged: trackUnchanged,
-      );
+  }) => GladeInput.create(
+    validator: (v) => v.build(),
+    value: value ?? initialValue,
+    initialValue: initialValue,
+    validationTranslate: validationTranslate,
+    defaultTranslations: defaultTranslations,
+    valueComparator: valueComparator,
+    stringToValueConverter: stringToValueConverter,
+    inputKey: inputKey,
+    isPure: pure,
+    dependencies: dependencies,
+    onChange: onChange,
+    onDependencyChange: onDependencyChange,
+    textEditingController: textEditingController,
+    useTextEditingController: useTextEditingController,
+    valueTransform: valueTransform,
+    trackUnchanged: trackUnchanged,
+  );
 
   /// Predefined GenericInput with predefined `notNull` validation.
   ///
@@ -299,25 +298,24 @@ class GladeInput<T> {
     bool useTextEditingController = false,
     ValueTransform<T>? valueTransform,
     bool trackUnchanged = true,
-  }) =>
-      GladeInput.create(
-        validator: (v) => (v..notNull()).build(),
-        value: value,
-        initialValue: initialValue,
-        validationTranslate: validationTranslate,
-        defaultTranslations: defaultTranslations,
-        valueComparator: valueComparator,
-        stringToValueConverter: stringToValueConverter,
-        inputKey: inputKey,
-        isPure: pure,
-        dependencies: dependencies,
-        onChange: onChange,
-        onDependencyChange: onDependencyChange,
-        textEditingController: textEditingController,
-        useTextEditingController: useTextEditingController,
-        valueTransform: valueTransform,
-        trackUnchanged: trackUnchanged,
-      );
+  }) => GladeInput.create(
+    validator: (v) => (v..notNull()).build(),
+    value: value,
+    initialValue: initialValue,
+    validationTranslate: validationTranslate,
+    defaultTranslations: defaultTranslations,
+    valueComparator: valueComparator,
+    stringToValueConverter: stringToValueConverter,
+    inputKey: inputKey,
+    isPure: pure,
+    dependencies: dependencies,
+    onChange: onChange,
+    onDependencyChange: onDependencyChange,
+    textEditingController: textEditingController,
+    useTextEditingController: useTextEditingController,
+    valueTransform: valueTransform,
+    trackUnchanged: trackUnchanged,
+  );
 
   @internal
   // ignore: use_setters_to_change_properties, as method.
@@ -342,7 +340,7 @@ class GladeInput<T> {
     // ignore: avoid-non-null-assertion, it is not null
     if (hasConversionError) return _translateConversionError(__conversionError!);
 
-    return _translate(severity: ValidationSeverity.warning, delimiter: delimiter) ?? '';
+    return _translate(severity: .warning, delimiter: delimiter) ?? '';
   }
 
   /// Shorthand validator for TextFieldForm inputs.
@@ -352,7 +350,7 @@ class GladeInput<T> {
   String? textFormFieldInputValidatorCustom(
     String? value, {
     String delimiter = '.',
-    ValidationSeverity severity = ValidationSeverity.error,
+    ValidationSeverity severity = .error,
   }) {
     assert(
       TypeHelper.typesEqual<T, String>() || TypeHelper.typesEqual<T, String?>() || stringToValueConverter != null,
@@ -377,17 +375,16 @@ class GladeInput<T> {
   /// Returns translated validation message.
   String? textFormFieldInputValidator(
     String? value, {
-    ValidationSeverity severity = ValidationSeverity.error,
+    ValidationSeverity severity = .error,
     String delimiter = '.',
-  }) =>
-      textFormFieldInputValidatorCustom(value, severity: severity, delimiter: delimiter);
+  }) => textFormFieldInputValidatorCustom(value, severity: severity, delimiter: delimiter);
 
   /// Shorthand validator for Form field input.
   ///
   /// Returns translated validation message.
   String? formFieldValidator(
     T value, {
-    ValidationSeverity severity = ValidationSeverity.error,
+    ValidationSeverity severity = .error,
     String delimiter = '.',
   }) {
     final convertedError = validatorInstance.validate(value);
@@ -605,7 +602,7 @@ class GladeInput<T> {
   String? _translate({
     String delimiter = '.',
     Object? customError,
-    ValidationSeverity severity = ValidationSeverity.error,
+    ValidationSeverity severity = .error,
   }) {
     final err = customError ?? validatorResult;
 
@@ -646,14 +643,14 @@ class GladeInput<T> {
   String _translateGenericValidation(
     ValidatorResult<T> validatorResult,
     String delimiter, {
-    ValidationSeverity severity = ValidationSeverity.error,
+    ValidationSeverity severity = .error,
   }) {
     final translateTmp = validationTranslate;
 
     final results = switch (severity) {
-      ValidationSeverity.error => validatorResult.errors,
+      .error => validatorResult.errors,
       // * Warning + Error
-      ValidationSeverity.warning => validatorResult.all,
+      .warning => validatorResult.all,
     };
 
     final defaultTranslationsTmp = defaultValidationTranslations;
@@ -661,15 +658,17 @@ class GladeInput<T> {
       return results.map((e) => translateTmp(e, e.key, e.devValidationMessage, dependenciesFactory())).join(delimiter);
     }
 
-    return results.map((e) {
-      if (defaultTranslationsTmp != null &&
-          (e.isNullError || e.hasStringEmptyOrNullErrorKey || e.hasNullValueOrEmptyValueKey)) {
-        return defaultTranslationsTmp.defaultValueIsNullOrEmptyMessage ?? e.toString();
-      } else if (_bindedModel case final model?) {
-        return model.defaultValidationTranslate(e, e.key, e.devValidationMessage, dependenciesFactory());
-      }
+    return results
+        .map((e) {
+          if (defaultTranslationsTmp != null &&
+              (e.isNullError || e.hasStringEmptyOrNullErrorKey || e.hasNullValueOrEmptyValueKey)) {
+            return defaultTranslationsTmp.defaultValueIsNullOrEmptyMessage ?? e.toString();
+          } else if (_bindedModel case final model?) {
+            return model.defaultValidationTranslate(e, e.key, e.devValidationMessage, dependenciesFactory());
+          }
 
-      return e.toString();
-    }).join(delimiter);
+          return e.toString();
+        })
+        .join(delimiter);
   }
 }

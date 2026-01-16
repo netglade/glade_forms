@@ -1,35 +1,33 @@
+import 'package:glade_forms_devtools_extension/src/models/child_glade_model_description.dart';
 import 'package:glade_forms_devtools_extension/src/models/glade_input_description.dart';
 import 'package:glade_forms_devtools_extension/src/models/glade_model_description.dart';
 
-/// Mock data scenarios for debugging the extension UI
+/// Mock data scenarios for debugging the extension UI.
+// ignore: prefer-match-file-name, keep in same file
 enum MockScenario {
-  noModels,
-  singleModel,
   composedModel,
   multipleModels,
+  noModels,
+  singleModel,
 }
 
-class MockDataProvider {
+abstract final class MockDataProvider {
   static List<GladeModelDescription> getModelsForScenario(MockScenario scenario) {
-    switch (scenario) {
-      case MockScenario.noModels:
-        return [];
-      case MockScenario.singleModel:
-        return [_createSingleModel()];
-      case MockScenario.composedModel:
-        return [_createComposedModel()];
-      case MockScenario.multipleModels:
-        return [
-          _createSingleModel(id: 'model-1', type: 'LoginForm'),
-          _createSingleModel(
-            id: 'model-2',
-            type: 'RegistrationForm',
-            isDirty: true,
-            isValid: false,
-          ),
-          _createComposedModel(),
-        ];
-    }
+    return switch (scenario) {
+      .noModels => [],
+      .singleModel => [_createSingleModel()],
+      .composedModel => [_createComposedModel()],
+      .multipleModels => [
+        _createSingleModel(id: 'model-1', type: 'LoginForm'),
+        _createSingleModel(
+          id: 'model-2',
+          type: 'RegistrationForm',
+          isDirty: true,
+          isValid: false,
+        ),
+        _createComposedModel(),
+      ],
+    };
   }
 
   static GladeModelDescription _createSingleModel({
@@ -86,7 +84,7 @@ class MockDataProvider {
           errors: isValid ? [] : ['Age must be between 18 and 100'],
           warnings: const [],
         ),
-        GladeInputDescription(
+        const GladeInputDescription(
           key: 'newsletter',
           type: 'GladeInput<bool>',
           strValue: 'true',
@@ -96,18 +94,16 @@ class MockDataProvider {
           isPure: false,
           isUnchanged: false,
           hasConversionError: false,
-          errors: const [],
-          warnings: const [],
+          errors: [],
+          warnings: [],
         ),
       ],
       formattedErrors: isValid ? '' : 'Age must be between 18 and 100',
-      isComposed: false,
-      childModels: const [],
     );
   }
 
   static GladeModelDescription _createComposedModel() {
-    return GladeModelDescription(
+    return const GladeModelDescription(
       id: 'composed-model-1',
       type: 'OrderCheckoutForm',
       debugKey: 'OrderCheckoutForm',
@@ -126,8 +122,8 @@ class MockDataProvider {
           isPure: true,
           isUnchanged: true,
           hasConversionError: false,
-          errors: const [],
-          warnings: const [],
+          errors: [],
+          warnings: [],
         ),
         GladeInputDescription(
           key: 'totalAmount',
@@ -139,8 +135,8 @@ class MockDataProvider {
           isPure: true,
           isUnchanged: true,
           hasConversionError: false,
-          errors: const [],
-          warnings: const [],
+          errors: [],
+          warnings: [],
         ),
       ],
       formattedErrors: 'Shipping address is required',
@@ -166,8 +162,8 @@ class MockDataProvider {
               isPure: true,
               isUnchanged: true,
               hasConversionError: false,
-              errors: const [],
-              warnings: const [],
+              errors: [],
+              warnings: [],
             ),
             GladeInputDescription(
               key: 'city',
@@ -179,8 +175,8 @@ class MockDataProvider {
               isPure: false,
               isUnchanged: false,
               hasConversionError: false,
-              errors: const [],
-              warnings: const [],
+              errors: [],
+              warnings: [],
             ),
             GladeInputDescription(
               key: 'zipCode',
@@ -192,8 +188,8 @@ class MockDataProvider {
               isPure: true,
               isUnchanged: true,
               hasConversionError: false,
-              errors: const [],
-              warnings: const [],
+              errors: [],
+              warnings: [],
             ),
           ],
           formattedErrors: '',
@@ -213,13 +209,12 @@ class MockDataProvider {
               type: 'GladeInput<String>',
               strValue: '',
               value: null,
-              initialValue: null,
               isValid: false,
               isPure: true,
               isUnchanged: true,
               hasConversionError: false,
-              errors: const ['Street is required'],
-              warnings: const [],
+              errors: ['Street is required'],
+              warnings: [],
             ),
             GladeInputDescription(
               key: 'street-empty',
@@ -231,8 +226,8 @@ class MockDataProvider {
               isPure: true,
               isUnchanged: true,
               hasConversionError: false,
-              errors: const ['Street is required'],
-              warnings: const [],
+              errors: ['Street is required'],
+              warnings: [],
             ),
             GladeInputDescription(
               key: 'city',
@@ -244,8 +239,8 @@ class MockDataProvider {
               isPure: true,
               isUnchanged: true,
               hasConversionError: false,
-              errors: const [],
-              warnings: const [],
+              errors: [],
+              warnings: [],
             ),
             GladeInputDescription(
               key: 'zipCode',
@@ -257,8 +252,8 @@ class MockDataProvider {
               isPure: true,
               isUnchanged: true,
               hasConversionError: false,
-              errors: const [],
-              warnings: const [],
+              errors: [],
+              warnings: [],
             ),
           ],
           formattedErrors: 'Street is required',
@@ -283,8 +278,8 @@ class MockDataProvider {
               isPure: true,
               isUnchanged: true,
               hasConversionError: false,
-              errors: const [],
-              warnings: const [],
+              errors: [],
+              warnings: [],
             ),
             GladeInputDescription(
               key: 'expiryDate',
@@ -296,8 +291,8 @@ class MockDataProvider {
               isPure: true,
               isUnchanged: true,
               hasConversionError: false,
-              errors: const [],
-              warnings: const [],
+              errors: [],
+              warnings: [],
             ),
             GladeInputDescription(
               key: 'cvv',
@@ -309,8 +304,8 @@ class MockDataProvider {
               isPure: true,
               isUnchanged: true,
               hasConversionError: false,
-              errors: const [],
-              warnings: const [],
+              errors: [],
+              warnings: [],
             ),
           ],
           formattedErrors: '',

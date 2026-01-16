@@ -26,7 +26,7 @@ extension DevToolsSerialization<T> on GladeInput<T> {
   }
 
   /// Encode value for JSON - keep primitives as-is, convert complex objects to strings.
-  // ignore: no-object-declaration, keep object
+  // ignore: no-object-declaration, keep object, avoid-unnecessary-nullable-parameters
   Object? _encodeValue(T? val) {
     if (val == null) return null;
 

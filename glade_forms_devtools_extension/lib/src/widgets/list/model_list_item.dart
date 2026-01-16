@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:glade_forms_devtools_extension/src/constants.dart';
+import 'package:glade_forms_devtools_extension/src/models/glade_base_model_description.dart';
 import 'package:glade_forms_devtools_extension/src/models/glade_model_description.dart';
 import 'package:glade_forms_devtools_extension/src/widgets/common/state_chip.dart';
 
@@ -10,13 +11,13 @@ class ModelListItem extends StatefulWidget {
   final bool isSelected;
   final String? selectedChildId;
   final VoidCallback onTap;
-  final void Function(String childId)? onChildTap;
+  final ValueChanged<String>? onChildTap;
 
   const ModelListItem({
     required this.model,
     required this.isSelected,
-    this.selectedChildId,
     required this.onTap,
+    this.selectedChildId,
     this.onChildTap,
     super.key,
   });
@@ -42,7 +43,7 @@ class _ModelListItemState extends State<ModelListItem> {
 
     // For composed models, show an expandable tree
     return Column(
-      mainAxisSize: MainAxisSize.min,
+      mainAxisSize: .min,
       children: [
         // Parent model card with expand/collapse
         _ModelCard(
@@ -55,11 +56,9 @@ class _ModelListItemState extends State<ModelListItem> {
               _isExpanded ? Icons.expand_less : Icons.expand_more,
               size: 20,
             ),
-            onPressed: () {
-              setState(() {
-                _isExpanded = !_isExpanded;
-              });
-            },
+            onPressed: () => setState(() {
+              _isExpanded = !_isExpanded;
+            }),
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
           ),
@@ -67,23 +66,22 @@ class _ModelListItemState extends State<ModelListItem> {
 
         // Child models (shown when expanded)
         if (_isExpanded)
-          ...widget.model.childModels.map((child) {
-            return Padding(
-              padding: const EdgeInsets.only(left: 24),
+          for (final child in widget.model.childModels)
+            Padding(
+              padding: const .only(left: 24),
               child: _ModelCard(
                 model: child,
                 isSelected: widget.selectedChildId == child.id,
                 onTap: () => widget.onChildTap?.call(child.id),
                 isChild: true,
               ),
-            );
-          }),
+            ),
       ],
     );
   }
 }
 
-/// A card widget displaying a model with its state and selection status
+/// A card widget displaying a model with its state and selection status.
 class _ModelCard extends StatelessWidget {
   final GladeBaseModelDescription model;
   final bool isSelected;
@@ -108,13 +106,13 @@ class _ModelCard extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Card(
-      margin: const EdgeInsets.all(GladeFormsConstants.spacing4),
+      margin: const .all(Constants.spacing4),
       color: isSelected ? colorScheme.primaryContainer : null,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: const .all(.circular(12)),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const .all(12),
           child: Row(
             children: [
               Icon(
@@ -124,15 +122,15 @@ class _ModelCard extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: .start,
+                  mainAxisSize: .min,
                   children: [
                     Text(
                       model.debugKey,
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                        fontWeight: isSelected ? .w600 : .w500,
                       ),
-                      overflow: TextOverflow.ellipsis,
+                      overflow: .ellipsis,
                     ),
                     const SizedBox(height: 4),
                     Wrap(
@@ -155,7 +153,7 @@ class _ModelCard extends StatelessWidget {
                     ),
                     if (modelsCount > 0)
                       Padding(
-                        padding: const EdgeInsets.only(top: 4),
+                        padding: const .only(top: 4),
                         child: Text(
                           '$modelsCount models',
                           style: theme.textTheme.labelSmall?.copyWith(
@@ -166,7 +164,7 @@ class _ModelCard extends StatelessWidget {
                   ],
                 ),
               ),
-              if (trailing != null) trailing!,
+              ?trailing,
             ],
           ),
         ),

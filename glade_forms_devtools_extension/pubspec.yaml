@@ -1,11 +1,11 @@
 name: glade_forms_devtools_extension
+resolution: workspace
 description: A DevTools extension for glade_forms package
-version: 1.0.0
 publish_to: none
+version: 1.0.0
 
 environment:
-  sdk: ">=3.6.0 <4.0.0"
-resolution: workspace
+  sdk: ">=3.10.0"
 
 dependencies:
   devtools_extensions: ^0.2.2
@@ -20,9 +20,9 @@ dependencies:
   provider: ^6.0.5
 
 dev_dependencies:
-  flutter_lints: ^5.0.0
   flutter_test:
     sdk: flutter
+  netglade_analysis: ^21.0.0
   test: ^1.25.8
   yaml: ^3.1.2
 

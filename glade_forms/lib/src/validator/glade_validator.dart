@@ -22,12 +22,11 @@ class GladeValidator<T> {
     ///
     /// Beware that some validators assume non-null value.
     bool stopOnFirstErrorOrWarning = false,
-  }) =>
-      ValidatorInstance(
-        parts: parts,
-        stopOnFirstError: stopOnFirstError,
-        stopOnFirstErrorOrWarning: stopOnFirstErrorOrWarning,
-      );
+  }) => .new(
+    parts: parts,
+    stopOnFirstError: stopOnFirstError,
+    stopOnFirstErrorOrWarning: stopOnFirstErrorOrWarning,
+  );
 
   /// Clears all validation parts.
   void clear() => parts = [];
@@ -37,7 +36,7 @@ class GladeValidator<T> {
     ValidateFunctionWithKey<T> onValidate, {
     Object? key,
     ShouldValidateCallback<T>? shouldValidate,
-    ValidationSeverity severity = ValidationSeverity.error,
+    ValidationSeverity severity = .error,
   }) {
     parts.add(
       CustomValidationPart(
@@ -57,20 +56,19 @@ class GladeValidator<T> {
     OnValidate<T>? devMessage,
     Object? key,
     ShouldValidateCallback<T>? shouldValidate,
-    ValidationSeverity severity = ValidationSeverity.error,
-  }) =>
-      _customInternal(
-        (value) => value == null
-            ? ValueNullError<T>(
-                value: value,
-                devMessage: devMessage,
-                key: key ?? GladeValidationsKeys.valueIsNull,
-                errorServerity: severity,
-              )
-            : null,
-        shouldValidate: shouldValidate,
-        severity: severity,
-      );
+    ValidationSeverity severity = .error,
+  }) => _customInternal(
+    (value) => value == null
+        ? ValueNullError<T>(
+            value: value,
+            devMessage: devMessage,
+            key: key ?? GladeValidationsKeys.valueIsNull,
+            errorServerity: severity,
+          )
+        : null,
+    shouldValidate: shouldValidate,
+    severity: severity,
+  );
 
   /// Value must satisfy given [predicate]. Returns [ValueSatisfyPredicateError].
   void satisfy(
@@ -79,32 +77,31 @@ class GladeValidator<T> {
     Object? key,
     ShouldValidateCallback<T>? shouldValidate,
     Object? metaData,
-    ValidationSeverity severity = ValidationSeverity.error,
-  }) =>
-      parts.add(
-        SatisfyPredicatePart(
-          predicate: predicate,
-          devMessage: devMessage ?? (value) => 'Value ${value ?? 'NULL'} does not satisfy given predicate.',
-          key: key,
-          shouldValidate: shouldValidate,
-          metaData: metaData,
-          serverity: severity,
-        ),
-      );
+    ValidationSeverity severity = .error,
+  }) => parts.add(
+    SatisfyPredicatePart(
+      predicate: predicate,
+      devMessage: devMessage ?? (value) => 'Value ${value ?? 'NULL'} does not satisfy given predicate.',
+      key: key,
+      shouldValidate: shouldValidate,
+      metaData: metaData,
+      serverity: severity,
+    ),
+  );
 
   /// Checks value with custom validation function.
   void _customInternal(
     ValidateFunction<T> onValidate, {
     required ValidationSeverity severity,
+    // ignore: avoid-never-passed-parameters, keep for consistency
     Object? key,
     ShouldValidateCallback<T>? shouldValidate,
-  }) =>
-      parts.add(
-        CustomValidationPart(
-          customValidator: onValidate,
-          key: key,
-          shouldValidate: shouldValidate,
-          serverity: severity,
-        ),
-      );
+  }) => parts.add(
+    CustomValidationPart(
+      customValidator: onValidate,
+      key: key,
+      shouldValidate: shouldValidate,
+      serverity: severity,
+    ),
+  );
 }

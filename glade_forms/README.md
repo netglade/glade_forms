@@ -1,5 +1,5 @@
 <a href="https://github.com/netglade">
-    <img alt="netglade" height='120px' src="https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/doc/badge.png">  
+    <img alt="netglade" height='120px' src="https://raw.githubusercontent.com/netglade/glade_forms/main/docs/assets/badge.png">  
 </a>
 
 Developed with 💚 by [netglade][netglade_link]
@@ -61,7 +61,7 @@ Then use `GladeFormBuilder`
 and connect the model to standard Flutter form and it's inputs like this:
 
 ```dart
-GladeFormBuilder(
+GladeFormBuilder.create(
   create: (context) => _Model(),
   builder: (context, model) => Form(
     autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -92,7 +92,7 @@ GladeFormBuilder(
 )
 ```
 
-![quick_start_example](https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/docs/assets/quickstart.gif)
+![quick_start_example](https://raw.githubusercontent.com/netglade/glade_forms/main/docs/assets/quickstart.gif)
 
 Interactive examples can be found in [📖 Glade Forms Widgetbook][storybook_demo_link].
 
@@ -104,7 +104,7 @@ Glade Forms includes a Flutter DevTools extension to help you inspect and debug 
 - Form dirty/pure states
 - Real-time updates as you interact with your app
 
-**Setup (required for early DevTools access):**
+**Setup**
 
 To ensure the DevTools extension is available immediately when you open DevTools (even before creating any forms), add this to your app's `main()` function:
 
@@ -118,8 +118,6 @@ void main() {
   runApp(MyApp());
 }
 ```
-
-Without this initialization, the extension will only become available after you navigate to a screen that creates a `GladeModel` instance.
 
 **How to access:**
 1. Run your app in debug mode: `flutter run`

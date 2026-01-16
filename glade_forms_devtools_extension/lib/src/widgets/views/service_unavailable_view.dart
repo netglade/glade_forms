@@ -5,10 +5,7 @@ import 'package:glade_forms_devtools_extension/src/constants.dart';
 class ServiceUnavailableView extends StatelessWidget {
   final VoidCallback onRetry;
 
-  const ServiceUnavailableView({
-    required this.onRetry,
-    super.key,
-  });
+  const ServiceUnavailableView({required this.onRetry, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,30 +13,30 @@ class ServiceUnavailableView extends StatelessWidget {
 
     return Center(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: .center,
         children: [
           Icon(
             Icons.cloud_off,
-            size: GladeFormsConstants.iconSize,
+            size: Constants.iconSize,
             color: theme.colorScheme.onSurfaceVariant,
           ),
-          const SizedBox(height: GladeFormsConstants.spacing16),
+          const SizedBox(height: Constants.spacing16),
           Text(
-            GladeFormsConstants.serviceUnavailableTitle,
+            Constants.serviceUnavailableTitle,
             style: theme.textTheme.headlineSmall,
           ),
-          const SizedBox(height: GladeFormsConstants.spacing8),
+          const SizedBox(height: Constants.spacing8),
           const Padding(
-            padding: EdgeInsets.symmetric(horizontal: GladeFormsConstants.spacing32),
+            padding: .symmetric(horizontal: Constants.spacing32),
             child: Text(
-              GladeFormsConstants.serviceUnavailableMessage,
-              textAlign: TextAlign.center,
+              Constants.serviceUnavailableMessage,
+              textAlign: .center,
             ),
           ),
-          const SizedBox(height: GladeFormsConstants.spacing16),
+          const SizedBox(height: Constants.spacing16),
           ElevatedButton(
             onPressed: onRetry,
-            child: const Text(GladeFormsConstants.retryButton),
+            child: const Text(Constants.retryButton),
           ),
         ],
       ),

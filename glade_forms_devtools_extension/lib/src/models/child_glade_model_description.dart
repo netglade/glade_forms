@@ -1,15 +1,16 @@
-import 'package:glade_forms_devtools_extension/src/models/child_glade_model_description.dart';
 import 'package:glade_forms_devtools_extension/src/models/glade_base_model_description.dart';
 import 'package:glade_forms_devtools_extension/src/models/glade_input_description.dart';
 
-/// Data model representing a GladeModel instance for DevTools display.
-class GladeModelDescription extends GladeBaseModelDescription {
-  @override
-  final bool isComposed;
-  final List<ChildGladeModelDescription> childModels;
+/// Data model representing a child model within a GladeComposedModel.
+class ChildGladeModelDescription extends GladeBaseModelDescription {
+  final int index;
 
-  const GladeModelDescription({
+  @override
+  bool get isComposed => false;
+
+  const ChildGladeModelDescription({
     required super.id,
+    required this.index,
     required super.debugKey,
     required super.type,
     required super.isValid,
@@ -18,14 +19,13 @@ class GladeModelDescription extends GladeBaseModelDescription {
     required super.isUnchanged,
     required super.inputs,
     required super.formattedErrors,
-    this.isComposed = false,
-    this.childModels = const [],
   });
 
-  factory GladeModelDescription.fromJson(Map<String, dynamic> json) {
-    return GladeModelDescription(
+  factory ChildGladeModelDescription.fromJson(Map<String, dynamic> json) {
+    return ChildGladeModelDescription(
       id: json['id'] as String,
       debugKey: json['debugKey'] as String,
+      index: json['index'] as int,
       type: json['type'] as String,
       isValid: json['isValid'] as bool,
       isPure: json['isPure'] as bool,
@@ -36,27 +36,15 @@ class GladeModelDescription extends GladeBaseModelDescription {
           .map((e) => GladeInputDescription.fromJson(e as Map<String, dynamic>))
           .toList(),
       formattedErrors: json['formattedErrors'] as String? ?? '',
-      isComposed: json['isComposed'] as bool? ?? false,
-      childModels:
-          // ignore: avoid-dynamic, can be anything
-          (json['childModels'] as List<dynamic>?)
-              ?.map(
-                (e) => ChildGladeModelDescription.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList() ??
-          const [],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'childModels': childModels.map((e) => e.toJson()).toList(),
       'formattedErrors': formattedErrors,
       'id': id,
+      'index': index,
       'inputs': inputs.map((e) => e.toJson()).toList(),
-      'isComposed': isComposed,
       'isDirty': isDirty,
       'isPure': isPure,
       'isUnchanged': isUnchanged,

@@ -54,9 +54,9 @@ class MetadataDescriptorExample extends StatelessWidget {
         // ignore: avoid-undisposed-instances, handled by GladeFormBuilder
         create: (context) => _Model(),
         builder: (context, model, _) => Padding(
-          padding: const EdgeInsets.all(32),
+          padding: const .all(32),
           child: Form(
-            autovalidateMode: AutovalidateMode.onUserInteraction,
+            autovalidateMode: .onUserInteraction,
             child: Column(
               children: [
                 TextFormField(

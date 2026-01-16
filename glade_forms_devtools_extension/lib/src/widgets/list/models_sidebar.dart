@@ -4,13 +4,15 @@ import 'package:glade_forms_devtools_extension/src/models/glade_model_descriptio
 import 'package:glade_forms_devtools_extension/src/widgets/list/model_list_item.dart';
 import 'package:netglade_flutter_utils/netglade_flutter_utils.dart';
 
+typedef OnChildTapCallback = void Function(GladeModelDescription model, String childId);
+
 /// Sidebar showing the list of active models.
 class ModelsSidebar extends StatelessWidget {
   final List<GladeModelDescription> models;
   final GladeModelDescription? selectedModel;
   final String? selectedChildId;
   final ValueChanged<GladeModelDescription> onModelTap;
-  final void Function(GladeModelDescription model, String childId) onChildTap;
+  final OnChildTapCallback onChildTap;
 
   const ModelsSidebar({
     required this.models,
@@ -26,12 +28,12 @@ class ModelsSidebar extends StatelessWidget {
     final theme = Theme.of(context);
 
     return SizedBox(
-      width: GladeFormsConstants.sidebarWidth,
+      width: Constants.sidebarWidth,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: .start,
         children: [
           Padding(
-            padding: const EdgeInsets.all(GladeFormsConstants.spacing16),
+            padding: const .all(Constants.spacing16),
             child: Text(
               'Active Models',
               style: theme.textTheme.titleMedium?.bold,
@@ -42,6 +44,7 @@ class ModelsSidebar extends StatelessWidget {
               itemCount: models.length,
               itemBuilder: (context, index) {
                 final model = models[index];
+
                 return ModelListItem(
                   model: model,
                   isSelected: selectedModel?.id == model.id,

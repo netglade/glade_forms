@@ -4,14 +4,15 @@ import 'package:glade_forms_devtools_extension/src/widgets/common/input_value_te
 import 'package:netglade_flutter_utils/netglade_flutter_utils.dart';
 
 class InputValue extends StatelessWidget {
+  // ignore: no-object-declaration, value can be of any type
   final Object? value;
-  final bool inverseBoolColors;
+  final bool shouldInverseBoolColors;
   final bool hasBackgroundWhitespaceIndicator;
 
   const InputValue({
-    super.key,
     required this.value,
-    this.inverseBoolColors = false,
+    super.key,
+    this.shouldInverseBoolColors = false,
     this.hasBackgroundWhitespaceIndicator = false,
   });
 
@@ -24,21 +25,25 @@ class InputValue extends StatelessWidget {
       return Text('null', style: textTheme.bodySmall?.semiBold);
     }
 
-    if (value is bool) {
-      final color = inverseBoolColors
-          ? (value == true ? GladeFormsConstants.invalidColor : GladeFormsConstants.validColor)
-          : (value == true ? GladeFormsConstants.validColor : GladeFormsConstants.invalidColor);
+    if (value case final boolValue?) {
+      final color = shouldInverseBoolColors
+          ? (boolValue == true ? Constants.invalidColor : Constants.validColor)
+          : (boolValue == true ? Constants.validColor : Constants.invalidColor);
 
-      return Text(value.toString(), style: textTheme.bodySmall?.withColor(color));
+      return Text(
+        boolValue.toString(),
+        style: textTheme.bodySmall?.withColor(color),
+      );
     }
 
-    if (value is String) {
+    if (value case final String stringValue) {
       return InputValueText(
-        stringValue: value.toString(),
+        stringValue: stringValue,
         hasBackgroundWhitespaceIndicator: hasBackgroundWhitespaceIndicator,
       );
     }
 
-    return Text(value.toString());
+    // ignore: avoid-non-null-assertion, checked above
+    return Text(value!.toString());
   }
 }

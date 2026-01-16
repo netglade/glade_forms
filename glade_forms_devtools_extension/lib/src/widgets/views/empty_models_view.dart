@@ -11,25 +11,22 @@ class EmptyModelsView extends StatelessWidget {
 
     return Center(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: .center,
         children: [
           Icon(
             Icons.assignment_outlined,
-            size: GladeFormsConstants.iconSize,
+            size: Constants.iconSize,
             color: theme.colorScheme.onSurfaceVariant,
           ),
-          const SizedBox(height: GladeFormsConstants.spacing16),
+          const SizedBox(height: Constants.spacing16),
           Text(
-            GladeFormsConstants.noModelsTitle,
+            Constants.noModelsTitle,
             style: theme.textTheme.headlineSmall,
           ),
-          const SizedBox(height: GladeFormsConstants.spacing8),
+          const SizedBox(height: Constants.spacing8),
           const Padding(
-            padding: EdgeInsets.symmetric(horizontal: GladeFormsConstants.spacing32),
-            child: Text(
-              GladeFormsConstants.noModelsMessage,
-              textAlign: TextAlign.center,
-            ),
+            padding: .symmetric(horizontal: Constants.spacing32),
+            child: Text(Constants.noModelsMessage, textAlign: .center),
           ),
         ],
       ),

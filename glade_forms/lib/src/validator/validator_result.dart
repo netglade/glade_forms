@@ -3,7 +3,7 @@ import 'package:glade_forms/src/core/core.dart';
 import 'package:glade_forms/src/validator/validator_result/glade_validator_result.dart';
 
 /// Complete result of validation process.
-class ValidatorResult<T> extends Equatable {
+class ValidatorResult<T> with EquatableMixin {
   /// Input associated with this validation result.
   final GladeInput<T>? associatedInput;
 
@@ -39,8 +39,8 @@ class ValidatorResult<T> extends Equatable {
 
   bool isValidWithSeverity(ValidationSeverity severity) {
     return switch (severity) {
-      ValidationSeverity.error => isValid,
-      ValidationSeverity.warning => isValidWithoutWarnings,
+      .error => isValid,
+      .warning => isValidWithoutWarnings,
     };
   }
 }

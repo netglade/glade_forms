@@ -11,6 +11,7 @@ class StateBadge extends StatelessWidget {
     required this.value,
     required this.icon,
     required this.color,
+    super.key,
   });
 
   @override
@@ -20,17 +21,14 @@ class StateBadge extends StatelessWidget {
         Icon(icon, size: 20, color: color),
         const SizedBox(width: 8),
         Expanded(
-          child: Text(
-            label,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
+          child: Text(label, style: Theme.of(context).textTheme.bodyMedium),
         ),
         Text(
           value.toString(),
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
+            fontWeight: .bold,
+            color: color,
+          ),
         ),
       ],
     );

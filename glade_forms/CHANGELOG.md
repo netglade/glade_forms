@@ -1,8 +1,10 @@
 ## 6.0.0
+- **Breaking**: Upgrade to Flutter SDK 3.38.0
+  - Change constraint to Dart sdk: ">=3.8.0"
 - **Breaking**: You need to call `GladeForms.initialize()` in order to use Glade Forms DevTools extension.
   - This is required to setup DevTools extension properly.
   - Can be called only in debug mode, but does nothing in release mode.
-- **[Add]**: Add **DevTools** extennsion!
+- **[Add]**: Add **DevTools** extension!
   - Allows to inspect Glade Forms models in Flutter DevTools
 - **[Add]**: Add `debugKey` property for developer friendly unique identification of models.
   - `debugKey` is a string that identifies the model in a human-readable way.

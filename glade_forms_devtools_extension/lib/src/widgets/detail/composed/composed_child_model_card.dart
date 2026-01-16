@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:glade_forms_devtools_extension/src/constants.dart';
-import 'package:glade_forms_devtools_extension/src/models/glade_model_description.dart';
+import 'package:glade_forms_devtools_extension/src/models/child_glade_model_description.dart';
 import 'package:glade_forms_devtools_extension/src/widgets/common/state_chip.dart';
 import 'package:glade_forms_devtools_extension/src/widgets/detail/composed/composed_child_model_input_summary.dart';
 import 'package:glade_forms_devtools_extension/src/widgets/detail/composed/state_badge.dart';
@@ -9,7 +9,7 @@ import 'package:netglade_flutter_utils/netglade_flutter_utils.dart';
 class ComposedChildModelCard extends StatefulWidget {
   final ChildGladeModelDescription child;
 
-  const ComposedChildModelCard({super.key, required this.child});
+  const ComposedChildModelCard({required this.child, super.key});
 
   @override
   State<ComposedChildModelCard> createState() => _ComposedChildModelCardState();
@@ -24,25 +24,25 @@ class _ComposedChildModelCardState extends State<ComposedChildModelCard> {
     final child = widget.child;
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const .only(bottom: 8),
       child: Column(
         children: [
           ListTile(
             leading: CircleAvatar(
               backgroundColor: child.isValid
-                  ? GladeFormsConstants.validColor.withAlpha((0.2 * 255).toInt())
-                  : GladeFormsConstants.invalidColor.withAlpha((0.2 * 255).toInt()),
+                  ? Constants.validColor.withValues(alpha: 0.2)
+                  : Constants.invalidColor.withValues(alpha: 0.2),
               child: Text(
                 '${child.index + 1}',
                 style: TextStyle(
-                  color: child.isValid ? GladeFormsConstants.validColor : GladeFormsConstants.invalidColor,
-                  fontWeight: FontWeight.bold,
+                  color: child.isValid ? Constants.validColor : Constants.invalidColor,
+                  fontWeight: .bold,
                 ),
               ),
             ),
             title: Text(
               child.debugKey,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              style: theme.textTheme.bodyMedium?.bold,
             ),
             subtitle: Wrap(
               spacing: 4,
@@ -70,15 +70,15 @@ class _ComposedChildModelCardState extends State<ComposedChildModelCard> {
           if (_isExpanded) ...[
             const Divider(height: 1),
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const .all(16),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: .start,
                 children: [
                   // Model state
                   Text(
                     'State',
                     style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
+                      fontWeight: .bold,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -106,17 +106,19 @@ class _ComposedChildModelCardState extends State<ComposedChildModelCard> {
                   if (child.formattedErrors.isNotEmpty) ...[
                     const SizedBox(height: 12),
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const .all(12),
                       decoration: BoxDecoration(
-                        color: child.validityColor.withAlpha((0.2 * 255).toInt()),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: child.validityColor.withAlpha((0.2 * 255).toInt())),
+                        color: child.validityColor.withValues(alpha: 0.2),
+                        borderRadius: const .all(.circular(8)),
+                        border: .all(
+                          color: child.validityColor.withValues(alpha: 0.2),
+                        ),
                       ),
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: .start,
+                        spacing: 8,
                         children: [
                           Icon(Icons.error_outline, size: 20, color: child.validityColor),
-                          const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               child.formattedErrors,
@@ -131,13 +133,13 @@ class _ComposedChildModelCardState extends State<ComposedChildModelCard> {
                   ],
 
                   if (child.inputs.isNotEmpty) ...[
-                    const SizedBox(height: GladeFormsConstants.spacing16),
+                    const SizedBox(height: Constants.spacing16),
                     Text(
                       'Inputs (${child.inputs.length})',
                       style: theme.textTheme.titleSmall?.bold,
                     ),
                     const SizedBox(height: 8),
-                    ...child.inputs.map((input) => ComposedChildModelInputSummary(input: input)),
+                    for (final input in child.inputs) ComposedChildModelInputSummary(input: input),
                   ],
                 ],
               ),

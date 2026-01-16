@@ -15,9 +15,9 @@ class GladeFormsDevToolsRegistry {
   final Set<String> _childModelIds = {};
 
   /// Get all registered models (excluding child models of composed models).
-  Map<String, GladeModelBase> get models => Map.unmodifiable(
-        Map.fromEntries(_models.entries.where((e) => !_childModelIds.contains(e.key))),
-      );
+  Map<String, GladeModelBase> get models => .unmodifiable(
+    Map.fromEntries(_models.entries.where((e) => !_childModelIds.contains(e.key))),
+  );
 
   factory GladeFormsDevToolsRegistry() {
     if (_instance == null) {
@@ -73,7 +73,6 @@ class GladeFormsDevToolsRegistry {
           final allModelsData = _models.entries.map((entry) => _serializeModel(entry.key, entry.value)).toList();
 
           // Second pass: filter out child models
-          // ignore: avoid-collection-methods-with-unrelated-types, should be ok
           final modelsData = allModelsData.where((modelData) => !_childModelIds.contains(modelData['id'])).toList();
 
           return developer.ServiceExtensionResponse.result(

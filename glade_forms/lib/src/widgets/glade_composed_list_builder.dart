@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:glade_forms/src/src.dart';
 import 'package:provider/provider.dart';
 
-typedef GladeComposedListItemBuilder<C extends GladeComposedModel<M>, M extends GladeModelBase> = Widget Function(
-  BuildContext context,
-  C composedModel,
-  M itemModel,
-  int index,
-);
+typedef GladeComposedListItemBuilder<C extends GladeComposedModel<M>, M extends GladeModelBase> =
+    Widget Function(
+      BuildContext context,
+      C composedModel,
+      M itemModel,
+      int index,
+    );
 
 typedef Builder = Widget Function(BuildContext context);
 
@@ -25,25 +26,24 @@ class GladeComposedListBuilder<C extends GladeComposedModel<M>, M extends GladeM
     required GladeComposedListItemBuilder<C, M> itemBuilder,
     Key? key,
     ScrollPhysics? physics,
-    Axis scrollDirection = Axis.vertical,
+    Axis scrollDirection = .vertical,
     bool shrinkWrap = false,
     Widget? child,
-  }) =>
-      GladeComposedListBuilder._(
-        itemBuilder: itemBuilder,
-        key: key,
-        physics: physics,
-        scrollDirection: scrollDirection,
-        shrinkWrap: shrinkWrap,
-        child: child,
-      );
+  }) => GladeComposedListBuilder._(
+    itemBuilder: itemBuilder,
+    key: key,
+    physics: physics,
+    scrollDirection: scrollDirection,
+    shrinkWrap: shrinkWrap,
+    child: child,
+  );
 
   factory GladeComposedListBuilder.create({
     required CreateModelFunction<C> create,
     required GladeComposedListItemBuilder<C, M> itemBuilder,
     Widget? child,
     ScrollPhysics? physics,
-    Axis scrollDirection = Axis.vertical,
+    Axis scrollDirection = .vertical,
     bool shrinkWrap = false,
     Key? key,
   }) {
@@ -63,7 +63,7 @@ class GladeComposedListBuilder<C extends GladeComposedModel<M>, M extends GladeM
     required GladeComposedListItemBuilder<C, M> itemBuilder,
     Widget? child,
     ScrollPhysics? physics,
-    Axis scrollDirection = Axis.vertical,
+    Axis scrollDirection = .vertical,
     bool shrinkWrap = false,
     Key? key,
   }) {
@@ -93,7 +93,7 @@ class GladeComposedListBuilder<C extends GladeComposedModel<M>, M extends GladeM
   Widget build(BuildContext context) {
     // choose provider style: create/value
     if (create case final createFn?) {
-      return GladeModelProvider<C>(
+      return GladeModelProvider(
         create: createFn,
         child: _GladeComposedFormList<C, M>(
           scrollDirection: scrollDirection,

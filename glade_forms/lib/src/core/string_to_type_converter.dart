@@ -3,15 +3,17 @@ import 'package:glade_forms/src/core/error/glade_validations_keys.dart';
 
 typedef OnErrorCallback<T> = ConvertError<T> Function(String? rawValue, Object error);
 
-typedef ConverterToType<T> = T Function(
-  String? rawInput,
-  T Function(
-    Object error, {
-    required String? rawValue,
-    Object? key,
-    OnConvertError? onError,
-  }) cantConvert,
-);
+typedef ConverterToType<T> =
+    T Function(
+      String? rawInput,
+      T Function(
+        Object error, {
+        required String? rawValue,
+        Object? key,
+        OnConvertError? onError,
+      })
+      cantConvert,
+    );
 
 typedef TypeConverterToString<T> = String? Function(T rawInput);
 
@@ -31,8 +33,8 @@ class StringToTypeConverter<T> {
     /// Converts [T] back to string.
     TypeConverterToString<T>? converterBack,
     //OnErrorCallback<T>? onError,
-  })  : _converterBack = converterBack ?? ((rawInput) => rawInput?.toString() ?? ''),
-        onError = ((rawValue, error) => ConvertError<T>(input: rawValue, error: error));
+  }) : _converterBack = converterBack ?? ((rawInput) => rawInput?.toString() ?? ''),
+       onError = ((rawValue, error) => ConvertError<T>(input: rawValue, error: error));
 
   /// Converts string input into `T` value.
   T convert(String? input) {
@@ -54,12 +56,12 @@ class StringToTypeConverter<T> {
     Object error, {
     required String? rawValue,
     Object? key,
+    // ignore: avoid-never-passed-parameters, keep for signature consistency
     OnConvertError? onError,
-  }) =>
-      throw ConvertError<T>(
-        input: rawValue,
-        formatError: onError,
-        error: error,
-        key: key ?? GladeValidationsKeys.conversionError,
-      );
+  }) => throw ConvertError<T>(
+    input: rawValue,
+    formatError: onError,
+    error: error,
+    key: key ?? GladeValidationsKeys.conversionError,
+  );
 }

@@ -11,7 +11,7 @@ class NoSelectionView extends StatelessWidget {
 
     return Center(
       child: Text(
-        GladeFormsConstants.selectModelMessage,
+        Constants.selectModelMessage,
         style: theme.textTheme.bodyLarge?.copyWith(
           color: theme.colorScheme.onSurfaceVariant,
         ),

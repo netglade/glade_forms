@@ -6,23 +6,25 @@ class StateRow extends StatelessWidget {
   final String label;
   final bool value;
   final IconData icon;
+
   const StateRow({
-    super.key,
     required this.label,
     required this.value,
     required this.icon,
+    super.key,
   });
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 20, color: value ? GladeFormsConstants.validColor : GladeFormsConstants.invalidColor),
-        const SizedBox(width: 8),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodyMedium,
+        Icon(
+          icon,
+          size: 20,
+          color: value ? Constants.validColor : Constants.invalidColor,
         ),
+        const SizedBox(width: 8),
+        Text(label, style: Theme.of(context).textTheme.bodyMedium),
         const Spacer(),
         InputValue(value: value),
       ],

@@ -9,11 +9,11 @@ class LoadingView extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Center(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: .center,
+        spacing: Constants.spacing16,
         children: [
           CircularProgressIndicator(),
-          SizedBox(height: GladeFormsConstants.spacing16),
-          Text(GladeFormsConstants.loadingMessage),
+          Text(Constants.loadingMessage),
         ],
       ),
     );

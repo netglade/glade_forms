@@ -7,43 +7,43 @@ import 'package:netglade_flutter_utils/netglade_flutter_utils.dart';
 class ComposedChildModelInputSummary extends StatelessWidget {
   final GladeInputDescription input;
 
-  const ComposedChildModelInputSummary({super.key, required this.input});
+  const ComposedChildModelInputSummary({required this.input, super.key});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 4),
-      padding: const EdgeInsets.all(8),
+      margin: const .only(bottom: 4),
+      padding: const .all(8),
       decoration: BoxDecoration(
         color: input.isValid
-            ? GladeFormsConstants.validColor.withAlpha((0.2 * 255).toInt())
-            : GladeFormsConstants.invalidColor.withAlpha((0.2 * 255).toInt()),
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(
+            ? Constants.validColor.withAlpha((0.2 * 255).toInt())
+            : Constants.invalidColor.withAlpha((0.2 * 255).toInt()),
+        borderRadius: const .all(.circular(4)),
+        border: .all(
           color: input.isValid
-              ? GladeFormsConstants.validColor.withAlpha((0.2 * 255).toInt())
-              : GladeFormsConstants.invalidColor.withAlpha((0.2 * 255).toInt()),
+              ? Constants.validColor.withAlpha((0.2 * 255).toInt())
+              : Constants.invalidColor.withAlpha((0.2 * 255).toInt()),
         ),
       ),
       child: Row(
+        spacing: Constants.spacing8,
         children: [
           Icon(
             input.isValid ? Icons.check_circle_outline : Icons.error_outline,
             size: 16,
-            color: input.isValid ? GladeFormsConstants.validColor : GladeFormsConstants.invalidColor,
+            color: input.isValid ? Constants.validColor : Constants.invalidColor,
           ),
-          const SizedBox(width: 8),
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: .start,
               children: [
-                Text(
-                  input.key,
-                  style: theme.textTheme.bodySmall?.bold,
+                Text(input.key, style: theme.textTheme.bodySmall?.bold),
+                InputValue(
+                  value: input.value,
+                  hasBackgroundWhitespaceIndicator: true,
                 ),
-                InputValue(value: input.value, hasBackgroundWhitespaceIndicator: true),
               ],
             ),
           ),

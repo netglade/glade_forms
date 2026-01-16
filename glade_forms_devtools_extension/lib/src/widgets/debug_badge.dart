@@ -8,19 +8,19 @@ class DebugBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: GladeFormsConstants.spacing8,
-        vertical: GladeFormsConstants.spacing4,
+      padding: const .symmetric(
+        horizontal: Constants.spacing8,
+        vertical: Constants.spacing4,
       ),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.orange,
-        borderRadius: BorderRadius.circular(GladeFormsConstants.spacing4),
+        borderRadius: .all(.circular(Constants.spacing4)),
       ),
       child: const Text(
-        GladeFormsConstants.debugBadge,
+        Constants.debugBadge,
         style: TextStyle(
-          fontSize: GladeFormsConstants.debugBadgeFontSize,
-          fontWeight: FontWeight.bold,
+          fontSize: Constants.debugBadgeFontSize,
+          fontWeight: .bold,
         ),
       ),
     );

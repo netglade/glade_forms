@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:glade_forms_devtools_extension/src/constants.dart';
-import 'package:glade_forms_devtools_extension/src/models/glade_model_description.dart';
+import 'package:glade_forms_devtools_extension/src/models/glade_base_model_description.dart';
 import 'package:glade_forms_devtools_extension/src/widgets/detail/glade_input_card.dart';
 import 'package:glade_forms_devtools_extension/src/widgets/detail/model_state_card.dart';
 
-/// Widget to display detailed information about a GladeModel
+/// Widget to display detailed information about a GladeModel.
 class ModelDetailView extends StatelessWidget {
   final GladeBaseModelDescription model;
 
@@ -15,15 +15,15 @@ class ModelDetailView extends StatelessWidget {
     final theme = Theme.of(context);
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const .all(16),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: .start,
         children: [
           // Model header
           Text(
             model.type,
             style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
+              fontWeight: .bold,
             ),
           ),
           const SizedBox(height: 8),
@@ -37,17 +37,15 @@ class ModelDetailView extends StatelessWidget {
 
           // Model state card
           ModelStateCard(model: model),
-          const SizedBox(height: GladeFormsConstants.spacing16),
+          const SizedBox(height: Constants.spacing16),
 
           // Inputs section
           Text(
             'Inputs (${model.inputs.length})',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: theme.textTheme.titleMedium?.copyWith(fontWeight: .bold),
           ),
-          const SizedBox(height: GladeFormsConstants.spacing8),
-          ...model.inputs.map((input) => GladeInputCard(input: input)),
+          const SizedBox(height: Constants.spacing8),
+          for (final input in model.inputs) GladeInputCard(input: input),
         ],
       ),
     );

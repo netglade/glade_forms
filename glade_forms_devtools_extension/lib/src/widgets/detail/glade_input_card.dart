@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:glade_forms_devtools_extension/src/constants.dart';
 import 'package:glade_forms_devtools_extension/src/models/glade_input_description.dart';
 import 'package:glade_forms_devtools_extension/src/widgets/common/input_value.dart';
 import 'package:glade_forms_devtools_extension/src/widgets/detail/info_row.dart';
@@ -6,7 +7,7 @@ import 'package:glade_forms_devtools_extension/src/widgets/detail/info_row.dart'
 class GladeInputCard extends StatelessWidget {
   final GladeInputDescription input;
 
-  const GladeInputCard({super.key, required this.input});
+  const GladeInputCard({required this.input, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,19 +16,16 @@ class GladeInputCard extends StatelessWidget {
     final hasWarnings = input.warnings.isNotEmpty;
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const .only(bottom: 8),
       child: ExpansionTile(
         leading: Icon(
           input.isValid ? Icons.check_circle : Icons.error,
           color: input.isValid ? Colors.green : Colors.red,
         ),
-        title: Text(
-          input.key,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: Text(input.key, style: const TextStyle(fontWeight: .bold)),
         subtitle: Row(
           children: [
-            Text('Value: '),
+            const Text('Value: '),
             InputValue(
               value: input.value,
               hasBackgroundWhitespaceIndicator: true,
@@ -36,9 +34,9 @@ class GladeInputCard extends StatelessWidget {
         ),
         children: [
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const .all(16),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: .start,
               children: [
                 InfoRow(label: 'Type', value: input.type),
                 InfoRow(label: 'Input key', value: input.key),
@@ -54,24 +52,21 @@ class GladeInputCard extends StatelessWidget {
                   hasBackgroundWhitespaceIndicator: true,
                 ),
                 const Divider(height: 16),
-                InfoRow(
-                  label: 'Valid',
-                  value: input.isValid,
-                ),
+                InfoRow(label: 'Valid', value: input.isValid),
                 Row(
                   children: [
                     Expanded(
                       child: InfoRow(
                         label: 'Has Validation error',
                         value: input.hasErrors,
-                        inverseBoolColors: true,
+                        hasInverseBoolColors: true,
                       ),
                     ),
                     Expanded(
                       child: InfoRow(
                         label: 'Has Conversion Error',
                         value: input.hasConversionError,
-                        inverseBoolColors: true,
+                        hasInverseBoolColors: true,
                       ),
                     ),
                   ],
@@ -85,10 +80,7 @@ class GladeInputCard extends StatelessWidget {
                       ),
                     ),
                     Expanded(
-                      child: InfoRow(
-                        label: 'Pure',
-                        value: input.isPure,
-                      ),
+                      child: InfoRow(label: 'Pure', value: input.isPure),
                     ),
                   ],
                 ),
@@ -97,64 +89,70 @@ class GladeInputCard extends StatelessWidget {
                   Text(
                     'Errors:',
                     style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
+                      fontWeight: .bold,
                       color: Colors.red,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  ...input.errors.map(
-                    (error) => Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Icon(Icons.error_outline, size: 16, color: Colors.red),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              error,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: Colors.red,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                  for (final error in input.errors)
+                    _ValidationMessage(
+                      message: error,
+                      icon: Icons.error_outline,
+                      color: Colors.red,
                     ),
-                  ),
                 ],
                 if (hasWarnings) ...[
                   const Divider(height: 16),
                   Text(
                     'Warnings:',
                     style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
+                      fontWeight: .bold,
                       color: Colors.orange,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  ...input.warnings.map(
-                    (warning) => Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Icon(Icons.warning_amber, size: 16, color: Colors.orange),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              warning,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: Colors.orange,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                  for (final warning in input.warnings)
+                    _ValidationMessage(
+                      message: warning,
+                      icon: Icons.warning_amber,
+                      color: Colors.orange,
                     ),
-                  ),
                 ],
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ValidationMessage extends StatelessWidget {
+  final String message;
+  final IconData icon;
+  final Color color;
+
+  const _ValidationMessage({
+    required this.message,
+    required this.icon,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: const .only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: .start,
+        spacing: Constants.spacing8,
+        children: [
+          Icon(icon, size: 16, color: color),
+          Expanded(
+            child: Text(
+              message,
+              style: theme.textTheme.bodySmall?.copyWith(color: color),
             ),
           ),
         ],

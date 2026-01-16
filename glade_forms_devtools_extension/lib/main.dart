@@ -15,7 +15,6 @@ class GladeFormsDevToolsExtension extends StatelessWidget {
       child: MaterialApp(
         theme: ThemeData.light(),
         darkTheme: ThemeData.dark(),
-        themeMode: ThemeMode.system,
         home: const GladeFormsExtensionScreen(),
       ),
     );

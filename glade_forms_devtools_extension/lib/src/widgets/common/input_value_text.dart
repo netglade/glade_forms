@@ -6,8 +6,8 @@ class InputValueText extends StatelessWidget {
   final bool hasBackgroundWhitespaceIndicator;
 
   const InputValueText({
-    super.key,
     required this.stringValue,
+    super.key,
     this.hasBackgroundWhitespaceIndicator = true,
   });
 
@@ -17,7 +17,7 @@ class InputValueText extends StatelessWidget {
 
     if (stringValue.isEmpty) {
       return Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: .min,
         children: [
           ColoredBox(
             color: hasBackgroundWhitespaceIndicator ? Colors.yellow.withAlpha(77) : Colors.transparent,

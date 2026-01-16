@@ -18,30 +18,24 @@ class ErrorView extends StatelessWidget {
 
     return Center(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: .center,
         children: [
           const Icon(
             Icons.error_outline,
-            size: GladeFormsConstants.iconSize,
+            size: Constants.iconSize,
             color: Colors.red,
           ),
-          const SizedBox(height: GladeFormsConstants.spacing16),
-          Text(
-            GladeFormsConstants.errorTitle,
-            style: theme.textTheme.headlineSmall,
-          ),
-          const SizedBox(height: GladeFormsConstants.spacing8),
+          const SizedBox(height: Constants.spacing16),
+          Text(Constants.errorTitle, style: theme.textTheme.headlineSmall),
+          const SizedBox(height: Constants.spacing8),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: GladeFormsConstants.spacing32),
-            child: Text(
-              errorMessage,
-              textAlign: TextAlign.center,
-            ),
+            padding: const .symmetric(horizontal: Constants.spacing32),
+            child: Text(errorMessage, textAlign: .center),
           ),
-          const SizedBox(height: GladeFormsConstants.spacing16),
+          const SizedBox(height: Constants.spacing16),
           ElevatedButton(
             onPressed: onRetry,
-            child: const Text(GladeFormsConstants.retryButton),
+            child: const Text(Constants.retryButton),
           ),
         ],
       ),
