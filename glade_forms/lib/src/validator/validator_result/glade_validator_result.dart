@@ -24,18 +24,27 @@ abstract class GladeValidatorResult<T> extends GladeInputValidation<T> with Equa
   String get devValidationMessage => onValidateMessage(value);
 
   @override
-  List<Object?> get props =>
-      [value, onValidateMessage, key, result, isConversionError, isNullError, severity, _errorServerity];
+  List<Object?> get props => [
+    value,
+    onValidateMessage,
+    key,
+    result,
+    isConversionError,
+    isNullError,
+    severity,
+    _errorServerity,
+  ];
 
   GladeValidatorResult({
     required this.value,
     required super.key,
     OnValidate<T>? devMessage,
-    ValidationSeverity errorServerity = ValidationSeverity.error,
-  })  : onValidateMessage = devMessage ??
-            ((v) =>
-                'Value "${v ?? 'NULL'}" does not satisfy validation. [This is default validation meessage. Use `onValidateMessage` to customize validation errors]'),
-        _errorServerity = errorServerity;
+    ValidationSeverity errorServerity = .error,
+  }) : onValidateMessage =
+           devMessage ??
+           ((v) =>
+               'Value "${v ?? 'NULL'}" does not satisfy validation. [This is default validation meessage. Use `onValidateMessage` to customize validation errors]'),
+       _errorServerity = errorServerity;
 
   @override
   String toString() {

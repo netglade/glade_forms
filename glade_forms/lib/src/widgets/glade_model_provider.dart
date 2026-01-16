@@ -30,6 +30,6 @@ class GladeModelProvider<M extends GladeModelBase> extends StatelessWidget {
     }
 
     // ignore: avoid-non-null-assertion, when value is null, it is guaranteed that create is not null.
-    return ChangeNotifierProvider<M>(create: create!, child: child);
+    return ChangeNotifierProvider(create: create!, child: child);
   }
 }

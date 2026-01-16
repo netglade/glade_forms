@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:glade_forms/src/validator/validator_result.dart';
 
 /// Information about changes in the input.
-class ChangesInfo<T> extends Equatable {
+class ChangesInfo<T> with EquatableMixin {
   /// Key of the input.
   final String inputKey;
 

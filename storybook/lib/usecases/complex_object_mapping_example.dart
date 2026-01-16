@@ -7,6 +7,7 @@ import 'package:glade_forms_storybook/shared/usecase_container.dart';
 class _Item {
   final int id;
   final String name;
+
   const _Item({required this.id, required this.name});
 }
 
@@ -72,12 +73,12 @@ class ComplexObjectMappingExample extends StatelessWidget {
         create: (context) => _Model(),
         builder: (context, model, _) {
           return Form(
-            autovalidateMode: AutovalidateMode.always,
+            autovalidateMode: .always,
             child: Row(
               children: [
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.all(8),
+                    padding: const .all(8),
                     child: Column(
                       children: [
                         TextFormField(
@@ -116,7 +117,7 @@ class ComplexObjectMappingExample extends StatelessWidget {
                     children: [
                       Text(
                         'Character stats',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(decoration: TextDecoration.underline),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(decoration: .underline),
                       ),
                       if (model.availableStats.value.isEmpty)
                         const Text('No stats')
@@ -124,7 +125,7 @@ class ComplexObjectMappingExample extends StatelessWidget {
                         ...model.availableStats.value.map((e) => Text(e.toString())),
                       Text(
                         'Selected item',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(decoration: TextDecoration.underline),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(decoration: .underline),
                       ),
                       Text(model.selectedItem.value?.name ?? 'No item selected'),
                     ],

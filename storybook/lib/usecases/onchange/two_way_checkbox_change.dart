@@ -27,10 +27,11 @@ class AgeRestrictedModel extends GladeModel {
       ),
     );
     ageInput = GladeIntInput(
-      validator: (v) => (v
-            ..notNull()
-            ..isMin(min: 18, shouldValidate: (_) => vipInput.value, key: _ErrorKeys.ageRestriction))
-          .build(),
+      validator: (v) =>
+          (v
+                ..notNull()
+                ..isMin(min: 18, shouldValidate: (_) => vipInput.value, key: _ErrorKeys.ageRestriction))
+              .build(),
       value: 0,
       inputKey: 'age-input',
       validationTranslate: (error, key, devMessage, dependencies) {
@@ -82,9 +83,9 @@ If *age* is changed to value under 18, *vip content* is unchecked and vice-versa
         // ignore: avoid-undisposed-instances, handled by GladeFormBuilder
         create: (context) => AgeRestrictedModel(),
         builder: (context, formModel, _) => Padding(
-          padding: const EdgeInsets.all(8),
+          padding: const .all(8),
           child: Form(
-            autovalidateMode: AutovalidateMode.always,
+            autovalidateMode: .always,
             child: ListView(
               children: [
                 TextFormField(

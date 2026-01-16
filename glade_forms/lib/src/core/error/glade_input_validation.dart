@@ -21,6 +21,10 @@ abstract class GladeInputValidation<T> {
       key == GladeValidationsKeys.valueIsNull || key == GladeValidationsKeys.valueIsEmpty;
 
   const GladeInputValidation({this.key});
+
+  @override
+  // ignore: avoid-nullable-interpolation, key can be null
+  String toString() => 'GladeInputValidation(key: $key, result: $result, severity: $severity)';
 }
 
 // ignore: prefer-single-declaration-per-file, keep here.

@@ -1,11 +1,11 @@
 name: glade_forms_example
+resolution: workspace
 description: Example project how to use GladeForms
-version: 1.0.1
 publish_to: none
+version: 1.0.1
 
 environment:
-  sdk: ">=3.6.0 <4.0.0"
-resolution: workspace
+  sdk: ">=3.10.0"
 
 dependencies:
   flutter:

@@ -1,11 +1,11 @@
 name: glade_forms_storybook
+resolution: workspace
 description: Glade Forms - Interactive example
-version: 1.0.0
 publish_to: none
+version: 1.0.0
 
 environment:
-  sdk: ^3.6.0
-resolution: workspace
+  sdk: ^3.10.0
 
 dependencies:
   easy_localization: ^3.0.7
@@ -22,7 +22,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  netglade_analysis: ^18.0.0
+  netglade_analysis: ^21.0.0
 
 flutter:
   uses-material-design: true

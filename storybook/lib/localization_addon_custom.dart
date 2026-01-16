@@ -17,7 +17,7 @@ class LocalizationAddonCustom extends WidgetbookAddon<Locale> {
         name: 'name',
         values: locales,
         // TODO(widgetbook): update deprecated
-        // ignore: deprecated_member_use, ok for now
+        // ignore: deprecated_member_use, ok for now, avoid-deprecated-usage
         initialValue: initialSetting,
         labelBuilder: (locale) => locale.toLanguageTag(),
         // TODO(widgetbook): update deprecated
@@ -32,20 +32,20 @@ class LocalizationAddonCustom extends WidgetbookAddon<Locale> {
     required this.localizationsDelegates,
     required this.onChange,
     Locale? initialLocale,
-  })  : assert(
-          locales.isNotEmpty,
-          'locales cannot be empty',
-        ),
-        assert(
-          initialLocale == null || locales.contains(initialLocale),
-          'initialLocale must be in locales',
-        ),
-        super(
-          name: 'Locale',
-          // TODO(widgetbook): update deprecated
-          // ignore: deprecated_member_use, ok for now, avoid-unsafe-collection-methods, ok here, avoid-deprecated-usage
-          initialSetting: initialLocale ?? locales.first,
-        );
+  }) : assert(
+         locales.isNotEmpty,
+         'locales cannot be empty',
+       ),
+       assert(
+         initialLocale == null || locales.contains(initialLocale),
+         'initialLocale must be in locales',
+       ),
+       super(
+         name: 'Locale',
+         // TODO(widgetbook): update deprecated
+         // ignore: deprecated_member_use, ok for now, avoid-unsafe-collection-methods, ok here, avoid-deprecated-usage
+         initialSetting: initialLocale ?? locales.first,
+       );
 
   @override
   Locale valueFromQueryGroup(Map<String, String> group) {

@@ -71,13 +71,17 @@ void main() {
       test(
         '($index): $testDate should be valid between $start - $end when testing inclusive and with included time',
         () {
-          final validator = (DateTimeValidator()
-                // ignore: avoid_redundant_argument_values, be explicit in tests.
-                ..isBetween(start: start, end: end, includeTime: true, inclusiveInterval: true))
-              .build();
+          // arrange
+          final validator =
+              (DateTimeValidator()
+                    // ignore: avoid_redundant_argument_values, be explicit in tests.
+                    ..isBetween(start: start, end: end, includeTime: true, inclusiveInterval: true))
+                  .build();
 
+          // act
           final result = validator.validate(testDate);
 
+          // assert
           expect(result.isValid, equals(isValid));
           expect(result.isNotValid, equals(!isValid));
         },
@@ -150,10 +154,13 @@ void main() {
       test(
         '($index): $testDate should be valid between $start - $end when testing inclusive and but without included time',
         () {
+          // arrange
           final validator = (DateTimeValidator()..isBetween(start: start, end: end, includeTime: false)).build();
 
+          // act
           final result = validator.validate(testDate);
 
+          // assert
           expect(result.isValid, equals(isValid));
           expect(result.isNotValid, equals(!isValid));
         },
@@ -226,18 +233,22 @@ void main() {
       test(
         '($index): $testDate should be valid between $start - $end when testing without inclusive and without included time',
         () {
-          final validator = (DateTimeValidator()
-                // ignore: be explicit in tests.
-                ..isBetween(
-                  start: start,
-                  end: end,
-                  includeTime: false,
-                  inclusiveInterval: false,
-                ))
-              .build();
+          // arrange
+          final validator =
+              (DateTimeValidator()
+                    // ignore: be explicit in tests.
+                    ..isBetween(
+                      start: start,
+                      end: end,
+                      includeTime: false,
+                      inclusiveInterval: false,
+                    ))
+                  .build();
 
+          // act
           final result = validator.validate(testDate);
 
+          // assert
           expect(result.isValid, equals(isValid));
           expect(result.isNotValid, equals(!isValid));
         },
@@ -310,18 +321,21 @@ void main() {
       test(
         '($index): $testDate should be valid between $start - $end when testing without inclusive but with included time',
         () {
-          final validator = (DateTimeValidator()
-                ..isBetween(
-                  start: start,
-                  end: end,
-                  inclusiveInterval: false,
-                  // ignore: avoid_redundant_argument_values, be explicit
-                  includeTime: true,
-                ))
-              .build();
+          // arrange
+          final validator =
+              (DateTimeValidator()..isBetween(
+                    start: start,
+                    end: end,
+                    inclusiveInterval: false,
+                    // ignore: avoid_redundant_argument_values, be explicit
+                    includeTime: true,
+                  ))
+                  .build();
 
+          // act
           final result = validator.validate(testDate);
 
+          // assert
           expect(result.isValid, equals(isValid));
           expect(result.isNotValid, equals(!isValid));
         },
@@ -366,10 +380,13 @@ void main() {
       test(
         '($index): $testDate should be valid after $start when testing inclusive and with included time',
         () {
+          // arrange
           final validator = (DateTimeValidator()..isAfter(start: start)).build();
 
+          // act
           final result = validator.validate(testDate);
 
+          // assert
           expect(result.isValid, equals(isValid));
           expect(result.isNotValid, equals(!isValid));
         },
@@ -412,10 +429,13 @@ void main() {
       test(
         '($index): $testDate should be valid after $start when testing exclusive and with included time',
         () {
+          // arrange
           final validator = (DateTimeValidator()..isAfter(start: start, inclusiveInterval: false)).build();
 
+          // act
           final result = validator.validate(testDate);
 
+          // assert
           expect(result.isValid, equals(isValid));
           expect(result.isNotValid, equals(!isValid));
         },
@@ -454,10 +474,13 @@ void main() {
       test(
         '($index): $testDate should be valid after $start when testing inclusive and without included time',
         () {
+          // arrange
           final validator = (DateTimeValidator()..isAfter(start: start, includeTime: false)).build();
 
+          // act
           final result = validator.validate(testDate);
 
+          // assert
           expect(result.isValid, equals(isValid));
           expect(result.isNotValid, equals(!isValid));
         },
@@ -496,11 +519,14 @@ void main() {
       test(
         '($index): $testDate should be valid after $start when testing exclusive and without included time',
         () {
-          final validator =
-              (DateTimeValidator()..isAfter(start: start, includeTime: false, inclusiveInterval: false)).build();
+          // arrange
+          final validator = (DateTimeValidator()..isAfter(start: start, includeTime: false, inclusiveInterval: false))
+              .build();
 
+          // act
           final result = validator.validate(testDate);
 
+          // assert
           expect(result.isValid, equals(isValid));
           expect(result.isNotValid, equals(!isValid));
         },
@@ -545,10 +571,13 @@ void main() {
       test(
         '($index): $testDate should be valid before $end when testing inclusive and with included time',
         () {
+          // arrange
           final validator = (DateTimeValidator()..isBefore(end: end)).build();
 
+          // act
           final result = validator.validate(testDate);
 
+          // assert
           expect(result.isValid, equals(isValid));
           expect(result.isNotValid, equals(!isValid));
         },
@@ -591,10 +620,13 @@ void main() {
       test(
         '($index): $testDate should be valid before $end when testing exclusive and with included time',
         () {
+          // arrange
           final validator = (DateTimeValidator()..isBefore(end: end, inclusiveInterval: false)).build();
 
+          // act
           final result = validator.validate(testDate);
 
+          // assert
           expect(result.isValid, equals(isValid));
           expect(result.isNotValid, equals(!isValid));
         },
@@ -625,10 +657,13 @@ void main() {
       test(
         '($index): $testDate should be valid before $end when testing inclusive and without included time',
         () {
+          // arrange
           final validator = (DateTimeValidator()..isBefore(end: end, includeTime: false)).build();
 
+          // act
           final result = validator.validate(testDate);
 
+          // assert
           expect(result.isValid, equals(isValid));
           expect(result.isNotValid, equals(!isValid));
         },
@@ -663,11 +698,14 @@ void main() {
       test(
         '($index): $testDate should be valid before $end when testing exclusive and without included time',
         () {
-          final validator =
-              (DateTimeValidator()..isBefore(end: end, includeTime: false, inclusiveInterval: false)).build();
+          // arrange
+          final validator = (DateTimeValidator()..isBefore(end: end, includeTime: false, inclusiveInterval: false))
+              .build();
 
+          // act
           final result = validator.validate(testDate);
 
+          // assert
           expect(result.isValid, equals(isValid));
           expect(result.isNotValid, equals(!isValid));
         },

@@ -1,5 +1,4 @@
 import 'package:glade_forms/src/src.dart';
-
 import 'package:glade_forms/src/validator/validator_result.dart';
 
 abstract class GladeComposedModel<M extends GladeModelBase> extends GladeModelBase {
@@ -40,6 +39,7 @@ abstract class GladeComposedModel<M extends GladeModelBase> extends GladeModelBa
         addModel(model);
       }
     }
+    registerWithDevTools();
   }
 
   /// Adds model to `models` list.
@@ -60,5 +60,17 @@ abstract class GladeComposedModel<M extends GladeModelBase> extends GladeModelBa
       ..removeListener(notifyListeners)
       ..unbindFromComposedModel(this);
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    // Iterate over a copy to avoid concurrent modification
+    for (final model in _models.toList()) {
+      model
+        ..removeListener(notifyListeners)
+        ..dispose();
+    }
+    _models.clear();
+    super.dispose();
   }
 }

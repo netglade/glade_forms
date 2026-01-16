@@ -50,6 +50,7 @@ class UsecaseContainer extends StatelessWidget {
 
 class _CodeSample extends HookWidget {
   final String fileName;
+
   const _CodeSample({required this.fileName});
 
   @override
@@ -57,7 +58,7 @@ class _CodeSample extends HookWidget {
     final getFileContentFutureMemo = useMemoized(_getFileContent);
     final getFileFuture = useFuture(getFileContentFutureMemo);
 
-    if (getFileFuture.connectionState == ConnectionState.waiting) {
+    if (getFileFuture.connectionState == .waiting) {
       return const Center(child: CircularProgressIndicator());
     }
 
@@ -75,7 +76,7 @@ class _CodeSample extends HookWidget {
                   child: HighlightView(
                     // ignore: avoid-non-null-assertion, ok here
                     getFileFuture.data!,
-                    padding: const EdgeInsets.all(10),
+                    padding: const .all(10),
                     language: 'dart',
                     theme: githubTheme,
                   ),
@@ -84,9 +85,9 @@ class _CodeSample extends HookWidget {
             ),
             Container(
               alignment: Alignment.topRight,
-              padding: const EdgeInsets.all(8),
+              padding: const .all(8),
               child: Padding(
-                padding: const EdgeInsets.all(8),
+                padding: const .all(8),
                 child: SizedBox(
                   width: 100,
                   height: 40,
@@ -95,8 +96,9 @@ class _CodeSample extends HookWidget {
                     onPressed: () {
                       // ignore: avoid-async-call-in-sync-function, avoid-non-null-assertion , ok here
                       Clipboard.setData(ClipboardData(text: getFileFuture.data!));
-                      final _ = ScaffoldMessenger.of(context)
-                          .showSnackBar(const SnackBar(content: Text('Code copied to clipboad')));
+                      final _ = ScaffoldMessenger.of(
+                        context, // ignore: unnecessary-trailing-comma, ok here
+                      ).showSnackBar(const SnackBar(content: Text('Code copied to clipboad')));
                     },
                     icon: const Icon(Icons.code),
                     label: const Text('Copy code'),

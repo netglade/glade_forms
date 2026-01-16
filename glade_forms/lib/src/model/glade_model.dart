@@ -72,6 +72,7 @@ abstract class GladeModel extends GladeModelBase {
 
   GladeModel() {
     initialize();
+    registerWithDevTools();
   }
 
   /// Initialize model's inputs.

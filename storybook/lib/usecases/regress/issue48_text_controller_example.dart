@@ -55,7 +55,7 @@ class HookExample extends HookWidget {
       children: [
         Text(numb.value.toString()),
         Form(
-          autovalidateMode: AutovalidateMode.onUserInteraction,
+          autovalidateMode: .onUserInteraction,
           child: TextField(
             controller: wrongField,
             onChanged: (v) => numb.value = v.length,
@@ -75,9 +75,9 @@ class ModelB extends HookWidget {
 
     return GladeFormBuilder<_Model>(
       builder: (context, model, _) => Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const .all(32),
         child: Form(
-          autovalidateMode: AutovalidateMode.onUserInteraction,
+          autovalidateMode: .onUserInteraction,
           child: Column(
             children: [
               Text(model.nameWithController.value),

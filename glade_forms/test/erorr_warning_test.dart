@@ -3,18 +3,21 @@ import 'package:test/test.dart';
 
 void main() {
   test('Warning populates proper result value', () {
+    // arrange
     final input = GladeIntInput(
-      validator: (v) => (v
-            ..isBetween(min: 25, max: 50, severity: ValidationSeverity.warning, key: 'between')
-            ..isMin(min: 10, key: 'min')
-            ..isMax(max: 100, key: 'max'))
-          .build(),
+      validator: (v) =>
+          (v
+                ..isBetween(min: 25, max: 50, severity: .warning, key: 'between')
+                ..isMin(min: 10, key: 'min')
+                ..isMax(max: 100, key: 'max'))
+              .build(),
       value: 15,
     );
 
-    // Act
+    // act
     final result = input.validate();
 
+    // assert
     expect(result.errors, isEmpty, reason: 'Errors should be empty');
     expect(result.warnings, isNotEmpty, reason: 'Warnings should not be empty');
     expect(result.isValid, isTrue, reason: 'Input should be valid');
@@ -26,18 +29,21 @@ void main() {
   });
 
   test('Warning does not stop validation by default', () {
+    // arrange
     final input = GladeIntInput(
-      validator: (v) => (v
-            ..isBetween(min: 25, max: 50, severity: ValidationSeverity.warning, key: 'between')
-            ..isMin(min: 20, key: 'min') // * triggers
-            ..isMax(max: 100, key: 'max'))
-          .build(),
+      validator: (v) =>
+          (v
+                ..isBetween(min: 25, max: 50, severity: .warning, key: 'between')
+                ..isMin(min: 20, key: 'min') // * triggers
+                ..isMax(max: 100, key: 'max'))
+              .build(),
       value: 15,
     );
 
-    // Act
+    // act
     final result = input.validate();
 
+    // assert
     expect(result.errors, isNotEmpty, reason: 'Errors should not be empty');
     expect(result.warnings, isNotEmpty, reason: 'Warnings should not be empty');
     expect(result.isValid, isFalse, reason: 'Input should  not be valid');
@@ -53,18 +59,21 @@ void main() {
   });
 
   test('Warning does not stop validation even when stopOnFirstError is false', () {
+    // arrange
     final input = GladeIntInput(
-      validator: (v) => (v
-            ..isBetween(min: 25, max: 50, severity: ValidationSeverity.warning, key: 'between')
-            ..isMin(min: 20, key: 'min') // * triggers
-            ..isMax(max: 10, key: 'max')) // * also triggers, although in reality does not make sense
-          .build(stopOnFirstError: false),
+      validator: (v) =>
+          (v
+                ..isBetween(min: 25, max: 50, severity: .warning, key: 'between')
+                ..isMin(min: 20, key: 'min') // * triggers
+                ..isMax(max: 10, key: 'max')) // * also triggers, although in reality does not make sense
+              .build(stopOnFirstError: false),
       value: 15,
     );
 
-    // Act
+    // act
     final result = input.validate();
 
+    // assert
     expect(result.errors, isNotEmpty, reason: 'Errors should not be empty');
     expect(result.warnings, isNotEmpty, reason: 'Warnings should not be empty');
     expect(result.isValid, isFalse, reason: 'Input should  not be valid');
@@ -82,18 +91,21 @@ void main() {
   });
 
   test('Warning stops validation when stopOnFirstErrorOrWarning is true', () {
+    // arrange
     final input = GladeIntInput(
-      validator: (v) => (v
-            ..isBetween(min: 25, max: 50, severity: ValidationSeverity.warning, key: 'between')
-            ..isMin(min: 20, key: 'min') // * triggers
-            ..isMax(max: 10, key: 'max')) // * also triggers, although in reality does not make sense
-          .build(stopOnFirstError: false, stopOnFirstErrorOrWarning: true),
+      validator: (v) =>
+          (v
+                ..isBetween(min: 25, max: 50, severity: .warning, key: 'between')
+                ..isMin(min: 20, key: 'min') // * triggers
+                ..isMax(max: 10, key: 'max')) // * also triggers, although in reality does not make sense
+              .build(stopOnFirstError: false, stopOnFirstErrorOrWarning: true),
       value: 15,
     );
 
-    // Act
+    // act
     final result = input.validate();
 
+    // assert
     expect(result.errors, isEmpty, reason: 'Errors should be empty');
     expect(result.warnings, isNotEmpty, reason: 'Warnings should not be empty');
     expect(result.isValid, isTrue, reason: 'Input should  not be valid');
@@ -106,19 +118,22 @@ void main() {
   });
 
   test('By default multiple warnigns are collected and do not stop validation', () {
+    // arrange
     final input = GladeIntInput(
-      validator: (v) => (v
-            ..isBetween(min: 25, max: 50, severity: ValidationSeverity.warning, key: 'between')
-            ..isMin(min: 10, key: 'min')
-            ..isBetween(min: 23, max: 24, severity: ValidationSeverity.warning, key: 'between2')
-            ..isMax(max: 18, key: 'max')) // * triggers, although in reality does not make sense
-          .build(),
+      validator: (v) =>
+          (v
+                ..isBetween(min: 25, max: 50, severity: .warning, key: 'between')
+                ..isMin(min: 10, key: 'min')
+                ..isBetween(min: 23, max: 24, severity: .warning, key: 'between2')
+                ..isMax(max: 18, key: 'max')) // * triggers, although in reality does not make sense
+              .build(),
       value: 20,
     );
 
-    // Act
+    // act
     final result = input.validate();
 
+    // assert
     expect(result.errors, isNotEmpty, reason: 'Errors should not be empty');
     expect(result.warnings, isNotEmpty, reason: 'Warnings should not be empty');
     expect(result.isValid, isFalse, reason: 'Input should  not be valid');

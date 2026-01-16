@@ -4,7 +4,7 @@ import 'package:glade_forms/src/validator/validator_result/glade_validator_resul
 
 typedef ShouldValidateCallback<T> = bool Function(T value);
 
-abstract class InputValidatorPart<T> extends Equatable {
+abstract class InputValidatorPart<T> with EquatableMixin {
   // ignore: no-object-declaration, key can be any object
   final Object? key;
 

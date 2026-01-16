@@ -63,26 +63,3 @@ GladeFormListener<MyModel>(
 ### GladeFormConsumer
 
 Combines `GladeFormBuilder` and `GladeFormListener` to react to changes in the model and listen for updates.
-
-## Widgets for debugging
-
-Use `GladeFormDebugInfo` widget to display properties of your model. It helps you to understand what is going on in your model.
-
-```dart
-Column(children: [
-    GladeFormDebugInfo<MyModel>(),
-
-    // ... my form 
-]);
-```
-
-Note that you can customize which properties are displayed.
-
-![GladeModelDebugInfo](/assets/glade-model-debug.png)
-
-### GladeFormDebugInfo Modal
-If you prefer to display debugging info as a modal use 
-
-```dart
-GladeFormDebugInfoModal.show(context, your_model);
-```
