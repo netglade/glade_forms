@@ -76,16 +76,16 @@ class _GladeFormDebugInfoState<M extends GladeModel> extends State<GladeFormDebu
         final hasMetadata = model.hasDebugMetadata;
 
         return Padding(
-          padding: const EdgeInsets.all(8),
+          padding: const .all(8),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: .start,
             children: [
               const _DangerStrips(color1: Colors.black, color2: Colors.red, gap: 5),
               // Table.
               Row(
                 children: [
                   Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: .start,
                     children: [
                       Row(
                         children: [
@@ -114,7 +114,7 @@ class _GladeFormDebugInfoState<M extends GladeModel> extends State<GladeFormDebu
                         title: Text('Show metadata table (${hasMetadata ? 'available' : 'none'})'),
                         value: _showMetadata,
                         dense: true,
-                        visualDensity: VisualDensity.compact,
+                        visualDensity: .compact,
                         onChanged: (value) => setState(() => _showMetadata = value),
                       ),
                     ),
@@ -172,12 +172,12 @@ class _GladeFormDebugInfoState<M extends GladeModel> extends State<GladeFormDebu
               ConditionalWrap(
                 condition: widget.scrollable,
                 wrapper: (context, child) => SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
+                  scrollDirection: .horizontal,
                   child: child,
                 ),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: .min,
+                  crossAxisAlignment: .start,
                   children: [
                     _GladeInputsTable(
                       scrollable: widget.scrollable,
@@ -242,8 +242,9 @@ class _GladeInputsTable extends StatelessWidget {
   Widget build(BuildContext context) {
     final inputs = model.inputs.where((element) => !hiddenKeys.contains(element.inputKey));
     final rowColor = Theme.of(context).colorScheme.surface;
-    final alternativeRowColor =
-        MediaQuery.platformBrightnessOf(context) == Brightness.dark ? rowColor.lighten() : rowColor.darken();
+    final alternativeRowColor = MediaQuery.platformBrightnessOf(context) == .dark
+        ? rowColor.lighten()
+        : rowColor.darken();
 
     return Table(
       defaultColumnWidth: scrollable ? const IntrinsicColumnWidth() : const FlexColumnWidth(),
@@ -251,7 +252,10 @@ class _GladeInputsTable extends StatelessWidget {
       children: [
         // Columns header.
         TableRow(
-          decoration: BoxDecoration(color: Theme.of(context).canvasColor, border: const Border(bottom: BorderSide())),
+          decoration: BoxDecoration(
+            color: Theme.of(context).canvasColor,
+            border: const Border(bottom: BorderSide()),
+          ),
           children: [
             const _ColumnHeader('Input'),
             if (showIsUnchanged) const _ColumnHeader('isUnchanged'),
@@ -272,7 +276,7 @@ class _GladeInputsTable extends StatelessWidget {
             ),
             children: [
               Padding(
-                padding: const EdgeInsets.only(left: 5),
+                padding: const .only(left: 5),
                 child: _RowValue(value: x.inputKey, wrap: true, center: false),
               ),
               if (showIsUnchanged) _RowValue(value: x.isUnchanged, tracked: x.trackUnchanged),
@@ -305,8 +309,9 @@ class _GladeModelMetadataTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final rowColor = Theme.of(context).colorScheme.surface;
-    final alternativeRowColor =
-        MediaQuery.platformBrightnessOf(context) == Brightness.dark ? rowColor.lighten() : rowColor.darken();
+    final alternativeRowColor = MediaQuery.platformBrightnessOf(context) == .dark
+        ? rowColor.lighten()
+        : rowColor.darken();
 
     return Column(
       children: [
@@ -316,8 +321,10 @@ class _GladeModelMetadataTable extends StatelessWidget {
           border: const TableBorder.symmetric(outside: BorderSide()),
           children: [
             TableRow(
-              decoration:
-                  BoxDecoration(color: Theme.of(context).canvasColor, border: const Border(bottom: BorderSide())),
+              decoration: BoxDecoration(
+                color: Theme.of(context).canvasColor,
+                border: const Border(bottom: BorderSide()),
+              ),
               children: const [_ColumnHeader('Key'), _ColumnHeader('Value'), _ColumnHeader('')],
             ),
             for (final (index, entry) in model.fillDebugMetadata().entries.indexed)
@@ -327,12 +334,13 @@ class _GladeModelMetadataTable extends StatelessWidget {
                 ),
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(left: 5),
+                    padding: const .only(left: 5),
                     child: _RowValue(value: entry.key),
                   ),
                   _RowValue(
                     value: entry.value,
-                    colorizedValue: entry.value is String ||
+                    colorizedValue:
+                        entry.value is String ||
                         (entry.value is GladeMetaData && (entry.value as GladeMetaData).shouldIndicateStringValue),
                   ),
                   const _RowValue(value: ''),
@@ -352,7 +360,10 @@ class _ColumnHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(padding: const EdgeInsets.only(left: 10), child: Center(child: Text(label)));
+    return Padding(
+      padding: const .only(left: 10),
+      child: Center(child: Text(label)),
+    );
   }
 }
 
@@ -402,7 +413,7 @@ class _RowValue extends StatelessWidget {
           child: Text(
             value?.toString() ?? '',
             softWrap: wrap,
-            overflow: wrap ? null : TextOverflow.ellipsis,
+            overflow: wrap ? null : .ellipsis,
           ),
         ),
       ),
@@ -418,7 +429,7 @@ class _StringValue extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ColoredBox(
-      color: Theme.of(context).brightness == Brightness.light
+      color: Theme.of(context).brightness == .light
           ? const Color.fromARGB(255, 196, 222, 184)
           : const Color.fromARGB(255, 15, 46, 0),
       child: Text(
@@ -473,6 +484,7 @@ class _DangerStrips extends StatelessWidget {
   final Color color1;
   final Color color2;
   final double gap;
+
   const _DangerStrips({
     required this.color1,
     required this.color2,
@@ -483,7 +495,7 @@ class _DangerStrips extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 5,
-      width: double.infinity,
+      width: .infinity,
       child: LayoutBuilder(
         builder: (context, constraints) {
           return Stack(children: _getListOfStripes((constraints.maxWidth / 2).ceil()));

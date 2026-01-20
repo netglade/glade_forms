@@ -1,0 +1,11 @@
+{
+    "name": "glade_forms_devtools_extension",
+    "short_name": "glade_forms",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#0175C2",
+    "theme_color": "#0175C2",
+    "description": "DevTools extension for glade_forms",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false
+}

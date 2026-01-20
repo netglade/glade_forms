@@ -1,5 +1,5 @@
 <a href="https://github.com/netglade">
-    <img alt="netglade" height='120px' src="https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/doc/badge.png">  
+    <img alt="netglade" height='120px' src="https://raw.githubusercontent.com/netglade/glade_forms/main/docs/assets/badge.png">  
 </a>
 
 Developed with 💚 by [netglade][netglade_link]
@@ -16,6 +16,7 @@ A universal way to define form validators with support of translations.
 
 - [👀 What is this?](#-what-is-this)
 - [🚀 Getting started](#-getting-started)
+- [🔍 DevTools Extension](#-devtools-extension)
 - [📖 Documentation](#-documentation)
 
 ## 👀 What is this?
@@ -60,7 +61,7 @@ Then use `GladeFormBuilder`
 and connect the model to standard Flutter form and it's inputs like this:
 
 ```dart
-GladeFormBuilder(
+GladeFormBuilder.create(
   create: (context) => _Model(),
   builder: (context, model) => Form(
     autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -91,9 +92,40 @@ GladeFormBuilder(
 )
 ```
 
-![quick_start_example](https://raw.githubusercontent.com/netglade/glade_forms/main/glade_forms/docs/assets/quickstart.gif)
+![quick_start_example](https://raw.githubusercontent.com/netglade/glade_forms/main/docs/assets/quickstart.gif)
 
 Interactive examples can be found in [📖 Glade Forms Widgetbook][storybook_demo_link].
+
+## 🔍 DevTools Extension
+
+Glade Forms includes a Flutter DevTools extension to help you inspect and debug your forms during development. The extension shows:
+- Active `GladeModel` instances
+- Input values and validation states
+- Form dirty/pure states
+- Real-time updates as you interact with your app
+
+**Setup**
+
+To ensure the DevTools extension is available immediately when you open DevTools (even before creating any forms), add this to your app's `main()` function:
+
+```dart
+import 'package:glade_forms/glade_forms.dart';
+
+void main() {
+  // Initialize GladeForms to enable DevTools integration
+  GladeForms.initialize();
+  
+  runApp(MyApp());
+}
+```
+
+**How to access:**
+1. Run your app in debug mode: `flutter run`
+2. Open DevTools (in VS Code: `Cmd+Shift+P` → "Dart: Open DevTools")
+3. Navigate to the **"Glade Forms"** tab
+4. Interact with your forms to see live updates!
+
+[Learn more about debugging with DevTools →][devtools_docs]
 
 ## 📖 Documentation
 Want to learn more? 
@@ -113,4 +145,5 @@ Check out the [Glade Forms Documentation][docs_page].
 [discord_badge_link]: https://discord.gg/sJfBBuDZy4
 [storybook_demo_link]: https://netglade.github.io/glade_forms
 [docs_page]: https://docs.page/netglade/glade_forms
+[devtools_docs]: https://docs.page/netglade/glade_forms/devtools
 [docs_badge]: docs/assets/icon.png

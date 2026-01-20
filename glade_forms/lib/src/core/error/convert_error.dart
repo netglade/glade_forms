@@ -25,15 +25,15 @@ class ConvertError<T> extends GladeInputValidation<T> with EquatableMixin implem
   Object get result => _convertError;
 
   @override
-  ValidationSeverity get severity => ValidationSeverity.error;
+  ValidationSeverity get severity => .error;
 
   ConvertError({
     required Object error,
     required this.input,
     super.key,
     OnConvertError? formatError,
-  })  : _convertError = error,
-        onConvertErrorMessage = formatError ?? ((rawValue, {key}) => 'Conversion error: $error');
+  }) : _convertError = error,
+       onConvertErrorMessage = formatError ?? ((rawValue, {key}) => 'Conversion error: $error');
 
   @override
   String toString() => onConvertErrorMessage(input, key: key);

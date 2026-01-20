@@ -1,10 +1,17 @@
 import 'package:flutter/foundation.dart';
+import 'package:glade_forms/src/devtools/devtools_registry.dart';
 import 'package:glade_forms/src/src.dart';
 import 'package:glade_forms/src/validator/validator_result.dart';
 
 abstract class GladeModelBase extends ChangeNotifier {
   List<GladeInput<Object?>> lastUpdates = [];
   final List<GladeComposedModel> _bindedComposeModels = [];
+  String? _devtoolsId;
+
+  /// Unique identifier for the model instance.
+  ///
+  /// Used for DevTools inspection.
+  String get debugKey => runtimeType.toString();
 
   bool get isValid;
 
@@ -32,11 +39,26 @@ abstract class GladeModelBase extends ChangeNotifier {
     return _bindedComposeModels.remove(model);
   }
 
+  /// Registers this model with DevTools for inspection.
+  void registerWithDevTools() {
+    if (kReleaseMode) return;
+
+    final devtoolsId = '${runtimeType}_${identityHashCode(this)}';
+    _devtoolsId = devtoolsId;
+    GladeFormsDevToolsRegistry().registerModel(devtoolsId, this);
+  }
+
   @override
   void dispose() {
-    for (final composeModel in _bindedComposeModels) {
+    if (_devtoolsId != null) {
+      GladeFormsDevToolsRegistry().unregisterModel(_devtoolsId!);
+    }
+
+    // Iterate over a copy to avoid concurrent modification
+    for (final composeModel in _bindedComposeModels.toList()) {
       composeModel.removeModel(this);
     }
+
     super.dispose();
   }
 }

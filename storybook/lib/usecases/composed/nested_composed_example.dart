@@ -24,12 +24,12 @@ class _Model extends GladeModel {
     firstName = GladeStringInput(
       initialValue: '',
       validator: (v) => (v..satisfy((value) => value.isNotEmpty)).build(),
-      validationTranslate: (_, __, ___, ____) => firstName.value.isEmpty ? 'First name cannot be empty' : '',
+      validationTranslate: (_, _, _, _) => firstName.value.isEmpty ? 'First name cannot be empty' : '',
     );
     lastName = GladeStringInput(
       initialValue: '',
       validator: (v) => (v..satisfy((value) => value.isNotEmpty)).build(),
-      validationTranslate: (_, __, ___, ____) => lastName.value.isEmpty ? 'Last name cannot be empty' : '',
+      validationTranslate: (_, _, _, _) => lastName.value.isEmpty ? 'Last name cannot be empty' : '',
     );
 
     super.initialize();
@@ -62,7 +62,7 @@ class NestedComposedExample extends StatelessWidget {
             ),
             GladeFormBuilder<_ComposedModel>(
               builder: (context, model, child) => Padding(
-                padding: const EdgeInsets.only(bottom: 16),
+                padding: const .only(bottom: 16),
                 child: Column(
                   children: [
                     Text(
@@ -101,14 +101,14 @@ class _GroupContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      padding: const .symmetric(vertical: 8, horizontal: 16),
       child: Card(
         child: Padding(
-          padding: const EdgeInsets.all(8),
+          padding: const .all(8),
           child: Column(
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: .spaceBetween,
                 children: [
                   const SizedBox.shrink(),
                   Text('Group #${groupIndex + 1}'),
@@ -157,16 +157,16 @@ class _Form extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(8),
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      margin: const .all(8),
+      padding: const .symmetric(vertical: 8, horizontal: 16),
       decoration: const BoxDecoration(
-        border: Border.fromBorderSide(BorderSide()),
-        borderRadius: BorderRadius.all(Radius.circular(16)),
+        border: .fromBorderSide(BorderSide()),
+        borderRadius: .all(.circular(16)),
         color: Colors.white,
       ),
       child: Form(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: .start,
           children: [
             Text('Person #${index + 1}'),
             Row(
@@ -174,7 +174,7 @@ class _Form extends StatelessWidget {
               children: [
                 Expanded(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: .start,
                     children: [
                       TextFormField(
                         controller: model.firstName.controller,
@@ -190,7 +190,7 @@ class _Form extends StatelessWidget {
                 ),
                 Expanded(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: .start,
                     children: [
                       TextFormField(
                         controller: model.lastName.controller,

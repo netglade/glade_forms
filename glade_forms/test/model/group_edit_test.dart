@@ -55,39 +55,54 @@ class _ModeWithDependencies extends GladeModel {
 }
 
 void main() {
+  setUp(GladeForms.initialize);
+
   test('When updating [a] listener is called', () {
+    // arrange
     final model = _Model();
     var listenerCount = 0;
+    // ignore: avoid-unremovable-callbacks-in-listeners, under test ok.
     model.addListener(() {
       listenerCount++;
     });
 
+    // act
     model.a.value = 5;
+
+    // assert
     expect(model.a.value, equals(5));
     expect(model.lastUpdatedInputKeys, equals(['a']));
     expect(listenerCount, equals(1), reason: 'Should be called');
   });
 
   test('When updating [b] listeners is called', () {
+    // arrange
     final model = _Model();
     var listenerCount = 0;
+    // ignore: avoid-unremovable-callbacks-in-listeners, under test ok.
     model.addListener(() {
       listenerCount++;
     });
 
+    // act
     model.b.value = 5;
+
+    // assert
     expect(model.b.value, equals(5));
     expect(model.lastUpdatedInputKeys, equals(['b']));
     expect(listenerCount, equals(1), reason: 'Should be called');
   });
 
   test('When updating [a] and [b] listeners are called two times', () {
+    // arrange
     final model = _Model();
     var listenerCount = 0;
+    // ignore: avoid-unremovable-callbacks-in-listeners, under test ok.
     model.addListener(() {
       listenerCount++;
     });
 
+    // act
     model.a.value = 3;
 
     expect(model.a.value, equals(3));
@@ -95,24 +110,29 @@ void main() {
 
     model.b.value = 5;
 
+    // assert
     expect(model.b.value, equals(5));
     expect(model.lastUpdatedInputKeys, equals(['b']));
     expect(listenerCount, equals(2), reason: 'Should be called');
   });
 
   test('When updating [a] and [b] at once listener is called once', () {
+    // arrange
     final model = _Model();
     var listenerCount = 0;
+    // ignore: avoid-unremovable-callbacks-in-listeners, under test ok.
     model.addListener(() {
       listenerCount++;
     });
 
+    // act
     // ignore: cascade_invocations, under test ok.
     model.groupEdit(() {
       model.a.value = 3;
       model.b.value = 5;
     });
 
+    // assert
     expect(model.a.value, equals(3));
     expect(model.b.value, equals(5));
 
@@ -122,6 +142,7 @@ void main() {
 
   group('notify dependencies after edit', () {
     test('When updating only [a] then [c] is notified', () {
+      // arrange
       final model = _ModeWithDependencies();
 
       expect(model.aUpdated, equals(0));
@@ -129,8 +150,10 @@ void main() {
       expect(model.cUpdated, equals(0));
       expect(model.onDepenencyCalledCount, equals(0));
 
+      // act
       model.a.value = 1;
 
+      // assert
       expect(model.aUpdated, equals(1));
       expect(model.bUpdated, equals(0));
       expect(model.cUpdated, equals(0));
@@ -138,14 +161,17 @@ void main() {
     });
 
     test('When updating only [b] then [c] is notified', () {
+      // arrange
       final model = _ModeWithDependencies();
 
       expect(model.aUpdated, equals(0));
       expect(model.bUpdated, equals(0));
       expect(model.cUpdated, equals(0));
 
+      // act
       model.b.value = 1;
 
+      // assert
       expect(model.aUpdated, equals(0));
       expect(model.bUpdated, equals(1));
       expect(model.cUpdated, equals(0));
@@ -153,6 +179,7 @@ void main() {
     });
 
     test('When updating [a] and [b] individually then [c] is notified twice', () {
+      // arrange
       final model = _ModeWithDependencies();
 
       expect(model.aUpdated, equals(0));
@@ -160,9 +187,11 @@ void main() {
       expect(model.cUpdated, equals(0));
       expect(model.onDepenencyCalledCount, equals(0));
 
+      // act
       model.a.value = 1;
       model.b.value = 1;
 
+      // assert
       expect(model.aUpdated, equals(1), reason: '[a] only once updated');
       expect(model.bUpdated, equals(1), reason: '[b] only once updated');
       expect(model.cUpdated, equals(0), reason: '[c] never updated');
@@ -170,6 +199,7 @@ void main() {
     });
 
     test('When updating [a] and [b] via groupEdit then [c] is notified once', () {
+      // arrange
       final model = _ModeWithDependencies();
 
       expect(model.aUpdated, equals(0));
@@ -177,11 +207,13 @@ void main() {
       expect(model.cUpdated, equals(0));
       expect(model.onDepenencyCalledCount, equals(0));
 
+      // act
       model.groupEdit(() {
         model.a.value = 1;
         model.b.value = 1;
       });
 
+      // assert
       expect(model.aUpdated, equals(1), reason: '[a] only once updated');
       expect(model.bUpdated, equals(1), reason: '[b] only once updated');
       expect(model.cUpdated, equals(0), reason: '[c] never updated');
