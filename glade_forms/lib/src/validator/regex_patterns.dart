@@ -1,6 +1,6 @@
 abstract final class RegexPatterns {
   /// Email regex pattern.
-  static const email = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
+  static const email = r"^[\w.!#$%&'*+/=?^`{|}~-]+@([\w-]+\.)+[a-zA-Z]{2,}$";
 
   /// URL with optional HTTP(S) scheme.
   static const urlWithOptionalHttp = r'^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&\(\)\*\+,;=.]+$';
