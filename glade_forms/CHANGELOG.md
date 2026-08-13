@@ -1,3 +1,6 @@
+## 6.0.1
+- **[Fix]**: `RegexPatterns.email` now accepts plus-aliases (e.g. `user+tag@gmail.com`) and TLDs longer than 4 characters (e.g. `.online`, `.software`). TLD is now restricted to letters only.
+
 ## 6.0.0
 - **Breaking**: Upgrade to Flutter SDK 3.38.0
   - Change constraint to Dart sdk: ">=3.8.0"

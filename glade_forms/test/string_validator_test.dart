@@ -46,9 +46,15 @@ void main() {
       ('test.user@gmail.com', true),
       ('test124@x.com', true),
       ('a.213.cz@gmail.com', true),
+      ('user+tag@gmail.com', true),
+      ('user@example.online', true),
+      ("o'brien@example.com", true),
       ('test.user@gmail', false),
       ('@x.com', false),
       ('a.213.czgmail.com', false),
+      ('user@@example.com', false),
+      ('user name@example.com', false),
+      ('user@example.c0m', false),
     ]) {
       test('When email is ${testCase.$1}, isEmail() ${testCase.$2 ? 'pass' : 'fails'}', () {
         // arrange
