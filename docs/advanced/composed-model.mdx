@@ -33,6 +33,14 @@ composedModel.removeModel(model);
 
 Whenever any contained form model changes — or a model is added or removed — the entire composed form builder rebuilds to reflect the updated list.
 
+Sometimes a model has to be attached while the widget tree is building — e.g. a lazily built list creates a form model the first time a row asks for it. Notifying listeners during the build phase is not allowed by Flutter (`setState() or markNeedsBuild() called during build`), so use `shouldNotify: false` to attach the model silently:
+
+```dart
+composedModel.addModel(model, shouldNotify: false);
+```
+
+The newly attached model is fully registered — its own changes are propagated as usual, only the notification about the attachment itself is skipped. `removeModel()` accepts the same parameter.
+
 **Rendering multiple identical forms**
 
 Since all form models within a composed model share the same type, it's often helpful to automatically generate the same form widget for each model. This is where `GladeComposedListBuilder` comes in. It iterates through all models and builds the appropriate form widget for each one.
