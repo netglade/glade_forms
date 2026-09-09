@@ -1,3 +1,13 @@
+## 6.1.0
+- **[Add]**: `GladeComposedModel.addModel()` and `removeModel()` accept `shouldNotify` parameter ([#104](https://github.com/netglade/glade_forms/issues/104)).
+  - Pass `shouldNotify: false` to attach or detach a model without notifying listeners - e.g. when a model is added during widget's build phase.
+  - Models passed into `GladeComposedModel`'s constructor no longer trigger notification.
+- **[Fix]**: `GladeInput` now disposes its `TextEditingController` when the input is disposed ([#102](https://github.com/netglade/glade_forms/issues/102)).
+  - Externally provided controller (via `textEditingController` parameter) is **not** disposed - its owner stays responsible for it.
+  - Repeated `dispose()` calls are no-op. New `GladeInput.isDisposed` getter tells whether the input was already disposed.
+- **[Fix]**: `GladeModel.dispose()` now disposes all its inputs (`allInputs`).
+  - Be aware that after model's disposal its inputs (and their controllers) must not be used anymore.
+
 ## 6.0.1
 - **[Fix]**: `RegexPatterns.email` now accepts plus-aliases (e.g. `user+tag@gmail.com`) and TLDs longer than 4 characters (e.g. `.online`, `.software`). TLD is now restricted to letters only.
 
