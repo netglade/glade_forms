@@ -1,5 +1,4 @@
 import 'package:glade_forms/src/src.dart';
-import 'package:glade_forms/src/validator/validator_result.dart';
 import 'package:meta/meta.dart';
 
 abstract class GladeModel extends GladeModelBase with GladeInputsOwner {

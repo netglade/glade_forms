@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:glade_forms/src/devtools/devtools_registry.dart';
 import 'package:glade_forms/src/src.dart';
-import 'package:glade_forms/src/validator/validator_result.dart';
 
 abstract class GladeModelBase extends ChangeNotifier {
   List<GladeInput<Object?>> lastUpdates = [];

@@ -9,7 +9,6 @@ import 'package:glade_forms/src/core/string_to_type_converter.dart';
 import 'package:glade_forms/src/model/glade_inputs_owner.dart';
 import 'package:glade_forms/src/utils/type_helper.dart';
 import 'package:glade_forms/src/validator/validator.dart';
-import 'package:glade_forms/src/validator/validator_result.dart';
 import 'package:meta/meta.dart';
 
 typedef ValueComparator<T> = bool Function(T? initial, T? value);
