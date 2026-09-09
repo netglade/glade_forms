@@ -61,6 +61,9 @@ class GladeInput<T> {
 
   final bool _useTextEditingController;
 
+  /// True when the controller was created by the input itself and therefore input is responsible for disposing it.
+  final bool _ownsTextEditingController;
+
   /// Initial value - does not change after creating.
   T? _initialValue;
 
@@ -80,6 +83,8 @@ class GladeInput<T> {
   /// If true onChange() is triggered.
   bool _controllerTriggersOnChange = true;
 
+  bool _isDisposed = false;
+
   /// Input is in invalid state when there was conversion error.
   ConvertError<T>? __conversionError;
 
@@ -92,6 +97,9 @@ class GladeInput<T> {
 
   /// Text editing controller for input. Used for syncing input with text field.
   TextEditingController? get controller => _textEditingController;
+
+  /// Input was already disposed and should not be used anymore.
+  bool get isDisposed => _isDisposed;
 
   T get value => _value;
 
@@ -182,7 +190,8 @@ class GladeInput<T> {
        _valueTransform = valueTransform,
 
        // ignore: avoid_bool_literals_in_conditional_expressions, cant be simplified.
-       _useTextEditingController = textEditingController != null ? true : useTextEditingController {
+       _useTextEditingController = textEditingController != null ? true : useTextEditingController,
+       _ownsTextEditingController = textEditingController == null && useTextEditingController {
     final defaultValue = (value ?? initialValue) as T;
     _textEditingController =
         textEditingController ??
@@ -522,9 +531,21 @@ class GladeInput<T> {
     );
   }
 
+  /// Releases input's resources.
+  ///
+  /// Disposes [controller] but only when it was created by the input itself.
+  /// Externally provided controller is left untouched and its owner is responsible for disposing it.
+  ///
+  /// Called automatically by `GladeModel.dispose()`. Repeated calls are no-op.
   @mustCallSuper
   void dispose() {
+    if (_isDisposed) return;
+
+    _isDisposed = true;
+
     _textEditingController?.removeListener(_onTextControllerChange);
+
+    if (_ownsTextEditingController) _textEditingController?.dispose();
   }
 
   @override

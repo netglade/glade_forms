@@ -122,5 +122,13 @@ class MyModel extends GladeModel {
 
 These metadata will be visible in `GladeFormDebugInfo` widget under model's section.
 
+## Disposing
+
+`GladeModel` is a `ChangeNotifier`, therefore it has to be disposed. When using `GladeFormBuilder.create()` or `GladeModelProvider()`, disposal is handled for you.
+
+`GladeModel.dispose()` disposes all inputs listed in `allInputs`. Each input disposes its `TextEditingController`, but only the one it created by itself. A controller provided through the `textEditingController` parameter is never disposed by the input - you are responsible for disposing it.
+
+<Warning>After the model is disposed, its inputs (and their controllers) must not be used anymore.</Warning>
+
 ----
 Looking for advanced behaviors such as controlling other inputs based on certain conditions? Check out the documentation for more information.
