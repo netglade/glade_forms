@@ -1,5 +1,5 @@
 import 'package:glade_forms/src/devtools/glade_input_dev_tools_serialization.dart';
-import 'package:glade_forms/src/model/glade_model.dart';
+import 'package:glade_forms/src/model/glade_inputs_owner.dart';
 import 'package:glade_forms/src/model/glade_model_base.dart';
 
 /// Extension providing DevTools serialization for GladeModelBase.
@@ -9,9 +9,9 @@ extension GladeModelBaseDevToolsSerialization on GladeModelBase {
   Map<String, dynamic> toDevToolsJson() {
     return {
       'debugKey': debugKey,
-      'formattedErrors': this is GladeModel ? (this as GladeModel).formattedValidationErrors : '',
-      'inputs': this is GladeModel
-          ? (this as GladeModel).inputs.map((input) => input.toDevToolsJson()).toList()
+      'formattedErrors': this is GladeInputsOwner ? (this as GladeInputsOwner).formattedValidationErrors : '',
+      'inputs': this is GladeInputsOwner
+          ? (this as GladeInputsOwner).inputs.map((input) => input.toDevToolsJson()).toList()
           : <Map<String, dynamic>>[],
       'isDirty': isDirty,
       'isPure': isPure,

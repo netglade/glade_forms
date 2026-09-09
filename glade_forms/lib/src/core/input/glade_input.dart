@@ -6,7 +6,7 @@ import 'package:glade_forms/src/core/changes_info.dart';
 import 'package:glade_forms/src/core/error/error.dart';
 import 'package:glade_forms/src/core/input_dependencies.dart';
 import 'package:glade_forms/src/core/string_to_type_converter.dart';
-import 'package:glade_forms/src/model/glade_model.dart';
+import 'package:glade_forms/src/model/glade_inputs_owner.dart';
 import 'package:glade_forms/src/utils/type_helper.dart';
 import 'package:glade_forms/src/validator/validator.dart';
 import 'package:glade_forms/src/validator/validator_result.dart';
@@ -88,7 +88,7 @@ class GladeInput<T> {
   /// Input is in invalid state when there was conversion error.
   ConvertError<T>? __conversionError;
 
-  GladeModel? _bindedModel;
+  GladeInputsOwner? _bindedModel;
 
   InputDependencies get dependencies => dependenciesFactory();
 
@@ -328,7 +328,7 @@ class GladeInput<T> {
 
   @internal
   // ignore: use_setters_to_change_properties, as method.
-  void bindToModel(GladeModel model) => _bindedModel = model;
+  void bindToModel(GladeInputsOwner model) => _bindedModel = model;
 
   // *
   // * Public methods

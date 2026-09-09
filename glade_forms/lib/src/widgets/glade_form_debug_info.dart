@@ -4,7 +4,7 @@ import 'package:glade_forms/src/widgets/glade_form_builder.dart';
 import 'package:netglade_flutter_utils/netglade_flutter_utils.dart';
 
 /// Provides debug table displaying model's inputs and validation errors.
-class GladeFormDebugInfo<M extends GladeModel> extends StatefulWidget {
+class GladeFormDebugInfo<M extends GladeInputsOwner> extends StatefulWidget {
   /// Whether to show isUnchanged column.
   final bool showIsUnchanged;
 
@@ -66,7 +66,7 @@ class GladeFormDebugInfo<M extends GladeModel> extends StatefulWidget {
   State<GladeFormDebugInfo<M>> createState() => _GladeFormDebugInfoState<M>();
 }
 
-class _GladeFormDebugInfoState<M extends GladeModel> extends State<GladeFormDebugInfo<M>> {
+class _GladeFormDebugInfoState<M extends GladeInputsOwner> extends State<GladeFormDebugInfo<M>> {
   bool _showMetadata = true;
 
   @override
@@ -221,7 +221,7 @@ class _GladeInputsTable extends StatelessWidget {
   final bool showValue;
   final bool showInitialValue;
   final bool showControllerText;
-  final GladeModel model;
+  final GladeInputsOwner model;
   final List<String> hiddenKeys;
 
   const _GladeInputsTable({
@@ -298,7 +298,7 @@ class _GladeInputsTable extends StatelessWidget {
 }
 
 class _GladeModelMetadataTable extends StatelessWidget {
-  final GladeModel model;
+  final GladeInputsOwner model;
   final bool scrollable;
 
   const _GladeModelMetadataTable({
