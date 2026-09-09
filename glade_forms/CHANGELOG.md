@@ -1,3 +1,23 @@
+## Unreleased
+- **[Add]**: `GladeComposedModel` can have inputs of its own, next to the models it contains ([#106](https://github.com/netglade/glade_forms/issues/106)).
+  - Declare them as on `GladeModel` - create the inputs in `initialize()` and list them in `inputs`. Overriding `initialize()` is optional for a composed model.
+  - Own inputs are aggregated **together with** the contained models into `isValid`, `isValidWithoutWarnings`, `isPure`, `isUnchanged` and `validatorResults`. A composed model without own inputs behaves exactly as before.
+  - `resetToInitialValue()` and `setInputValuesAsNewInitialValues()` on a composed model reach its own inputs and every contained model.
+  - Composed-level inputs and inputs of contained models do **not** observe each other - neither direction of a cross-level dependency is notified. See the docs.
+  - **Beware**: if your `GladeComposedModel` already declares a method named `initialize()`, it now overrides the new hook and is invoked from the constructor - rename it.
+- **[Add]**: New `GladeInputsOwner` mixin carries the input ownership shared by `GladeModel` and `GladeComposedModel`. Every member remains available on both classes with an unchanged signature; only `GladeInput.bindToModel` (`@internal`) accepts the mixin instead of `GladeModel`.
+  - `GladeFormDebugInfo` and `GladeFormDebugInfoModal.show` are bound to `GladeInputsOwner`, so they accept a composed model as well. `GladeFormDebugInfo` also shows how many models a composed model contains and how many of them are not valid.
+- **[Add]**: DevTools extension displays composed model's own inputs and counts them next to its child models.
+- **[Add]**: Export `ValidatorResult` - it is the element type of the public `validatorResults`, `GladeInput.validatorResult`, `GladeInput.validate()` and `ChangesInfo.validatorResult`, but could not be named by a consumer.
+- **[Fix]**: `lastUpdates` on a composed model no longer re-broadcasts keys of the previous own-input update when a contained model changes or a model is attached or detached - it is empty for those notifications.
+- **[Fix]**: `groupEdit()` no longer leaks keys of an update which preceded the batch, so dependencies of inputs which did not change within the batch are not notified anymore.
+  - A notification raised by a contained model during a composed model's `groupEdit()` is folded into the single notification the batch emits at its end. Previously it broke the batch in two and dropped the accumulated keys.
+  - Group edit mode is always left, even when the callback throws.
+- **[Fix]**: DevTools serializer produced the key `depedencies`, so an input's dependencies were never displayed in the extension.
+- **[Fix]**: DevTools extension failed to parse any model which has at least one input - decoded JSON lists were cast directly to `List<String>`, which throws even for an empty list.
+- **[Fix]**: Own inputs of a composed model are disposed after its contained models are detached and after it detaches from its parent composed models, because both notify synchronously and their listeners may still read those inputs. The disposal can no longer be skipped by a throw.
+- Asserts were added for input ownership: an input can be binded to one model only, an input can not be updated through a model which does not own it, and a composed model can not share an input with a contained model.
+
 ## 6.1.0
 - **[Add]**: `GladeComposedModel.addModel()` and `removeModel()` accept `shouldNotify` parameter ([#104](https://github.com/netglade/glade_forms/issues/104)).
   - Pass `shouldNotify: false` to attach or detach a model without notifying listeners - e.g. when a model is added during widget's build phase.
