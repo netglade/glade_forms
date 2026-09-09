@@ -176,4 +176,14 @@ abstract class GladeModel extends GladeModelBase {
   Map<String, Object> fillDebugMetadata() {
     return {};
   }
+
+  /// Disposes model and all its inputs (see [GladeInput.dispose]).
+  @override
+  void dispose() {
+    for (final input in allInputs) {
+      input.dispose();
+    }
+
+    super.dispose();
+  }
 }
