@@ -65,7 +65,9 @@ mixin GladeInputsOwner on GladeModelBase {
   void initialize() {
     assert(
       inputs.map((e) => e.inputKey).length == inputs.map((e) => e.inputKey).toSet().length,
-      'Model contains inputs with duplicated key!',
+      '''
+Model contains inputs with duplicated key!
+Did you forget to override initialize() and create the model's inputs there?''',
     );
 
     for (final input in allInputs) {
@@ -78,6 +80,8 @@ mixin GladeInputsOwner on GladeModelBase {
 
   /// Updates model's input with String? value using its converter.
   void stringFieldUpdateInput<INPUT extends GladeInput<Object?>>(INPUT input, String? value) {
+    assert(_ownsInput(input), _foreignInputMessage(input));
+
     if (input.value == value) return;
 
     input.updateValueWithString(value);
@@ -86,6 +90,8 @@ mixin GladeInputsOwner on GladeModelBase {
 
   /// Updates model's input value.
   void updateInput<INPUT extends GladeInput<T?>, T>(INPUT input, T value) {
+    assert(_ownsInput(input), _foreignInputMessage(input));
+
     if (input.value == value) return;
 
     lastUpdates = [input];
@@ -107,11 +113,15 @@ mixin GladeInputsOwner on GladeModelBase {
 
   /// Use it to update multiple inputs at once before these changes are popragated through notifyListeners().
   void groupEdit(VoidCallback edit) {
+    // Keys of previous updates do not belong to this batch.
+    lastUpdates = [];
     _groupEdit = true;
 
-    edit();
-
-    _groupEdit = false;
+    try {
+      edit();
+    } finally {
+      _groupEdit = false;
+    }
 
     notifyDependencies();
 
@@ -157,4 +167,11 @@ mixin GladeInputsOwner on GladeModelBase {
   Map<String, Object> fillDebugMetadata() {
     return {};
   }
+
+  bool _ownsInput(GladeInput<Object?> input) => input.bindedModel == null || input.bindedModel == this;
+
+  String _foreignInputMessage(GladeInput<Object?> input) =>
+      '''
+Input '${input.inputKey}' is owned by ${input.bindedModel.runtimeType}, not by $runtimeType.
+Update the input through the model which owns it.''';
 }

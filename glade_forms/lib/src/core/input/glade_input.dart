@@ -92,6 +92,10 @@ class GladeInput<T> {
 
   InputDependencies get dependencies => dependenciesFactory();
 
+  /// Model which owns this input, or null when the input was not binded to any model yet.
+  @internal
+  GladeInputsOwner? get bindedModel => _bindedModel;
+
   /// Initial value of input.
   T? get initialValue => _initialValue;
 
@@ -327,8 +331,17 @@ class GladeInput<T> {
   );
 
   @internal
-  // ignore: use_setters_to_change_properties, as method.
-  void bindToModel(GladeInputsOwner model) => _bindedModel = model;
+  void bindToModel(GladeInputsOwner model) {
+    assert(
+      _bindedModel == null || _bindedModel == model,
+      '''
+Input '$inputKey' is already owned by ${_bindedModel.runtimeType} and can not be binded to ${model.runtimeType}.
+An input belongs to exactly one model - list it in `inputs`/`allInputs` of that model only.
+A GladeComposedModel lists its own inputs, never inputs of its contained models.''',
+    );
+
+    _bindedModel = model;
+  }
 
   // *
   // * Public methods
