@@ -87,8 +87,8 @@ class ModelCard extends StatelessWidget {
                       label: '${model.childModels.length} models',
                       color: theme.colorScheme.primary,
                       isSmall: true,
-                    )
-                  else
+                    ),
+                  if (!model.isComposed || model.inputs.isNotEmpty)
                     _StatusChip(
                       label: '${model.inputs.length} inputs',
                       color: Colors.grey,

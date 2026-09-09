@@ -102,9 +102,9 @@ class GladeInputDescription {
       isPure: json['isPure'] as bool,
       isUnchanged: json['isUnchanged'] as bool,
       hasConversionError: json['hasConversionError'] as bool,
-      dependencies: json['dependencies'] != null ? (json['dependencies'] as List<String>) : [],
-      errors: json['errors'] as List<String>,
-      warnings: json['warnings'] as List<String>,
+      dependencies: _stringList(json['dependencies']),
+      errors: _stringList(json['errors']),
+      warnings: _stringList(json['warnings']),
     );
   }
 
@@ -123,4 +123,8 @@ class GladeInputDescription {
       'warnings': warnings,
     };
   }
+
+  /// Decoded JSON always yields `List<dynamic>`, so the list can not be cast to `List<String>` directly.
+  static List<String> _stringList(Object? value) =>
+      value is List<Object?> ? value.map((e) => e?.toString() ?? '').toList() : const [];
 }

@@ -8,7 +8,7 @@ extension GladeInputDevToolsSerialization<T> on GladeInput<T> {
     final strVal = stringValue;
 
     return {
-      'depedencies': dependencies.map((d) => d.inputKey).toList(),
+      'dependencies': dependencies.map((d) => d.inputKey).toList(),
       'errors': validationErrors.map((e) => e.toString()).toList(),
       'hasConversionError': hasConversionError,
       'initialValue': initialValue,
