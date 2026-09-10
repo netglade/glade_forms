@@ -21,7 +21,8 @@ class _TeamModel extends GladeComposedModel<_MemberModel> {
       validator: (v) => (v..notEmpty()).build(),
       validationTranslate: (_, _, _, _) => 'Team name cannot be empty',
     );
-    motto = GladeStringInput(initialValue: '', inputKey: 'motto');
+    // GladeStringInput is required by default, and the motto is not.
+    motto = GladeStringInput(initialValue: '', inputKey: 'motto', isRequired: false);
 
     super.initialize();
   }
