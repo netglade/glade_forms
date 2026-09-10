@@ -36,7 +36,7 @@ abstract class GladeComposedModel<M extends GladeModelBase> extends GladeModelBa
   GladeComposedModel([List<M>? initialModels]) {
     if (initialModels != null) {
       for (final model in initialModels) {
-        addModel(model);
+        addModel(model, shouldNotify: false);
       }
     }
     registerWithDevTools();
@@ -44,22 +44,29 @@ abstract class GladeComposedModel<M extends GladeModelBase> extends GladeModelBa
 
   /// Adds model to `models` list.
   /// Whenever form model changes, it triggers also change on this composed model.
-  void addModel(M model) {
+  ///
+  /// [shouldNotify] - if false, listeners are not notified about the attachment.
+  /// Use it when model is attached during widget's build phase where notifying listeners is not allowed.
+  void addModel(M model, {bool shouldNotify = true}) {
     _models.add(model);
     model
       ..addListener(notifyListeners)
       ..bindToComposedModel(this);
-    notifyListeners();
+
+    if (shouldNotify) notifyListeners();
   }
 
   /// Removes model from `models` list.
   /// Also unregisters from listening to its changes.
-  void removeModel(M model) {
+  ///
+  /// [shouldNotify] - if false, listeners are not notified about the detachment.
+  void removeModel(M model, {bool shouldNotify = true}) {
     final _ = _models.remove(model);
     model
       ..removeListener(notifyListeners)
       ..unbindFromComposedModel(this);
-    notifyListeners();
+
+    if (shouldNotify) notifyListeners();
   }
 
   @override

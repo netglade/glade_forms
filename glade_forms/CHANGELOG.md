@@ -1,4 +1,7 @@
-## Unreleased
+## 6.1.0
+- **[Add]**: `GladeComposedModel.addModel()` and `removeModel()` accept `shouldNotify` parameter ([#104](https://github.com/netglade/glade_forms/issues/104)).
+  - Pass `shouldNotify: false` to attach or detach a model without notifying listeners - e.g. when a model is added during widget's build phase.
+  - Models passed into `GladeComposedModel`'s constructor no longer trigger notification.
 - **[Fix]**: `GladeInput` now disposes its `TextEditingController` when the input is disposed ([#102](https://github.com/netglade/glade_forms/issues/102)).
   - Externally provided controller (via `textEditingController` parameter) is **not** disposed - its owner stays responsible for it.
   - Repeated `dispose()` calls are no-op. New `GladeInput.isDisposed` getter tells whether the input was already disposed.
