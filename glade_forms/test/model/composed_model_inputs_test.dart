@@ -1,5 +1,6 @@
 // ignore_for_file: cascade_invocations, avoid-duplicate-test-assertions
 
+import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart';
 import 'package:glade_forms/glade_forms.dart';
 import 'package:test/test.dart';
@@ -136,21 +137,97 @@ class _CrossLevelTeamModel extends GladeComposedModel<GladeModel> {
   }
 }
 
+/// Composed model whose own input updates a contained model from its dependency callback,
+/// re-entering the composed model's notification while it is still being delivered.
+class _ReentrantTeamModel extends GladeComposedModel<_MemberModel> {
+  late GladeStringInput teamName;
+  late GladeStringInput motto;
+
+  @override
+  List<GladeInput<Object?>> get inputs => [teamName, motto];
+
+  _ReentrantTeamModel([super.initialModels]);
+
+  @override
+  void initialize() {
+    teamName = GladeStringInput(value: '', inputKey: 'teamName');
+    motto = GladeStringInput(
+      value: '',
+      inputKey: 'motto',
+      dependencies: () => [teamName],
+      onDependencyChange: (_) => models.firstOrNull?.firstName.value = teamName.value,
+    );
+
+    super.initialize();
+  }
+}
+
+/// Contained model whose disposal throws.
+class _ThrowingMemberModel extends GladeModel {
+  late GladeStringInput firstName;
+
+  @override
+  List<GladeInput<Object?>> get inputs => [firstName];
+
+  @override
+  void initialize() {
+    firstName = GladeStringInput(value: '', inputKey: 'firstName');
+
+    super.initialize();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    throw StateError('disposal failed');
+  }
+}
+
+class _ThrowingChildTeamModel extends GladeComposedModel<_ThrowingMemberModel> {
+  late GladeStringInput teamName;
+
+  @override
+  List<GladeInput<Object?>> get inputs => [teamName];
+
+  _ThrowingChildTeamModel([super.initialModels]);
+
+  @override
+  void initialize() {
+    teamName = GladeStringInput(value: '', inputKey: 'teamName');
+
+    super.initialize();
+  }
+}
+
+/// Records lastUpdatedInputKeys of every notification.
+class _KeysObserver {
+  final GladeModelBase model;
+  final List<List<String>> observedKeys;
+
+  const _KeysObserver(this.model, this.observedKeys);
+
+  void onNotified() => observedKeys.add(model.lastUpdatedInputKeys);
+}
+
 class _Counter {
   int count = 0;
 
   void increment() => count++;
 }
 
-/// Records the text of composed model's own input on every notification it receives.
+/// Records whether composed model's own input was already disposed on every notification received.
+///
+/// Reading `controller.text` would not do - a disposed TextEditingController keeps returning its
+/// last value, so the observation has to be `isDisposed` itself.
 class _OwnInputObserver {
   final _TeamModel model;
 
-  final List<String> observedTexts = [];
+  final List<bool> ownInputDisposedStates = [];
 
   _OwnInputObserver(this.model);
 
-  void onNotified() => observedTexts.add(model.teamName.controller?.text ?? 'DISPOSED');
+  void onNotified() => ownInputDisposedStates.add(model.teamName.isDisposed);
 }
 
 VoidCallback _assertNotDisposed(ChangeNotifier notifier) =>
@@ -308,6 +385,22 @@ void main() {
       expect(member.lastUpdatedInputKeys, equals(['firstName']));
     });
 
+    test('Own keys survive a contained model changing during dependency propagation', () {
+      // arrange
+      final team = _ReentrantTeamModel([_MemberModel()]);
+      final observedKeys = <List<String>>[];
+      final observer = _KeysObserver(team, observedKeys);
+      team.addListener(observer.onNotified);
+
+      // act
+      team.teamName.value = 'A-team';
+
+      // assert
+      expect(team.models.firstOrNull?.firstName.value, equals('A-team'), reason: 'the callback did run');
+      expect(observedKeys.lastOrNull, equals(['teamName']));
+      expect(team.lastUpdatedInputKeys, equals(['teamName']));
+    });
+
     test('addModel clears own lastUpdates', () {
       // arrange
       final team = _TeamModel();
@@ -354,6 +447,39 @@ void main() {
       expect(team.lastUpdatedInputKeys, containsAll(['teamName', 'motto']));
       expect(team.mottoDependencyCalls, equals(1), reason: 'motto depends on teamName updated in the batch');
       expect(team.mottoDependencyKeys, equals(['teamName']));
+    });
+
+    test('Nested groupEdit keeps keys accumulated by the outer batch', () {
+      // arrange
+      final team = _TeamModel();
+
+      // act
+      team.groupEdit(() {
+        team.teamName.value = 'A-team';
+        team.groupEdit(() => team.motto.value = 'go go go');
+      });
+
+      // assert
+      expect(team.lastUpdatedInputKeys, containsAll(['teamName', 'motto']));
+    });
+
+    test('A throwing batch still notifies about the updates which already happened', () {
+      // arrange
+      final team = _TeamModel();
+      final counter = _Counter();
+      team.addListener(counter.increment);
+
+      // act
+      void act() => team.groupEdit(() {
+        team.teamName.value = 'A-team';
+
+        throw StateError('boom');
+      });
+
+      // assert
+      expect(act, throwsA(isA<StateError>()));
+      expect(counter.count, equals(1));
+      expect(team.lastUpdatedInputKeys, equals(['teamName']));
     });
 
     test('Keys of an update preceding groupEdit are not re-broadcast', () {
@@ -497,7 +623,7 @@ void main() {
       expect(_assertNotDisposed(ownController), throwsA(isA<FlutterError>()));
     });
 
-    test('Own inputs are still readable by listeners notified during dispose', () {
+    test('Own inputs are not disposed yet when listeners are notified during dispose', () {
       // arrange
       final member = _MemberModel();
       final team = _TeamModel([member]);
@@ -510,8 +636,21 @@ void main() {
       team.dispose();
 
       // assert
-      expect(observer.observedTexts, isNot(contains('DISPOSED')));
+      expect(observer.ownInputDisposedStates, isNotEmpty, reason: 'dispose must notify at least once');
+      expect(observer.ownInputDisposedStates, everyElement(isFalse));
       expect(team.teamName.isDisposed, isTrue);
+    });
+
+    test('Own inputs are disposed even when a contained model throws while disposing', () {
+      // arrange
+      final team = _ThrowingChildTeamModel([_ThrowingMemberModel()]);
+
+      // act
+      void act() => team.dispose();
+
+      // assert
+      expect(act, throwsA(isA<StateError>()));
+      expect(team.teamName.isDisposed, isTrue, reason: 'own inputs must not leak their controllers');
     });
   });
 }

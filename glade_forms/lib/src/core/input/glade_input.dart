@@ -558,6 +558,10 @@ A GladeComposedModel lists its own inputs, never inputs of its contained models.
     _textEditingController?.removeListener(_onTextControllerChange);
 
     if (_ownsTextEditingController) _textEditingController?.dispose();
+
+    // Let the input be re-binded when it outlives its model - the assert in `bindToModel` would
+    // otherwise refuse an input handed to a newly created model.
+    _bindedModel = null;
   }
 
   @override

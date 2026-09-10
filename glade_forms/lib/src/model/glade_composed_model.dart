@@ -153,15 +153,17 @@ Inputs of a contained model are aggregated through that model itself.''',
           ..dispose();
       }
       _models.clear();
-
-      // Detaching from parent composed models (in super.dispose()) notifies them synchronously.
-      // Own inputs must outlive those notifications, therefore they are disposed as the very last step.
-      super.dispose();
     } finally {
-      // In `finally` so that own inputs (and their controllers) can never be leaked, not even when
-      // disposal of a contained model throws.
-      for (final input in allInputs) {
-        input.dispose();
+      // Both nested in `finally` so that a throw while disposing a contained model can neither leave
+      // this model undisposed nor leak its own inputs (and their controllers).
+      try {
+        // Detaching from parent composed models (in super.dispose()) notifies them synchronously.
+        // Own inputs must outlive those notifications, therefore they are disposed as the very last step.
+        super.dispose();
+      } finally {
+        for (final input in allInputs) {
+          input.dispose();
+        }
       }
     }
   }

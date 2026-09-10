@@ -11,7 +11,7 @@ extension GladeInputDevToolsSerialization<T> on GladeInput<T> {
       'dependencies': dependencies.map((d) => d.inputKey).toList(),
       'errors': validationErrors.map((e) => e.toString()).toList(),
       'hasConversionError': hasConversionError,
-      'initialValue': initialValue,
+      'initialValue': _encodeValue(initialValue),
       'isPure': isPure,
       'isUnchanged': isUnchanged,
       'isValid': isValid,
@@ -25,7 +25,7 @@ extension GladeInputDevToolsSerialization<T> on GladeInput<T> {
   }
 
   /// Encode value for JSON - keep primitives as-is, convert complex objects to strings.
-  // ignore: no-object-declaration, keep object, avoid-unnecessary-nullable-parameters
+  // ignore: no-object-declaration, keep object
   Object? _encodeValue(T? val) {
     if (val == null) return null;
 

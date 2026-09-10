@@ -12,7 +12,7 @@ abstract final class GladeFormDebugInfoModal {
       builder: (builderContext) => GladeModelProvider.value(
         value: model,
         // ignore: no-empty-block, empty is ok.
-        child: BottomSheet(onClosing: () {}, builder: (context) => const GladeFormDebugInfo()),
+        child: BottomSheet(onClosing: () {}, builder: (context) => GladeFormDebugInfo<M>()),
       ),
     );
   }

@@ -12,9 +12,14 @@ class ComposedModelStateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // Own inputs are aggregated together with the contained models, so the labels must not claim
-    // the state describes the models alone.
-    final scope = model.inputs.isEmpty ? 'All Models' : 'Own Inputs + Models';
+    // Own inputs are aggregated together with the contained models, so the label must describe
+    // whichever of the two the state actually covers.
+    final scope = switch ((model.inputs.isNotEmpty, model.childModels.isNotEmpty)) {
+      (true, true) => 'Own Inputs + All Models',
+      (true, false) => 'Own Inputs',
+      (false, true) => 'All Models',
+      (false, false) => 'Empty Model',
+    };
 
     return Card(
       child: Padding(

@@ -107,25 +107,32 @@ Did you forget to override initialize() and create the model's inputs there?''',
     } else {
       lastUpdates = [input];
       notifyDependencies();
+      // Re-assigned on purpose: a dependency callback can update another input or a contained model,
+      // and that nested notification rewrites lastUpdates. This notification is still about [input].
+      lastUpdates = [input];
       notifyListeners();
     }
   }
 
   /// Use it to update multiple inputs at once before these changes are popragated through notifyListeners().
   void groupEdit(VoidCallback edit) {
-    // Keys of previous updates do not belong to this batch.
-    lastUpdates = [];
+    // Keys of previous updates do not belong to this batch. A nested groupEdit is part of the batch
+    // already being accumulated, so it must not drop what the outer one collected.
+    if (!_groupEdit) lastUpdates = [];
+
     _groupEdit = true;
 
     try {
       edit();
     } finally {
+      // In `finally` so a throwing callback can not swallow updates which already happened - including
+      // a notification of a contained model, which is deferred while the batch is open.
       _groupEdit = false;
+
+      notifyDependencies();
+
+      notifyListeners();
     }
-
-    notifyDependencies();
-
-    notifyListeners();
   }
 
   /// Notifies dependant inputs about changes.

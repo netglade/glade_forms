@@ -95,7 +95,7 @@ Dependencies are resolved within a single model, so declare them between inputs 
 
 ```dart
 GladeFormListener<MemberModel>(
-  listener: (context, model) => print(model.lastUpdatedInputKeys),
+  listener: (context, model, updatedKeys) => print(updatedKeys),
   child: ...,
 )
 ```
