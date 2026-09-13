@@ -96,6 +96,10 @@ GladeFormBuilder.create(
 
 Interactive examples can be found in [📖 Glade Forms Widgetbook][storybook_demo_link].
 
+### Async validation
+
+Validators can be asynchronous (`satisfyAsync`, `customAsync`), with debounce, race protection and a per-model policy for the pending state. `TextFormField` integration stays the same. See the [Async validation docs](https://docs.page/netglade/glade_forms/async-validation).
+
 ## 🔍 DevTools Extension
 
 Glade Forms includes a Flutter DevTools extension to help you inspect and debug your forms during development. The extension shows:

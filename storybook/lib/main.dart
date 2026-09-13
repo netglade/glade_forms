@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:glade_forms/glade_forms.dart';
 import 'package:glade_forms_storybook/generated/locale_loader.g.dart';
 import 'package:glade_forms_storybook/localization_addon_custom.dart';
+import 'package:glade_forms_storybook/usecases/async/dependency_revalidation_example.dart';
+import 'package:glade_forms_storybook/usecases/async/username_availability_example.dart';
 import 'package:glade_forms_storybook/usecases/complex_object_mapping_example.dart';
 import 'package:glade_forms_storybook/usecases/composed/composed_example.dart';
 import 'package:glade_forms_storybook/usecases/composed/nested_composed_example.dart';
@@ -70,6 +72,19 @@ class App extends StatelessWidget {
         WidgetbookUseCase(name: 'Quickstart form', builder: (context) => const QuickStartExample()),
         WidgetbookUseCase(name: 'Metadata descriptor example', builder: (context) => const MetadataDescriptorExample()),
         WidgetbookUseCase(name: 'Warning input example', builder: (context) => const WarningInputExample()),
+        WidgetbookCategory(
+          name: 'Async validation',
+          children: [
+            WidgetbookUseCase(
+              name: 'Username availability (modes, debounce, failures)',
+              builder: (context) => const UsernameAvailabilityExample(),
+            ),
+            WidgetbookUseCase(
+              name: 'Dependency revalidation',
+              builder: (context) => const DependencyRevalidationExample(),
+            ),
+          ],
+        ),
         WidgetbookCategory(
           name: 'onChange',
           children: [

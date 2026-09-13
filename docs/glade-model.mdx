@@ -99,6 +99,14 @@ class FormModel extends GladeModel {
 
 After that listener will contain `lastUpdatedKeys` with keys of `age` and `name` inputs.
 
+## Async validation
+
+When inputs declare asynchronous validators, the model exposes:
+
+- `isValidating` - `true` while any input's async validation is scheduled or running.
+- `validateAsync()` - runs pending async validations immediately, awaits them and returns `isValid`.
+- `asyncValidationMode` - override to choose how pending validation affects `isValid`. See [Async validation](/async-validation).
+
 ## Debug metadata
 GladeModel can hold debug metadata via `fillDebugMetadata()` method. Override this method to provide metadata as key-value pairs.
 

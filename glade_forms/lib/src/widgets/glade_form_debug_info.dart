@@ -11,6 +11,9 @@ class GladeFormDebugInfo<M extends GladeModel> extends StatefulWidget {
   /// Whether to show isValid column.
   final bool showIsValid;
 
+  /// Whether to show isValidating column.
+  final bool showIsValidating;
+
   /// Whether to show isValidWithoutWarnings column.
   final bool showIsValidWithoutWarnings;
 
@@ -38,6 +41,7 @@ class GladeFormDebugInfo<M extends GladeModel> extends StatefulWidget {
     super.key,
     this.showIsUnchanged = true,
     this.showIsValid = true,
+    this.showIsValidating = true,
     this.showIsValidWithoutWarnings = true,
     this.showValidationError = true,
     this.showConversionError = true,
@@ -52,6 +56,7 @@ class GladeFormDebugInfo<M extends GladeModel> extends StatefulWidget {
     super.key,
     this.showIsUnchanged = false,
     this.showIsValid = false,
+    this.showIsValidating = false,
     this.showIsValidWithoutWarnings = false,
     this.showValidationError = false,
     this.showConversionError = false,
@@ -91,6 +96,12 @@ class _GladeFormDebugInfoState<M extends GladeModel> extends State<GladeFormDebu
                         children: [
                           const Text('IsValid:'),
                           _BoolIcon(value: model.isValid),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          const Text('isValidating:'),
+                          _BoolIcon(value: model.isValidating),
                         ],
                       ),
                       Row(
@@ -183,6 +194,7 @@ class _GladeFormDebugInfoState<M extends GladeModel> extends State<GladeFormDebu
                       scrollable: widget.scrollable,
                       showIsUnchanged: widget.showIsUnchanged,
                       showIsValid: widget.showIsValid,
+                      showIsValidating: widget.showIsValidating,
                       showIsValidWithoutWarnings: widget.showIsValidWithoutWarnings,
                       showValidationError: widget.showValidationError,
                       showConversionError: widget.showConversionError,
@@ -215,6 +227,7 @@ class _GladeInputsTable extends StatelessWidget {
   final bool scrollable;
   final bool showIsUnchanged;
   final bool showIsValid;
+  final bool showIsValidating;
   final bool showIsValidWithoutWarnings;
   final bool showValidationError;
   final bool showConversionError;
@@ -228,6 +241,7 @@ class _GladeInputsTable extends StatelessWidget {
     required this.scrollable,
     required this.showIsUnchanged,
     required this.showIsValid,
+    required this.showIsValidating,
     required this.showIsValidWithoutWarnings,
     required this.showValidationError,
     required this.showConversionError,
@@ -260,6 +274,7 @@ class _GladeInputsTable extends StatelessWidget {
             const _ColumnHeader('Input'),
             if (showIsUnchanged) const _ColumnHeader('isUnchanged'),
             if (showIsValid) const _ColumnHeader('isValid'),
+            if (showIsValidating) const _ColumnHeader('isValidating'),
             if (showIsValidWithoutWarnings) const _ColumnHeader(r'isValid W\ Warnings'),
             if (showValidationError) const _ColumnHeader('Validation'),
             if (showConversionError) const _ColumnHeader('Conversion error'),
@@ -281,6 +296,7 @@ class _GladeInputsTable extends StatelessWidget {
               ),
               if (showIsUnchanged) _RowValue(value: x.isUnchanged, tracked: x.trackUnchanged),
               if (showIsValid) _RowValue(value: x.isValid),
+              if (showIsValidating) _RowValue(value: x.isValidating),
               if (showIsValidWithoutWarnings) _RowValue(value: x.isValidAndWithoutWarnings),
               if (showValidationError) _RowValue(value: x.errorOrWarningFormatted(delimiter: '\n')),
               if (showConversionError) _RowValue(value: x.hasConversionError),

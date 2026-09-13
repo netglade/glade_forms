@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:glade_forms/src/src.dart';
-import 'package:glade_forms/src/validator/validator_result.dart';
 import 'package:meta/meta.dart';
 
 abstract class GladeModel extends GladeModelBase {
@@ -31,7 +30,15 @@ abstract class GladeModel extends GladeModelBase {
   @override
   bool get isUnchanged => inputs.where((input) => input.trackUnchanged).every((input) => input.isUnchanged);
 
+  @override
+  bool get isValidating => inputs.any((input) => input.isValidating);
+
   ValidationTranslator<Object?> get defaultValidationTranslate => (error, key, devMessage, dependencies) => devMessage;
+
+  /// Determines how pending asynchronous validation affects `isValid` of inputs and the model.
+  ///
+  /// Override to switch to [AsyncValidationMode.lastKnown]. Default is [AsyncValidationMode.strict].
+  AsyncValidationMode get asyncValidationMode => .strict;
 
   /// Currently tracked inputs by GladeModel.
   ///
@@ -56,6 +63,8 @@ abstract class GladeModel extends GladeModelBase {
   /// Formats errors from `inputs` with debug information.
   String get debugFormattedValidationErrors => inputs.map((e) {
         if (e.hasConversionError) return '${e.inputKey} - CONVERSION ERROR';
+
+        if (e.isValidating) return '${e.inputKey} - VALIDATING';
 
         if (e.validatorResult.isNotValid) {
           return '${e.inputKey} - ${e.errorFormatted()}';
@@ -95,6 +104,13 @@ abstract class GladeModel extends GladeModelBase {
   /// Binds input to model.
   void bindToModel(GladeInput<Object?> input) => input.bindToModel(this);
 
+  @override
+  Future<bool> validateAsync() async {
+    final _ = await Future.wait(inputs.map((input) => input.validateAsync()));
+
+    return isValid;
+  }
+
   /// Updates model's input with String? value using its converter.
   void stringFieldUpdateInput<INPUT extends GladeInput<Object?>>(INPUT input, String? value) {
     if (input.value == value) return;
@@ -112,6 +128,13 @@ abstract class GladeModel extends GladeModelBase {
     input.value = value;
     notifyListeners();
   }
+
+  /// Called by inputs when their asynchronous validation finished.
+  ///
+  /// Only notifies listeners. Unlike [notifyInputUpdated] it does not touch [lastUpdates] nor dependencies,
+  /// because no value changed.
+  @internal
+  void notifyInputValidationUpdated(GladeInput<Object?> input) => notifyListeners();
 
   @internal
   void notifyInputUpdated(GladeInput<Object?> input) {

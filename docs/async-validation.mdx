@@ -1,0 +1,141 @@
+---
+title: Async validation
+description: Validate input values against a server or any other asynchronous source.
+---
+
+Asynchronous validators run next to synchronous ones. A typical case is checking whether a username is available.
+
+```dart
+username = GladeStringInput(
+  inputKey: 'username',
+  validator: (v) => (v
+        ..minLength(length: 3)
+        ..satisfyAsync(
+          (value) => api.isUsernameAvailable(value),
+          key: 'username-taken',
+          devMessage: (value) => 'Username "$value" is already taken',
+        ))
+      .build(),
+);
+```
+
+Two async parts are available on the validator:
+
+- `satisfyAsync(predicate)` - asynchronous predicate. When it returns `false`, a `ValueSatisfyPredicateError` is reported.
+- `customAsync((value, key) async => ...)` - returns a `GladeValidatorResult` or `null` when the value is valid.
+
+Both accept the same `key`, `severity`, `shouldValidate` options as their synchronous counterparts, plus:
+
+- `runOnlyWhenSyncValid` (default `true`) - the part runs only when synchronous validation produced no error. There is no point asking a server about an empty email.
+- `onError` - handles exceptions thrown by the part. Return a result to report it, or `null` to treat the value as valid. Without `onError` an `AsyncValidationFailedError` with key `GladeValidationsKeys.asyncValidationFailed` is reported.
+
+Async parts run sequentially in declaration order and respect `stopOnFirstError` and `stopOnFirstErrorOrWarning` the same way synchronous parts do.
+When the synchronous half already stopped validation, no async part runs.
+
+## How it fits Flutter forms
+
+`TextFormField.validator` is synchronous, so async validation is split into two halves:
+
+1. **Running** happens in the background. Validation requests (value change, `input.validate()`, `textFormFieldInputValidator`, `formFieldValidator`, `validateAsync()`) schedule a run. Rapid changes are merged by a debounce. The result is cached together with the value it was produced for.
+2. **Reading** stays synchronous. `textFormFieldInputValidator`, `validatorResult`, `isValid` return synchronous results merged with the cached async result.
+
+When a run finishes the model notifies its listeners, the form rebuilds and `TextFormField` re-runs the validator, which now sees the cached result. No special widget is needed:
+
+```dart
+TextFormField(
+  controller: model.username.controller,
+  validator: model.username.textFormFieldInputValidator,
+  decoration: InputDecoration(
+    labelText: 'Username',
+    suffixIcon: model.username.isValidating ? const CircularProgressIndicator() : null,
+  ),
+)
+```
+
+Getters such as `isValid`, `validatorResult` or `validationErrors` never start a request. Only validation requests do.
+That is why the form's `autovalidateMode` decides when the initial value is validated:
+
+| autovalidateMode | Async validation of the initial value runs |
+|---|---|
+| `.always` | on the first build |
+| `.onUserInteraction` | after the first change |
+| `.disabled` | on `formKey.currentState.validate()` or on value change |
+
+Widgets without `FormField` (dropdowns, pickers) go through `model.updateInput` or `input.updateValue`, which trigger async validation as well. Read the message from `input.errorFormatted()`.
+
+## Pending state and `AsyncValidationMode`
+
+While a run is scheduled or in flight, `input.isValidating` and `model.isValidating` are `true` and `validatorResult.asyncState` is `AsyncValidationState.pending`.
+What `isValid` returns during that time is decided per model:
+
+```dart
+class MyModel extends GladeModel {
+  @override
+  AsyncValidationMode get asyncValidationMode => AsyncValidationMode.lastKnown;
+}
+```
+
+| Scenario | `strict` (default) | `lastKnown` |
+|---|---|---|
+| Async never ran for the current value | synchronous result | synchronous result |
+| Synchronous validation failed | `false` (async is skipped) | `false` |
+| Value changed, request scheduled or in flight | `false` | synchronous result |
+| Async finished with an error | `false` | `false` |
+| Async finished, valid | `true` | `true` |
+| Async threw (default `onError`) | `false` | `false` |
+
+The modes differ in one situation only: the current value has not been verified yet and synchronous validation passed.
+`strict` blocks a submit button bound to `model.isValid`. `lastKnown` keeps it enabled, so await the server before saving:
+
+```dart
+onPressed: () async {
+  final isValid = await model.validateAsync();
+  if (isValid) save();
+}
+```
+
+`model.validateAsync()` runs pending validations immediately (skipping the debounce), joins requests already in flight, reuses finished results and returns `isValid` after everything completed. It works in both modes.
+
+A response that arrives for a value the user already changed is discarded. Every finished result exposes `validatorResult.asyncValidatedValue`, the value it was produced for.
+
+## Debounce
+
+The debounce is configured per validator in `build()`:
+
+```dart
+validator: (v) => (v..satisfyAsync(api.isUsernameAvailable)).build(asyncDebounce: const Duration(milliseconds: 500)),
+```
+
+Default is 300 ms. `Duration.zero` starts the request immediately. `validateAsync()` always skips the debounce.
+
+## Dependencies
+
+An async validator may read other inputs. When such an input changes, the value of the validated input stays the same and the cached result would be kept.
+Re-run it explicitly:
+
+```dart
+email = GladeStringInput(
+  dependencies: () => [organisation],
+  onDependencyChange: (_) => unawaited(email.validateAsync(force: true)),
+  validator: (v) => (v
+        ..customAsync((value, key) async {
+          final allowed = await api.isEmailAllowed(value, organisation.value);
+          return allowed ? null : ValueError(value: value, key: key, devMessage: (_) => 'Email not allowed');
+        }))
+      .build(),
+);
+```
+
+`force: true` drops the cached result and any request in flight before running.
+
+## Translations
+
+Async results go through the same translation pipeline as synchronous ones, identified by their `key`.
+Failures produced by the default `onError` use `GladeValidationsKeys.asyncValidationFailed`; the exception is available as `AsyncValidationFailedError.error`.
+`DefaultValidationTranslations.defaultAsyncValidationFailedMessage` sets a fallback message for them.
+
+## Lifecycle notes
+
+- `resetToInitialValue()` and `setNewInitialValue()` drop the cached result and discard requests in flight. The input is back to "async never ran".
+- `dispose()` discards requests in flight; late responses are ignored.
+- `GladeComposedModel.isValidating` is `true` when any child model is validating, `validateAsync()` awaits all children.

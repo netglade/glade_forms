@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:glade_forms/src/devtools/devtools_registry.dart';
 import 'package:glade_forms/src/src.dart';
-import 'package:glade_forms/src/validator/validator_result.dart';
 
 abstract class GladeModelBase extends ChangeNotifier {
   List<GladeInput<Object?>> lastUpdates = [];
@@ -21,6 +20,9 @@ abstract class GladeModelBase extends ChangeNotifier {
 
   bool get isUnchanged;
 
+  /// True when any input's asynchronous validation is scheduled or running.
+  bool get isValidating;
+
   List<ValidatorResult<Object?>> get validatorResults;
 
   bool get isNotValid => !isValid;
@@ -28,6 +30,11 @@ abstract class GladeModelBase extends ChangeNotifier {
   bool get isDirty => !isPure;
 
   List<String> get lastUpdatedInputKeys => lastUpdates.map((e) => e.inputKey).toList();
+
+  /// Runs asynchronous validation of all inputs immediately, awaits it and returns [isValid].
+  ///
+  /// Use it before submitting when [AsyncValidationMode.lastKnown] is used, or to validate initial values.
+  Future<bool> validateAsync();
 
   /// Binds current model to compose model.
   void bindToComposedModel(GladeComposedModel model) {
