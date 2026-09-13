@@ -1,3 +1,12 @@
+## 6.2.0
+- **[Add]**: Asynchronous validation ([#12](https://github.com/netglade/glade_forms/issues/12)).
+  - New validator parts `satisfyAsync()` and `customAsync()` with `runOnlyWhenSyncValid` and `onError` options; `build(asyncDebounce:)` configures debounce (default 300 ms).
+  - `GladeInput` gains `isValidating`, `hasAsyncValidation` and `validateAsync({force})`. Validation requests (`validate()`, `textFormFieldInputValidator`, `formFieldValidator`, value changes) trigger async validation; getters only read.
+  - `ValidatorResult` gains `asyncState`, `asyncValidatedValue` and `isValidating`. `ValidatorResult` is now exported from the package.
+  - `GladeModel.asyncValidationMode` (`strict` default, `lastKnown`) decides how pending async validation affects `isValid`. Models expose `isValidating` and `validateAsync()`.
+  - `AsyncValidationFailedError` with key `GladeValidationsKeys.asyncValidationFailed` reports exceptions from async validators; `DefaultValidationTranslations.defaultAsyncValidationFailedMessage` provides a fallback message.
+  - `GladeFormDebugInfo` and the DevTools extension show async validation state.
+
 ## 6.1.0
 - **[Add]**: `GladeComposedModel.addModel()` and `removeModel()` accept `shouldNotify` parameter ([#104](https://github.com/netglade/glade_forms/issues/104)).
   - Pass `shouldNotify: false` to attach or detach a model without notifying listeners - e.g. when a model is added during widget's build phase.
