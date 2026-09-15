@@ -37,8 +37,11 @@ class ValidatorResult<T> with EquatableMixin {
   /// Returns `true` if there are errors.
   bool get isNotValid => errors.isNotEmpty;
 
-  /// Async validation is scheduled or running for the current value.
-  bool get isValidating => asyncState == .pending;
+  /// Async validation is waiting for the debounce or running for the current value.
+  bool get isValidating => asyncState == .debouncing || asyncState == .running;
+
+  /// An async validation request is in flight. `false` while only the debounce is running.
+  bool get isAsyncValidationRunning => asyncState == .running;
 
   @override
   List<Object?> get props => [associatedInput, all, errors, warnings, asyncState, asyncValidatedValue];
@@ -59,6 +62,10 @@ class ValidatorResult<T> with EquatableMixin {
     };
   }
 
+  /// Copies the result.
+  ///
+  /// Pass [clearAsyncValidatedValue] to drop [asyncValidatedValue] - it must not outlive the async results
+  /// it belongs to, for example when the state goes back to [AsyncValidationState.notRun].
   ValidatorResult<T> copyWith({
     List<GladeValidatorResult<T>>? all,
     List<GladeValidatorResult<T>>? errors,
@@ -66,12 +73,13 @@ class ValidatorResult<T> with EquatableMixin {
     GladeInput<T>? associatedInput,
     AsyncValidationState? asyncState,
     T? asyncValidatedValue,
+    bool clearAsyncValidatedValue = false,
   }) => .new(
     all: all ?? this.all,
     errors: errors ?? this.errors,
     warnings: warnings ?? this.warnings,
     associatedInput: associatedInput ?? this.associatedInput,
     asyncState: asyncState ?? this.asyncState,
-    asyncValidatedValue: asyncValidatedValue ?? this.asyncValidatedValue,
+    asyncValidatedValue: clearAsyncValidatedValue ? null : (asyncValidatedValue ?? this.asyncValidatedValue),
   );
 }

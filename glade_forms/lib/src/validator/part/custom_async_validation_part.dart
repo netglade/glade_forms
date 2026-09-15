@@ -14,7 +14,7 @@ class CustomAsyncValidationPart<T> extends AsyncInputValidatorPart<T> {
     required this.customValidator,
     super.key,
     super.shouldValidate,
-    super.serverity,
+    super.severity,
     super.runOnlyWhenSyncValid,
     super.onError,
   });

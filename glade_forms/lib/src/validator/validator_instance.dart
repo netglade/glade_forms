@@ -3,7 +3,9 @@ import 'package:glade_forms/src/core/core.dart';
 import 'package:glade_forms/src/validator/part/async_input_validator_part.dart';
 import 'package:glade_forms/src/validator/part/input_validator_part.dart';
 import 'package:glade_forms/src/validator/validator_result.dart';
+import 'package:glade_forms/src/validator/validator_result/async_validation_outcome.dart';
 import 'package:glade_forms/src/validator/validator_result/validator_error.dart';
+import 'package:meta/meta.dart';
 
 class ValidatorInstance<T> {
   /// Stops validation on first error.
@@ -78,40 +80,71 @@ class ValidatorInstance<T> {
   /// Performs synchronous validation followed by asynchronous parts.
   ///
   /// Async parts run sequentially in declaration order. A part is skipped when its `shouldValidate`
-  /// returns `false`, or when it has `runOnlyWhenSyncValid` and synchronous validation produced an error.
-  /// No async part runs when the synchronous half already stopped validation
-  /// ([stopOnFirstError] with an error, or [stopOnFirstErrorOrWarning] with any result).
+  /// returns `false`, or when it has `runOnlyWhenSyncValid` and synchronous validation produced an error
+  /// (or already stopped through [stopOnFirstError] / [stopOnFirstErrorOrWarning]).
+  /// A part declared with `runOnlyWhenSyncValid: false` runs even then - the per-part opt-out wins over the stop flags.
   ///
-  /// Exceptions thrown by a part are passed to its `onError`; without it [AsyncValidationFailedError] is reported.
+  /// Exceptions thrown by a part (or by its `shouldValidate`) are passed to its `onError`;
+  /// without it [AsyncValidationFailedError] is reported.
   Future<ValidatorResult<T>> validateAsync(T value) async {
     final syncResult = validate(value);
+    final outcome = await runAsyncParts(value, syncResult);
+
+    return combineWithAsyncResults(syncResult, outcome.results, asyncValidatedValue: value);
+  }
+
+  /// Runs asynchronous parts against [value] given an already computed [syncResult].
+  ///
+  /// Returns only the asynchronous results so that the synchronous half can be recomputed later.
+  @internal
+  Future<AsyncValidationOutcome<T>> runAsyncParts(T value, ValidatorResult<T> syncResult) async {
+    final results = <GladeValidatorResult<T>>[];
+    final syncStopped = _syncStopped(syncResult);
+    var hasFailure = false;
+
+    for (final part in _asyncParts) {
+      if (part.runOnlyWhenSyncValid && (syncStopped || syncResult.isNotValid)) continue;
+
+      final partOutcome = await _runAsyncPart(part, value);
+
+      if (partOutcome.hasFailure) hasFailure = true;
+
+      final result = partOutcome.results.firstOrNull;
+
+      if (result == null) continue;
+
+      results.add(result);
+
+      if (stopOnFirstError && result.severity == .error) break;
+      if (stopOnFirstErrorOrWarning) break;
+    }
+
+    return AsyncValidationOutcome(results: results, hasFailure: hasFailure);
+  }
+
+  /// Merges [syncResult] with already computed [asyncResults].
+  ///
+  /// The synchronous half is always the one passed in, so a recomputed [syncResult] never keeps stale errors.
+  /// Asynchronous results are appended as they are - [runAsyncParts] already applied [stopOnFirstError] and
+  /// [stopOnFirstErrorOrWarning] among them, and a part which opted out through `runOnlyWhenSyncValid: false`
+  /// reports its result even when the synchronous half produced an error.
+  @internal
+  ValidatorResult<T> combineWithAsyncResults(
+    ValidatorResult<T> syncResult,
+    List<GladeValidatorResult<T>> asyncResults, {
+    required T asyncValidatedValue,
+  }) {
     final combined = [...syncResult.all];
     final errors = [...syncResult.errors];
     final warnings = [...syncResult.warnings];
 
-    if (!_syncStopped(syncResult)) {
-      for (final part in _asyncParts) {
-        final shouldValidate = part.shouldValidate?.call(value) ?? true;
+    for (final result in asyncResults) {
+      combined.add(result);
 
-        if (!shouldValidate) continue;
-        if (part.runOnlyWhenSyncValid && syncResult.isNotValid) continue;
-
-        final result = await _runAsyncPart(part, value);
-
-        if (result == null) continue;
-
-        final isError = result.severity == .error;
-
-        combined.add(result);
-
-        if (isError) {
-          errors.add(result);
-        } else {
-          warnings.add(result);
-        }
-
-        if (stopOnFirstError && isError) break;
-        if (stopOnFirstErrorOrWarning) break;
+      if (result.severity == .error) {
+        errors.add(result);
+      } else {
+        warnings.add(result);
       }
     }
 
@@ -121,15 +154,17 @@ class ValidatorInstance<T> {
       warnings: warnings,
       associatedInput: _input,
       asyncState: .done,
-      asyncValidatedValue: value,
+      asyncValidatedValue: asyncValidatedValue,
     );
   }
 
   /// Whether [validateAsync] would run at least one asynchronous part given [syncResult].
   bool shouldRunAsyncParts(ValidatorResult<T> syncResult) {
-    if (!hasAsyncParts || _syncStopped(syncResult)) return false;
+    if (!hasAsyncParts) return false;
 
-    return syncResult.isValid || _asyncParts.any((part) => !part.runOnlyWhenSyncValid);
+    final runsSyncDependentParts = !_syncStopped(syncResult) && syncResult.isValid;
+
+    return _asyncParts.any((part) => runsSyncDependentParts || !part.runOnlyWhenSyncValid);
   }
 
   InputValidatorPart<T>? tryFindValidatorPart(Object key) {
@@ -164,22 +199,24 @@ class ValidatorInstance<T> {
   bool _syncStopped(ValidatorResult<T> syncResult) =>
       (stopOnFirstError && syncResult.isNotValid) || (stopOnFirstErrorOrWarning && syncResult.all.isNotEmpty);
 
-  Future<GladeValidatorResult<T>?> _runAsyncPart(AsyncInputValidatorPart<T> part, T value) async {
+  Future<AsyncValidationOutcome<T>> _runAsyncPart(AsyncInputValidatorPart<T> part, T value) async {
     try {
-      return await part.validate(value);
+      final shouldValidate = part.shouldValidate?.call(value) ?? true;
+
+      if (!shouldValidate) return const AsyncValidationOutcome(results: [], hasFailure: false);
+
+      final result = await part.validate(value);
+
+      return AsyncValidationOutcome(results: [?result], hasFailure: false);
       // ignore: avoid_catches_without_on_clauses, any exception must be turned into a validation result
     } catch (e, stackTrace) {
       final onError = part.onError;
+      final result = onError != null
+          ? onError(value, e, stackTrace, part.key)
+          // Severity of an infrastructure failure never follows the part's own severity - see docs.
+          : AsyncValidationFailedError<T>(value: value, error: e, stackTrace: stackTrace, partKey: part.key);
 
-      if (onError != null) return onError(value, e, stackTrace, part.key);
-
-      return AsyncValidationFailedError<T>(
-        value: value,
-        error: e,
-        stackTrace: stackTrace,
-        partKey: part.key,
-        errorServerity: part.serverity,
-      );
+      return AsyncValidationOutcome(results: [?result], hasFailure: true);
     }
   }
 }

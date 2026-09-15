@@ -1,4 +1,5 @@
-// ignore_for_file: cascade_invocations, avoid-async-call-in-sync-function, prefer-async-await
+// ignore_for_file: cascade_invocations, avoid-async-call-in-sync-function, avoid-redundant-async
+// ignore_for_file: no-empty-block, onValidationStateChanged is a no-op in most tests here; the state change itself is what's under test
 
 import 'dart:async';
 
@@ -20,41 +21,83 @@ void main() {
     asyncDebounce: debounce,
   );
 
-  // ignore: no-empty-block, the completion callback is irrelevant for these tests
-  void noop() {}
-
-  test('schedule waits for debounce, then runs and caches', () {
+  test('schedule waits for debounce, then runs and caches async results', () {
     FakeAsync().run((async) {
       // arrange
       var calls = 0;
-      var completed = 0;
+      var notifications = 0;
       final runner = AsyncValidationRunner(
         validatorInstance: instanceWith((value) async {
           calls++;
 
           return value != 'taken';
         }),
-        onCompleted: () => completed++,
+        onValidationStateChanged: () => notifications++,
       );
 
       // act
       runner.schedule('taken');
+      async.flushMicrotasks();
 
       // assert
+      expect(runner.state, equals(AsyncValidationState.debouncing));
       expect(runner.isValidating, isTrue);
-      expect(calls, isZero);
+      expect(runner.isRunning, isFalse, reason: 'no request in flight during the debounce');
+      expect(notifications, equals(1));
+      expect(calls, equals(0), reason: 'debounce has not fired yet');
 
       async.elapse(const Duration(milliseconds: 299));
-      expect(calls, equals(0), reason: 'debounce did not elapse yet');
+      expect(calls, equals(0), reason: 'debounce still short of the threshold');
 
       async.elapse(const Duration(milliseconds: 1));
       async.flushMicrotasks();
 
       expect(calls, equals(1));
+      expect(runner.state, equals(AsyncValidationState.done));
       expect(runner.isValidating, isFalse);
-      expect(runner.cachedResult?.isNotValid, isTrue);
-      expect(runner.cachedResult?.asyncValidatedValue, equals('taken'));
-      expect(completed, equals(1));
+      expect(runner.cachedResults?.singleOrNull?.key, equals('server'));
+      expect(notifications, equals(3), reason: 'debouncing, running, done');
+    });
+  });
+
+  test('state notification is deferred so triggers may run inside build', () {
+    FakeAsync().run((async) {
+      // arrange
+      var notifications = 0;
+      final runner = AsyncValidationRunner(
+        validatorInstance: instanceWith((value) async => true),
+        onValidationStateChanged: () => notifications++,
+      );
+
+      // act
+      runner.schedule('a');
+
+      // assert
+      expect(runner.isValidating, isTrue);
+      expect(notifications, equals(0), reason: 'not notified synchronously');
+
+      async.flushMicrotasks();
+
+      expect(notifications, equals(1));
+    });
+  });
+
+  test('markStateNotified suppresses the pending notification', () {
+    FakeAsync().run((async) {
+      // arrange
+      var notifications = 0;
+      final runner = AsyncValidationRunner(
+        validatorInstance: instanceWith((value) async => true),
+        onValidationStateChanged: () => notifications++,
+      );
+
+      // act
+      runner.schedule('a');
+      runner.markStateNotified();
+      async.flushMicrotasks();
+
+      // assert
+      expect(notifications, equals(0));
     });
   });
 
@@ -68,7 +111,7 @@ void main() {
 
           return true;
         }),
-        onCompleted: noop,
+        onValidationStateChanged: () {},
       );
 
       // act
@@ -85,7 +128,7 @@ void main() {
     });
   });
 
-  test('Duration.zero debounce runs immediately', () {
+  test('Duration.zero debounce runs immediately without a debouncing state', () {
     FakeAsync().run((async) {
       // arrange
       var calls = 0;
@@ -98,16 +141,20 @@ void main() {
           },
           debounce: .zero,
         ),
-        onCompleted: noop,
+        onValidationStateChanged: () {},
       );
 
       // act
       runner.schedule('a');
-      async.flushMicrotasks();
 
       // assert
+      expect(runner.state, equals(AsyncValidationState.running));
+
+      async.flushMicrotasks();
+
       expect(calls, equals(1));
-      expect(runner.cachedResult, isNotNull);
+      expect(runner.cachedResults, isEmpty);
+      expect(runner.state, equals(AsyncValidationState.done));
     });
   });
 
@@ -121,7 +168,7 @@ void main() {
 
           return true;
         }),
-        onCompleted: noop,
+        onValidationStateChanged: () {},
       );
 
       // act
@@ -134,15 +181,15 @@ void main() {
       // assert
       expect(calls, equals(0));
       expect(runner.isValidating, isFalse);
-      expect(runner.cachedResult, isNull);
+      expect(runner.cachedResults, isNull);
+      expect(runner.state, equals(AsyncValidationState.notRun));
     });
   });
 
-  test('stale response is discarded and does not call onCompleted', () {
+  test('stale response is discarded and does not notify', () {
     FakeAsync().run((async) {
       // arrange
       final completers = <Completer<bool>>[];
-      var completed = 0;
       final runner = AsyncValidationRunner(
         validatorInstance: instanceWith(
           (value) {
@@ -153,7 +200,7 @@ void main() {
           },
           debounce: .zero,
         ),
-        onCompleted: () => completed++,
+        onValidationStateChanged: () {},
       );
 
       // act
@@ -163,24 +210,22 @@ void main() {
       runner.schedule('second');
       async.flushMicrotasks();
 
-      completers.firstOrNull?.complete(false);
+      completers.elementAtOrNull(0)?.complete(false);
       async.flushMicrotasks();
 
-      // assert: first response ignored
-      expect(runner.cachedResult, isNull);
-      expect(runner.isValidating, isTrue);
-      expect(completed, equals(0));
+      // assert
+      expect(runner.cachedResults, isNull);
+      expect(runner.isRunning, isTrue);
 
-      completers.lastOrNull?.complete(true);
+      completers.elementAtOrNull(1)?.complete(true);
       async.flushMicrotasks();
 
-      expect(runner.cachedResult?.isValid, isTrue);
-      expect(runner.cachedResult?.asyncValidatedValue, equals('second'));
-      expect(completed, equals(1));
+      expect(runner.cachedResults, isEmpty);
+      expect(runner.state, equals(AsyncValidationState.done));
     });
   });
 
-  test('runNow bypasses debounce and shares in-flight request', () {
+  test('runNow bypasses debounce and shares the in-flight request', () {
     FakeAsync().run((async) {
       // arrange
       var calls = 0;
@@ -191,15 +236,23 @@ void main() {
 
           return completer.future;
         }),
-        onCompleted: noop,
+        onValidationStateChanged: () {},
       );
       ValidatorResult<String>? first;
       ValidatorResult<String>? second;
 
+      Future<void> runFirst() async {
+        first = await runner.runNow('a');
+      }
+
+      Future<void> runSecond() async {
+        second = await runner.runNow('a');
+      }
+
       // act
       runner.schedule('a');
-      unawaited(runner.runNow('a').then((r) => first = r));
-      unawaited(runner.runNow('a').then((r) => second = r));
+      unawaited(runFirst());
+      unawaited(runSecond());
       async.flushMicrotasks();
 
       expect(calls, equals(1));
@@ -209,12 +262,12 @@ void main() {
 
       // assert
       expect(first, isNotNull);
-      expect(identical(first, second), isTrue);
+      expect(first, equals(second));
       expect(runner.isValidating, isFalse);
     });
   });
 
-  test('runNow returns cache when present without new request', () {
+  test('runNow reuses a successful cache without a new request', () {
     FakeAsync().run((async) {
       // arrange
       var calls = 0;
@@ -227,19 +280,121 @@ void main() {
           },
           debounce: .zero,
         ),
-        onCompleted: noop,
+        onValidationStateChanged: () {},
       );
       ValidatorResult<String>? result;
+
+      Future<void> runNow() async {
+        result = await runner.runNow('a');
+      }
 
       // act
       runner.schedule('a');
       async.flushMicrotasks();
-      unawaited(runner.runNow('a').then((r) => result = r));
+      unawaited(runNow());
       async.flushMicrotasks();
 
       // assert
       expect(calls, equals(1));
-      expect(identical(result, runner.cachedResult), isTrue);
+      expect(result?.asyncValidatedValue, equals('a'));
+      expect(result?.isValid, isTrue);
+    });
+  });
+
+  test('a failed request is cached for display but retried by runNow', () {
+    FakeAsync().run((async) {
+      // arrange
+      var calls = 0;
+      var shouldFail = true;
+      final runner = AsyncValidationRunner(
+        validatorInstance: instanceWith(
+          (value) async {
+            calls++;
+
+            if (shouldFail) throw Exception('network down');
+
+            return true;
+          },
+          debounce: .zero,
+        ),
+        onValidationStateChanged: () {},
+      );
+
+      // act
+      runner.schedule('a');
+      async.flushMicrotasks();
+
+      // assert
+      expect(runner.cachedResults?.singleOrNull, isA<AsyncValidationFailedError<String>>());
+
+      runner.schedule('a');
+      async.flushMicrotasks();
+
+      expect(calls, equals(1), reason: 'a rebuild must not hammer a failing server');
+
+      shouldFail = false;
+      expect(shouldFail, isFalse, reason: 'the retried request must observe the server recovering');
+      runner.runNow('a');
+      async.flushMicrotasks();
+
+      expect(calls, equals(2), reason: 'an explicit run retries');
+      expect(runner.cachedResults, isEmpty);
+    });
+  });
+
+  test('throwing synchronous validation does not leave the runner validating', () {
+    FakeAsync().run((async) {
+      // arrange
+      final instance =
+          (GladeValidator<String>()
+                ..satisfy((value) => throw StateError('dependency missing'), key: 'sync')
+                ..satisfyAsync((value) async => true))
+              .build(asyncDebounce: .zero);
+      final runner = AsyncValidationRunner(
+        validatorInstance: instance,
+        onValidationStateChanged: () {},
+      );
+      Object? caughtError;
+
+      Future<void> runAndCatch() async {
+        try {
+          final _ = await runner.runNow('a');
+        } on Object catch (e) {
+          caughtError = e;
+        }
+      }
+
+      // act
+      unawaited(runAndCatch());
+      async.flushMicrotasks();
+
+      // assert
+      expect(caughtError, isA<StateError>());
+      expect(runner.isValidating, isFalse);
+      expect(runner.state, equals(AsyncValidationState.notRun));
+      expect(runner.cachedResults, isNull);
+    });
+  });
+
+  test('scheduled run swallows the error instead of leaving it unhandled', () {
+    FakeAsync().run((async) {
+      // arrange
+      final instance =
+          (GladeValidator<String>()
+                ..satisfy((value) => throw StateError('boom'), key: 'sync')
+                ..satisfyAsync((value) async => true))
+              .build(asyncDebounce: .zero);
+      final runner = AsyncValidationRunner(
+        validatorInstance: instance,
+        onValidationStateChanged: () {},
+      );
+
+      // act
+      runner.schedule('a');
+      async.flushMicrotasks();
+
+      // assert
+      expect(runner.isValidating, isFalse);
     });
   });
 
@@ -249,12 +404,16 @@ void main() {
       final completer = Completer<bool>();
       final runner = AsyncValidationRunner(
         validatorInstance: instanceWith((value) => completer.future, debounce: .zero),
-        onCompleted: noop,
+        onValidationStateChanged: () {},
       );
       ValidatorResult<String>? result;
 
+      Future<void> runOld() async {
+        result = await runner.runNow('old');
+      }
+
       // act
-      unawaited(runner.runNow('old').then((r) => result = r));
+      unawaited(runOld());
       async.flushMicrotasks();
       runner.invalidate();
       completer.complete(false);
@@ -262,7 +421,7 @@ void main() {
 
       // assert
       expect(result?.asyncValidatedValue, equals('old'));
-      expect(runner.cachedResult, isNull);
+      expect(runner.cachedResults, isNull);
     });
   });
 }

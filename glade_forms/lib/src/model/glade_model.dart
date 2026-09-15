@@ -33,6 +33,9 @@ abstract class GladeModel extends GladeModelBase {
   @override
   bool get isValidating => inputs.any((input) => input.isValidating);
 
+  @override
+  bool get isAsyncValidationRunning => inputs.any((input) => input.isAsyncValidationRunning);
+
   ValidationTranslator<Object?> get defaultValidationTranslate => (error, key, devMessage, dependencies) => devMessage;
 
   /// Determines how pending asynchronous validation affects `isValid` of inputs and the model.

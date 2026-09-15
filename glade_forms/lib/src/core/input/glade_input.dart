@@ -144,8 +144,14 @@ class GladeInput<T> {
   /// True when input is not valid - it has errors.
   bool get isNotValid => !isValid;
 
-  /// True when asynchronous validation for the current value is scheduled or running.
+  /// True when asynchronous validation for the current value waits for the debounce or is running.
   bool get isValidating => _asyncRunner?.isValidating ?? false;
+
+  /// True when an asynchronous validation request is in flight.
+  ///
+  /// Unlike [isValidating] this is `false` while only the debounce is running, so a loading indicator
+  /// bound to it does not flicker on every keystroke.
+  bool get isAsyncValidationRunning => _asyncRunner?.isRunning ?? false;
 
   /// True when the input declares at least one asynchronous validator.
   bool get hasAsyncValidation => validatorInstance.hasAsyncParts;
@@ -153,17 +159,11 @@ class GladeInput<T> {
   /// True when input has conversion error.
   bool get hasConversionError => __conversionError != null;
 
-  /// Synchronous result merged with the cached asynchronous result for the current value.
+  /// Freshly computed synchronous result merged with cached asynchronous results for the current value.
   ///
-  /// Pure read, never triggers async validation. Use [validate] or [validateAsync] to trigger it.
-  ValidatorResult<T> get validatorResult {
-    final runner = _asyncRunner;
-
-    if (runner == null) return validatorInstance.validate(value);
-    if (runner.cachedResult case final cached?) return cached;
-
-    return validatorInstance.validate(value).copyWith(asyncState: runner.isValidating ? .pending : .notRun);
-  }
+  /// Only asynchronous results are cached, so a change of a dependency is reflected immediately by the
+  /// synchronous half. Pure read, never triggers async validation. Use [validate] or [validateAsync] to trigger it.
+  ValidatorResult<T> get validatorResult => _validatorResultFor(validatorInstance.validate(value));
 
   List<GladeInputValidation<T>> get validationErrors => validatorResult.errors;
 
@@ -244,7 +244,7 @@ class GladeInput<T> {
     if (validatorInstance.hasAsyncParts) {
       _asyncRunner = AsyncValidationRunner(
         validatorInstance: validatorInstance,
-        onCompleted: _onAsyncValidationCompleted,
+        onValidationStateChanged: _onAsyncValidationStateChanged,
       );
     }
   }
@@ -373,15 +373,25 @@ class GladeInput<T> {
 
   /// Returns current validation result and triggers asynchronous validation when it did not run for the current value yet.
   ValidatorResult<T> validate() {
-    _scheduleAsyncValidation();
+    final syncResult = validatorInstance.validate(value);
 
-    return validatorResult;
+    _scheduleAsyncValidation(syncResult: syncResult);
+
+    return _validatorResultFor(syncResult);
   }
 
   /// Runs asynchronous validation for the current value immediately, skipping the debounce, and awaits it.
   ///
-  /// Returns the cached result when async validation already finished for the current value, unless [force] is `true`.
+  /// Returns the cached result when async validation already finished for the current value, unless [force] is `true`
+  /// or the cached result comes from a failed request - those are retried.
   /// Joins a running validation instead of starting a new one. Without async validators returns the synchronous result.
+  ///
+  /// The returned result belongs to the value which was validated, not necessarily to the input's current value:
+  /// when the value changes while the request is in flight, the input discards the response but awaiting callers
+  /// still receive it. Compare [ValidatorResult.asyncValidatedValue] with [value] when that matters.
+  ///
+  /// Throws when synchronous validation or an async part's `shouldValidate` throws. Exceptions thrown by the async
+  /// part itself are turned into validation results instead.
   Future<ValidatorResult<T>> validateAsync({bool force = false}) {
     final runner = _asyncRunner;
 
@@ -389,7 +399,9 @@ class GladeInput<T> {
 
     if (force) runner.invalidate();
 
-    if (!validatorInstance.shouldRunAsyncParts(validatorInstance.validate(value))) return Future.value(validatorResult);
+    final syncResult = validatorInstance.validate(value);
+
+    if (!validatorInstance.shouldRunAsyncParts(syncResult)) return Future.value(_validatorResultFor(syncResult));
 
     return runner.runNow(value);
   }
@@ -430,12 +442,12 @@ class GladeInput<T> {
 
     try {
       final convertedValue = converter.convert(value);
+      final isCurrentValue = ValueEquality.equals(convertedValue, this.value);
+      final syncResult = validatorInstance.validate(isCurrentValue ? this.value : convertedValue);
 
-      _scheduleAsyncValidation();
+      if (isCurrentValue) _scheduleAsyncValidation(syncResult: syncResult);
 
-      final result = ValueEquality.equals(convertedValue, this.value)
-          ? validatorResult
-          : validatorInstance.validate(convertedValue);
+      final result = isCurrentValue ? _validatorResultFor(syncResult) : syncResult;
 
       return !result.isValidWithSeverity(severity)
           ? _translate(delimiter: delimiter, customError: result, severity: severity)
@@ -465,9 +477,12 @@ class GladeInput<T> {
     ValidationSeverity severity = .error,
     String delimiter = '.',
   }) {
-    _scheduleAsyncValidation();
+    final isCurrentValue = ValueEquality.equals(value, this.value);
+    final syncResult = validatorInstance.validate(isCurrentValue ? this.value : value);
 
-    final result = ValueEquality.equals(value, this.value) ? validatorResult : validatorInstance.validate(value);
+    if (isCurrentValue) _scheduleAsyncValidation(syncResult: syncResult);
+
+    final result = isCurrentValue ? _validatorResultFor(syncResult) : syncResult;
 
     return result.isNotValid ? _translate(customError: result, severity: severity, delimiter: delimiter) : null;
   }
@@ -693,18 +708,31 @@ class GladeInput<T> {
     }
 
     _bindedModel?.notifyInputUpdated(this);
+    _asyncRunner?.markStateNotified();
   }
 
-  void _scheduleAsyncValidation() {
+  ValidatorResult<T> _validatorResultFor(ValidatorResult<T> syncResult) {
+    final runner = _asyncRunner;
+
+    if (runner == null) return syncResult;
+
+    if (runner.cachedResults case final cached?) {
+      return validatorInstance.combineWithAsyncResults(syncResult, cached, asyncValidatedValue: value);
+    }
+
+    return syncResult.copyWith(asyncState: runner.state, clearAsyncValidatedValue: true);
+  }
+
+  void _scheduleAsyncValidation({ValidatorResult<T>? syncResult}) {
     final runner = _asyncRunner;
 
     if (runner == null || hasConversionError || _isDisposed) return;
-    if (!validatorInstance.shouldRunAsyncParts(validatorInstance.validate(value))) return;
+    if (!validatorInstance.shouldRunAsyncParts(syncResult ?? validatorInstance.validate(value))) return;
 
     runner.schedule(value);
   }
 
-  void _onAsyncValidationCompleted() {
+  void _onAsyncValidationStateChanged() {
     if (_isDisposed) return;
 
     _bindedModel?.notifyInputValidationUpdated(this);

@@ -178,7 +178,7 @@ void main() {
 
       // assert
       expect(part.key, equals('k'));
-      expect(part.serverity, equals(ValidationSeverity.warning));
+      expect(part.severity, equals(ValidationSeverity.warning));
       expect(part.runOnlyWhenSyncValid, isFalse);
       expect(part.onError, same(onError));
     });

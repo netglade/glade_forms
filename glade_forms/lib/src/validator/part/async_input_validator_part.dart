@@ -12,6 +12,8 @@ typedef OnAsyncValidationError<T> =
 /// Asynchronous counterpart of [InputValidatorPart].
 ///
 /// Async parts run after synchronous parts, sequentially in declaration order.
+///
+/// Unlike [InputValidatorPart.serverity] this class spells the field `severity`.
 abstract class AsyncInputValidatorPart<T> with EquatableMixin {
   /// Identification of this part.
   // ignore: no-object-declaration, key can be any object
@@ -22,7 +24,7 @@ abstract class AsyncInputValidatorPart<T> with EquatableMixin {
   final ShouldValidateCallback<T>? shouldValidate;
 
   /// Severity of produced result.
-  final ValidationSeverity serverity;
+  final ValidationSeverity severity;
 
   /// When `true` (default) the part runs only if synchronous validation produced no error.
   final bool runOnlyWhenSyncValid;
@@ -32,12 +34,12 @@ abstract class AsyncInputValidatorPart<T> with EquatableMixin {
 
   @override
   // ignore: list-all-equatable-fields, on purpose
-  List<Object?> get props => [key, serverity, runOnlyWhenSyncValid];
+  List<Object?> get props => [key, severity, runOnlyWhenSyncValid];
 
   const AsyncInputValidatorPart({
     this.key,
     this.shouldValidate,
-    this.serverity = ValidationSeverity.error,
+    this.severity = ValidationSeverity.error,
     this.runOnlyWhenSyncValid = true,
     this.onError,
   });

@@ -60,6 +60,8 @@ Changing the organisation does not change the email value, so the cached async r
 `onDependencyChange` calls `email.validateAsync(force: true)` to re-run it.
 
 The dropdown updates the input through `model.updateInput`, which is a trigger as well, no `FormField` involved.
+
+Only asynchronous results are cached, so a synchronous validator reading a dependency is re-evaluated on every read without any extra call.
 ''',
       className: 'async/dependency_revalidation_example.dart',
       child: GladeFormBuilder.create(
@@ -87,7 +89,7 @@ The dropdown updates the input through `model.updateInput`, which is a trigger a
                   validator: model.email.textFormFieldInputValidator,
                   decoration: InputDecoration(
                     labelText: 'Email',
-                    suffixIcon: model.email.isValidating
+                    suffixIcon: model.email.isAsyncValidationRunning
                         ? const Padding(
                             padding: .all(12),
                             child: SizedBox.square(dimension: 16, child: CircularProgressIndicator(strokeWidth: 2)),

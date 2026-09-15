@@ -26,6 +26,9 @@ abstract class GladeComposedModel<M extends GladeModelBase> extends GladeModelBa
   @override
   bool get isValidating => models.any((model) => model.isValidating);
 
+  @override
+  bool get isAsyncValidationRunning => models.any((model) => model.isAsyncValidationRunning);
+
   /// Models that this composed model is currently listening to.
   List<M> get models => _models;
 

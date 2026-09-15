@@ -14,6 +14,7 @@ extension GladeInputDevToolsSerialization<T> on GladeInput<T> {
       'hasAsyncValidation': hasAsyncValidation,
       'hasConversionError': hasConversionError,
       'initialValue': initialValue,
+      'isAsyncValidationRunning': isAsyncValidationRunning,
       'isPure': isPure,
       'isUnchanged': isUnchanged,
       'isValid': isValid,

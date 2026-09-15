@@ -112,7 +112,7 @@ void main() {
       input.updateValue('taken');
 
       expect(input.isValidating, isTrue);
-      expect(input.validatorResult.asyncState, equals(AsyncValidationState.pending));
+      expect(input.validatorResult.asyncState, equals(AsyncValidationState.debouncing));
 
       async.elapse(const Duration(milliseconds: 300));
       async.flushMicrotasks();
@@ -350,7 +350,7 @@ void main() {
       input.updateValue('free');
 
       // assert
-      expect(info?.validatorResult?.asyncState, equals(AsyncValidationState.pending));
+      expect(info?.validatorResult?.asyncState, equals(AsyncValidationState.debouncing));
     });
   });
 
@@ -404,4 +404,163 @@ void main() {
       expect(input.errorFormatted(), equals('Server unavailable'));
     });
   });
+  test('dependency change is reflected by the sync half even though async results are cached', () {
+    FakeAsync().run((async) {
+      // arrange
+      final server = _Server();
+      final minLength = GladeIntInput(value: 1, inputKey: 'min-length');
+      final username = GladeStringInput(
+        inputKey: 'username',
+        value: '',
+        useTextEditingController: false,
+        isRequired: false,
+        dependencies: () => [minLength],
+        validator: (v) =>
+            (v
+                  ..satisfy((value) => value.length >= minLength.value, key: 'too-short')
+                  ..satisfyAsync(server.isAvailable, key: 'taken', devMessage: (_) => 'Taken'))
+                .build(asyncDebounce: .zero, stopOnFirstError: false),
+      );
+
+      // act
+      username.updateValue('free');
+      async.flushMicrotasks();
+
+      expect(username.isValid, isTrue);
+      expect(server.calls, equals(1));
+
+      minLength.updateValue(10);
+
+      // assert
+      expect(username.validationErrors.map((e) => e.key), equals(['too-short']));
+      expect(server.calls, equals(1), reason: 'the value did not change, so no new request');
+
+      minLength.updateValue(1);
+
+      expect(username.validationErrors, isEmpty);
+      expect(username.validatorResult.asyncState, equals(AsyncValidationState.done));
+    });
+  });
+
+  test('isValidating is broadcast when validation starts from a form field validator', () {
+    FakeAsync().run((async) {
+      // arrange
+      final server = _Server();
+      final model = _ModelWithAsyncInput(server);
+      var notifications = 0;
+      void onModelChanged() => notifications++;
+      model.addListener(onModelChanged);
+
+      // act
+      final message = model.username.textFormFieldInputValidator('initial');
+
+      // assert
+      expect(message, isNull);
+      expect(model.isValidating, isTrue);
+      expect(notifications, equals(0), reason: 'triggers run inside build, notification must be deferred');
+
+      async.flushMicrotasks();
+
+      expect(notifications, equals(1), reason: 'listeners learn that validation started');
+
+      async.elapse(const Duration(milliseconds: 300));
+      async.flushMicrotasks();
+
+      expect(model.isValidating, isFalse);
+      expect(notifications, greaterThanOrEqualTo(2), reason: 'and that it finished');
+
+      model.dispose();
+    });
+  });
+
+  test('debouncing is distinguishable from running', () {
+    FakeAsync().run((async) {
+      // arrange
+      final server = _Server(manual: true);
+      final input = _usernameInput(server);
+
+      // act
+      input.updateValue('free');
+
+      // assert
+      expect(input.isValidating, isTrue);
+      expect(input.isAsyncValidationRunning, isFalse);
+
+      async.elapse(const Duration(milliseconds: 300));
+      async.flushMicrotasks();
+
+      expect(input.isValidating, isTrue, reason: 'still validating once the request is in flight');
+      expect(input.isAsyncValidationRunning, isTrue);
+
+      server.pending.singleOrNull?.complete(true);
+      async.flushMicrotasks();
+
+      expect(input.isValidating, isFalse, reason: 'validation finished once the request completed');
+      expect(input.isAsyncValidationRunning, isFalse, reason: 'no request is in flight after completion');
+    });
+  });
+
+  test('failed request is displayed but retried by validateAsync', () {
+    FakeAsync().run((async) {
+      // arrange
+      var shouldFail = true;
+      var calls = 0;
+      final input = GladeStringInput(
+        value: 'a',
+        useTextEditingController: false,
+        validator: (v) =>
+            (v..customAsync((value, key) async {
+                  calls++;
+
+                  if (shouldFail) throw Exception('network down');
+
+                  return null;
+                }))
+                .build(asyncDebounce: .zero),
+      );
+
+      // act
+      input.updateValue('b');
+      async.flushMicrotasks();
+
+      // assert
+      expect(input.validationErrors.singleOrNull?.isAsyncValidationFailedError, isTrue);
+
+      final _ = input.validate();
+      async.flushMicrotasks();
+
+      expect(calls, equals(1), reason: 'passive triggers must not retry a failing server');
+
+      shouldFail = false;
+      expect(shouldFail, isFalse, reason: 'the retried request must observe the server recovering');
+      unawaited(input.validateAsync());
+      async.flushMicrotasks();
+
+      expect(calls, equals(2));
+      expect(input.validationErrors, isEmpty);
+    });
+  });
+}
+
+class _ModelWithAsyncInput extends GladeModel {
+  final _Server server;
+
+  late GladeStringInput username;
+
+  @override
+  List<GladeInput<Object?>> get inputs => [username];
+
+  _ModelWithAsyncInput(this.server);
+
+  @override
+  void initialize() {
+    username = GladeStringInput(
+      inputKey: 'username',
+      initialValue: 'initial',
+      useTextEditingController: false,
+      validator: (v) => (v..satisfyAsync(server.isAvailable, key: 'taken', devMessage: (_) => 'Taken')).build(),
+    );
+
+    super.initialize();
+  }
 }

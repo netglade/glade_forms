@@ -24,7 +24,7 @@ class SatisfyAsyncPredicatePart<T> extends AsyncInputValidatorPart<T> {
     super.key,
     super.shouldValidate,
     this.metaData,
-    super.serverity,
+    super.severity,
     super.runOnlyWhenSyncValid,
     super.onError,
   });
@@ -35,6 +35,6 @@ class SatisfyAsyncPredicatePart<T> extends AsyncInputValidatorPart<T> {
 
     return satisfied
         ? null
-        : ValueSatisfyPredicateError<T>(value: value, devMessage: devMessage, key: key, errorServerity: serverity);
+        : ValueSatisfyPredicateError<T>(value: value, devMessage: devMessage, key: key, errorServerity: severity);
   }
 }

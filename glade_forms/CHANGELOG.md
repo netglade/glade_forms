@@ -2,8 +2,11 @@
 - **[Add]**: Asynchronous validation ([#12](https://github.com/netglade/glade_forms/issues/12)).
   - New validator parts `satisfyAsync()` and `customAsync()` with `runOnlyWhenSyncValid` and `onError` options; `build(asyncDebounce:)` configures debounce (default 300 ms).
   - `GladeInput` gains `isValidating`, `hasAsyncValidation` and `validateAsync({force})`. Validation requests (`validate()`, `textFormFieldInputValidator`, `formFieldValidator`, value changes) trigger async validation; getters only read.
-  - `ValidatorResult` gains `asyncState`, `asyncValidatedValue` and `isValidating`. `ValidatorResult` is now exported from the package.
-  - `GladeModel.asyncValidationMode` (`strict` default, `lastKnown`) decides how pending async validation affects `isValid`. Models expose `isValidating` and `validateAsync()`.
+  - `ValidatorResult` gains `asyncState` (`notRun`, `debouncing`, `running`, `done`), `asyncValidatedValue`, `isValidating` and `isAsyncValidationRunning`.
+  - `isValidating` covers the debounce window and the request; `isAsyncValidationRunning` covers only a request in flight, so a loading indicator does not flicker while typing.
+  - Only asynchronous results are cached - the synchronous half is recomputed on every read, so a synchronous validator reading a dependency is never masked by a cached result.
+  - A failed request is reported but retried by an explicit `validateAsync()`; passive triggers do not retry it. `ValidatorResult` is now exported from the package.
+  - `GladeModel.asyncValidationMode` (`strict` default, `lastKnown`) decides how pending async validation affects `isValid`. Models expose `isValidating`, `isAsyncValidationRunning` and `validateAsync()`.
   - `AsyncValidationFailedError` with key `GladeValidationsKeys.asyncValidationFailed` reports exceptions from async validators; `DefaultValidationTranslations.defaultAsyncValidationFailedMessage` provides a fallback message.
   - `GladeFormDebugInfo` and the DevTools extension show async validation state.
 

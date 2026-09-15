@@ -66,7 +66,29 @@ void main() {
     expect(order, equals(['first', 'second']));
   });
 
-  test('sync error with stopOnFirstError skips all async parts', () async {
+  test('sync error with stopOnFirstError skips sync-dependent async parts', () async {
+    // arrange
+    var called = false;
+    final instance = build(
+      (v) => v
+        ..satisfy((value) => false, key: 'sync')
+        ..customAsync((value, key) async {
+          called = true;
+
+          return null;
+        }),
+    );
+
+    // act
+    final result = await instance.validateAsync('x');
+
+    // assert
+    expect(called, isFalse);
+    expect(result.errors.single.key, equals('sync'));
+    expect(instance.shouldRunAsyncParts(instance.validate('x')), isFalse);
+  });
+
+  test('runOnlyWhenSyncValid false runs the part even when stopOnFirstError stopped the sync half', () async {
     // arrange
     var called = false;
     final instance = build(
@@ -86,9 +108,25 @@ void main() {
     final result = await instance.validateAsync('x');
 
     // assert
-    expect(called, isFalse);
-    expect(result.errors.single.key, equals('sync'));
-    expect(instance.shouldRunAsyncParts(instance.validate('x')), isFalse);
+    expect(called, isTrue, reason: 'the per-part opt-out wins over stopOnFirstError');
+    expect(instance.shouldRunAsyncParts(instance.validate('x')), isTrue);
+    expect(result.errors.single.key, equals('sync'), reason: 'the async part itself reported nothing');
+  });
+
+  test('runOnlyWhenSyncValid false reports its error when the sync half did not stop', () async {
+    // arrange
+    final instance = build(
+      (v) => v
+        ..satisfy((value) => false, key: 'sync')
+        ..satisfyAsync((value) async => false, key: 'async', runOnlyWhenSyncValid: false),
+      stopOnFirstError: false,
+    );
+
+    // act
+    final result = await instance.validateAsync('x');
+
+    // assert
+    expect(result.errors.map((e) => e.key), equals(['sync', 'async']));
   });
 
   test('runOnlyWhenSyncValid true skips part when sync failed and stopOnFirstError is false', () async {
@@ -248,5 +286,84 @@ void main() {
     expect(result.errors.single.key, equals('sync'));
     expect(result.asyncState, equals(AsyncValidationState.done));
     expect(instance.shouldRunAsyncParts(instance.validate('')), isFalse);
+  });
+  test('failure severity is always error even when the part is a warning', () async {
+    // arrange
+    final instance = build(
+      (v) => v..customAsync((value, key) async => throw Exception('boom'), key: 'k', severity: .warning),
+    );
+
+    // act
+    final result = await instance.validateAsync('x');
+
+    // assert
+    expect(result.errors.single, isA<AsyncValidationFailedError<String>>());
+    expect(result.warnings, isEmpty);
+  });
+
+  test('throwing shouldValidate is reported as failure instead of escaping', () async {
+    // arrange
+    final instance = build(
+      (v) => v
+        ..satisfyAsync(
+          (value) async => true,
+          key: 'k',
+          shouldValidate: (value) => throw StateError('dependency missing'),
+        ),
+    );
+
+    // act
+    final result = await instance.validateAsync('x');
+
+    // assert
+    expect(result.errors.single, isA<AsyncValidationFailedError<String>>());
+  });
+
+  test('runAsyncParts reports hasFailure only when a part threw', () async {
+    // arrange
+    final failing = build((v) => v..customAsync((value, key) async => throw Exception('boom')));
+    final invalid = build((v) => v..satisfyAsync((value) async => false, key: 'async'));
+
+    // act
+    final failingOutcome = await failing.runAsyncParts('x', failing.validate('x'));
+    final invalidOutcome = await invalid.runAsyncParts('x', invalid.validate('x'));
+
+    // assert
+    expect(failingOutcome.hasFailure, isTrue);
+    expect(invalidOutcome.hasFailure, isFalse);
+    expect(invalidOutcome.results.single.key, equals('async'));
+  });
+
+  test('combineWithAsyncResults uses the sync half it is given, so stale sync errors never persist', () async {
+    // arrange
+    var syncIsValid = true;
+    final instance = build(
+      (v) => v
+        ..satisfy((value) => syncIsValid, key: 'sync')
+        ..satisfyAsync((value) async => false, key: 'async'),
+    );
+    final asyncResults = (await instance.runAsyncParts('x', instance.validate('x'))).results;
+
+    // act
+    syncIsValid = false;
+    expect(syncIsValid, isFalse, reason: 'the sync half must read the failing value');
+    final whileSyncFails = instance.combineWithAsyncResults(
+      instance.validate('x'),
+      asyncResults,
+      asyncValidatedValue: 'x',
+    );
+
+    syncIsValid = true;
+    expect(syncIsValid, isTrue, reason: 'the sync half must read the passing value');
+    // ignore: avoid-duplicate-initializers, deliberately re-evaluates validate('x') after flipping syncIsValid back
+    final whenSyncPasses = instance.combineWithAsyncResults(
+      instance.validate('x'),
+      asyncResults,
+      asyncValidatedValue: 'x',
+    );
+
+    // assert
+    expect(whileSyncFails.errors.map((e) => e.key), equals(['sync', 'async']));
+    expect(whenSyncPasses.errors.map((e) => e.key), equals(['async']));
   });
 }

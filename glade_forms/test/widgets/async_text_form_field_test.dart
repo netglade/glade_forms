@@ -129,4 +129,28 @@ void main() {
 
     model.dispose();
   });
+  testWidgets('always: spinner appears without any user interaction', (tester) async {
+    // arrange
+    final model = _Model(taken: {'taken'}, initial: 'taken');
+
+    // act
+    await tester.pumpWidget(_App(model: model, mode: .always));
+    await tester.pump();
+
+    // assert
+    expect(
+      find.byKey(const Key('spinner')),
+      findsOneWidget,
+      reason: 'validation started during build must be broadcast',
+    );
+
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pump();
+
+    expect(find.byKey(const Key('spinner')), findsNothing);
+    expect(find.text('Username is taken'), findsOneWidget);
+
+    model.dispose();
+  });
 }

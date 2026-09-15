@@ -64,7 +64,8 @@ class UsernameAvailabilityExample extends StatelessWidget {
 Type a username. Taken usernames: `admin`, `glade`, `petr`.
 
 - Synchronous rule (min length 3) runs first; the server is asked only when it passes.
-- Requests are debounced; rapid typing produces one request.
+- Requests are debounced; rapid typing produces one request. The spinner is bound to `isAsyncValidationRunning`, so it appears only once a request is really in flight - watch the state line go `debouncing` then `running`.
+- A failed request is shown but not retried on every rebuild. Pressing Save calls `model.validateAsync()`, which retries it.
 - **strict** mode: the Save button is disabled while validating.
 - **lastKnown** mode: the Save button stays enabled while validating and `onPressed` awaits `model.validateAsync()` before saving.
 - Toggle *Server failing* to see `onError` default handling (`AsyncValidationFailedError` with a default message).
@@ -95,7 +96,8 @@ Type a username. Taken usernames: `admin`, `glade`, `petr`.
                       validator: model.username.textFormFieldInputValidator,
                       decoration: InputDecoration(
                         labelText: 'Username',
-                        suffixIcon: model.username.isValidating
+                        // Bound to isAsyncValidationRunning, not isValidating, so it does not flash during debounce.
+                        suffixIcon: model.username.isAsyncValidationRunning
                             ? const Padding(
                                 padding: .all(12),
                                 child: SizedBox.square(dimension: 16, child: CircularProgressIndicator(strokeWidth: 2)),
@@ -104,7 +106,7 @@ Type a username. Taken usernames: `admin`, `glade`, `petr`.
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Text('Mode: ${model.asyncValidationMode.name}, requests: ${model.server.requestCount}'),
+                    Text(_statusLine(model)),
                     const SizedBox(height: 10),
                     ElevatedButton(
                       onPressed: model.isValid ? () => unawaited(_save(context, model)) : null,
@@ -119,6 +121,12 @@ Type a username. Taken usernames: `admin`, `glade`, `petr`.
         ),
       ),
     );
+  }
+
+  String _statusLine(_Model model) {
+    final state = model.username.validatorResult.asyncState.name;
+
+    return 'Mode: ${model.asyncValidationMode.name}, state: $state, requests: ${model.server.requestCount}';
   }
 
   Future<void> _save(BuildContext context, _Model model) async {

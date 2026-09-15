@@ -45,13 +45,15 @@ to today, where getters are pure reads.
 
 | Topic | Decision |
 |---|---|
-| Pending semantics | Configurable per model via `AsyncValidationMode`. `strict` (default): pending means `isValid == false`. `lastKnown`: pending means sync result only (cache is empty for a changed value, so there is no stale result to fall back on). |
-| Cache lifetime | Cache is dropped on every real value change. Existence of a cache implies it is for the current value. |
+| Pending semantics | Configurable per model via `AsyncValidationMode`. `strict` (default): pending means `isValid == false`. `lastKnown`: pending means sync result only (cache is empty for a changed value, so there is no stale result to fall back on). Pending splits into `debouncing` and `running` so a loading indicator can ignore the debounce window. |
+| Notifications | Every change of the async state notifies listeners, deferred to a microtask because triggers run inside build. Without it a spinner would never appear on the `Form.validate()` / `autovalidateMode: always` path. |
+| Cache lifetime | Only results of asynchronous parts are cached; the synchronous half is recomputed on every read so a dependency change is never masked. The cache is dropped on every real value change, so its existence implies it is for the current value. |
+| Failed requests | A result produced by the error path is shown but marked retryable: passive triggers do not retry (no request per frame on a failing server), an explicit `validateAsync()` does. |
 | Sync first | Async parts run only when sync validation passed, configurable per part via `runOnlyWhenSyncValid` (default `true`). |
 | Trigger | Validation requests trigger async runs; getters do not. Value change is always a trigger. |
 | Debounce | Per `ValidatorInstance` (one timer per input), configured in `build(asyncDebounce:)`, default 300 ms, `Duration.zero` disables. Explicit `validateAsync()` bypasses it. |
-| Ordering | Async parts run sequentially in declaration order, respecting `stopOnFirstError` / `stopOnFirstErrorOrWarning` across sync and async results. |
-| Exceptions | Per part `onError` callback returning `GladeValidatorResult<T>?` (`null` means valid). Default produces `AsyncValidationFailedError<T>` with key `GladeValidationsKeys.asyncValidationFailed`. |
+| Ordering | Async parts run sequentially in declaration order, respecting `stopOnFirstError` / `stopOnFirstErrorOrWarning` among themselves. A part with `runOnlyWhenSyncValid: false` runs and reports its result even when the synchronous half already stopped - the per-part opt-out wins over the stop flags. |
+| Exceptions | Per part `onError` callback returning `GladeValidatorResult<T>?` (`null` means valid), covering both the part and its `shouldValidate`. Default produces `AsyncValidationFailedError<T>` with key `GladeValidationsKeys.asyncValidationFailed`, always with severity `error` - the part's own severity describes the value, not the infrastructure. A throw outside the parts (synchronous validation) propagates to awaiting callers and never leaves the input validating. |
 | Race protection | Sequence number per input. Responses whose sequence does not match the current one are discarded. No cancellation token. |
 | Validated value | Every result exposes `asyncValidatedValue`, the value the async parts were run against. |
 
@@ -63,8 +65,8 @@ Rows where `strict` and `lastKnown` differ are marked with an asterisk.
 |---|---|---|---|---|
 | 1 | Pure input, async never ran | sync result | sync result | false |
 | 2 | Sync validation fails | false | false | false (async skipped when all parts are sync-first) |
-| 3* | Value changed, debounce running | false | sync result | true |
-| 4* | Request in flight | false | sync result | true |
+| 3* | Value changed, debounce running | false | sync result | true (`debouncing`) |
+| 4* | Request in flight | false | sync result | true (`running`) |
 | 5 | Async done, error | false | false | false |
 | 6 | Async done, valid | true | true | false |
 | 7 | Async threw, default `onError` | false | false | false |
@@ -194,12 +196,11 @@ AsyncInputValidatorPart<T> findAsyncValidatorPart(Object key);
    false; skip when `runOnlyWhenSyncValid` and the sync result has errors.
 3. Awaits the part. On exception calls `onError`; when `onError` is `null`
    produces `AsyncValidationFailedError` with the part's severity.
-4. Applies `stopOnFirstError` / `stopOnFirstErrorOrWarning` across the combined
-   list, same rules as sync. When the sync half already stopped (an error with
-   `stopOnFirstError`, or any result with `stopOnFirstErrorOrWarning`), no
-   async part runs, regardless of `runOnlyWhenSyncValid`. The
-   `runOnlyWhenSyncValid: false` option therefore only has an effect together
-   with `stopOnFirstError: false`.
+4. Applies `stopOnFirstError` / `stopOnFirstErrorOrWarning` among the async
+   results. When the sync half already stopped (an error with
+   `stopOnFirstError`, or any result with `stopOnFirstErrorOrWarning`), parts
+   gated by `runOnlyWhenSyncValid` are skipped; a part declared with
+   `runOnlyWhenSyncValid: false` still runs and its result is reported.
 5. Returns a `ValidatorResult` with combined `all` / `errors` / `warnings`,
    `asyncState: .done`, `asyncValidatedValue: value`.
 

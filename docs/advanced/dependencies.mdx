@@ -27,7 +27,9 @@ For instance, consider a scenario where we want the "VIP Content" option to be a
 
 ## Dependencies and async validation
 
-Changing a dependency does not change the dependent input's value, so its cached asynchronous result stays.
+A synchronous validator reading a dependency needs nothing special - the synchronous half is recomputed on every read.
+
+An asynchronous validator is different: changing a dependency does not change the dependent input's value, so its cached asynchronous result stays.
 Re-run it with `validateAsync(force: true)`:
 
 ```dart

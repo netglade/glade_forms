@@ -20,8 +20,13 @@ abstract class GladeModelBase extends ChangeNotifier {
 
   bool get isUnchanged;
 
-  /// True when any input's asynchronous validation is scheduled or running.
+  /// True when any input's asynchronous validation waits for the debounce or is running.
   bool get isValidating;
+
+  /// True when any input has an asynchronous validation request in flight.
+  ///
+  /// Unlike [isValidating] this is `false` while only the debounce is running.
+  bool get isAsyncValidationRunning;
 
   List<ValidatorResult<Object?>> get validatorResults;
 

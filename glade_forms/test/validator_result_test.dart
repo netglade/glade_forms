@@ -24,15 +24,20 @@ void main() {
     final result = ValidatorResult<int>(all: [error], errors: [error], warnings: [], associatedInput: null);
 
     // act
-    final pending = result.copyWith(asyncState: .pending);
+    final pending = result.copyWith(asyncState: .debouncing);
+    final running = result.copyWith(asyncState: .running);
     final done = result.copyWith(asyncState: .done, asyncValidatedValue: 1);
 
     // assert
     expect(pending.isValidating, isTrue);
+    expect(pending.isAsyncValidationRunning, isFalse);
+    expect(running.isValidating, isTrue);
+    expect(running.isAsyncValidationRunning, isTrue);
     expect(pending.errors, equals([error]));
     expect(done.asyncState, equals(AsyncValidationState.done));
     expect(done.asyncValidatedValue, equals(1));
     expect(pending == result, isFalse);
+    expect(done.copyWith(asyncState: .notRun, clearAsyncValidatedValue: true).asyncValidatedValue, isNull);
   });
 
   test('AsyncValidationFailedError has failure key and dev message', () {

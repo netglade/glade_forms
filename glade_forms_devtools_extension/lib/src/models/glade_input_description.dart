@@ -16,6 +16,7 @@ class GladeInputDescription {
   final bool isUnchanged;
   final bool hasConversionError;
   final bool isValidating;
+  final bool isAsyncValidationRunning;
   final bool hasAsyncValidation;
   final String asyncState;
   final List<String> errors;
@@ -49,7 +50,7 @@ class GladeInputDescription {
   Color get conversionColor => hasConversionError ? Constants.errorColor : Constants.successColor;
 
   /// Label for async validation state.
-  String get asyncLabel => isValidating ? 'Validating' : asyncState;
+  String get asyncLabel => isValidating ? (isAsyncValidationRunning ? 'Running' : 'Debouncing') : asyncState;
 
   /// Returns true if the input has any errors.
   bool get hasErrors => errors.isNotEmpty || hasConversionError;
@@ -92,6 +93,7 @@ class GladeInputDescription {
     required this.isUnchanged,
     required this.hasConversionError,
     required this.isValidating,
+    required this.isAsyncValidationRunning,
     required this.hasAsyncValidation,
     required this.asyncState,
     required this.errors,
@@ -112,6 +114,7 @@ class GladeInputDescription {
       isUnchanged: json['isUnchanged'] as bool,
       hasConversionError: json['hasConversionError'] as bool,
       isValidating: json['isValidating'] as bool? ?? false,
+      isAsyncValidationRunning: json['isAsyncValidationRunning'] as bool? ?? false,
       hasAsyncValidation: json['hasAsyncValidation'] as bool? ?? false,
       asyncState: json['asyncState'] as String? ?? 'notRun',
       dependencies: json['dependencies'] != null ? (json['dependencies'] as List<String>) : [],
@@ -128,6 +131,7 @@ class GladeInputDescription {
       'hasAsyncValidation': hasAsyncValidation,
       'hasConversionError': hasConversionError,
       'initialValue': initialValue,
+      'isAsyncValidationRunning': isAsyncValidationRunning,
       'isPure': isPure,
       'isUnchanged': isUnchanged,
       'isValid': isValid,
