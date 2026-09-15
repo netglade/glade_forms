@@ -8,13 +8,17 @@ extension GladeInputDevToolsSerialization<T> on GladeInput<T> {
     final strVal = stringValue;
 
     return {
+      'asyncState': validatorResult.asyncState.name,
       'depedencies': dependencies.map((d) => d.inputKey).toList(),
       'errors': validationErrors.map((e) => e.toString()).toList(),
+      'hasAsyncValidation': hasAsyncValidation,
       'hasConversionError': hasConversionError,
       'initialValue': initialValue,
+      'isAsyncValidationRunning': isAsyncValidationRunning,
       'isPure': isPure,
       'isUnchanged': isUnchanged,
       'isValid': isValid,
+      'isValidating': isValidating,
       'key': inputKey,
       'strValue': strVal,
       // ignore: no_runtimetype_tostring, keep as is.

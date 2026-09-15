@@ -15,6 +15,7 @@ abstract class GladeInputValidation<T> {
 
   bool get isConversionError => this is ConvertError<T>;
   bool get isNullError => this is ValueNullError<T>;
+  bool get isAsyncValidationFailedError => this is AsyncValidationFailedError<T>;
 
   bool get hasStringEmptyOrNullErrorKey => key == GladeValidationsKeys.stringEmpty;
   bool get hasNullValueOrEmptyValueKey =>

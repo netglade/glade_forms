@@ -35,3 +35,6 @@ Order of translation is as follows:
 ```dart
 validationTranslate -> defaultValidationTranslations -> Model.defaultValidationTranslate -> error.devMessage 
 ```
+
+Failures of asynchronous validators (an exception without custom `onError`) are reported with key `GladeValidationsKeys.asyncValidationFailed`.
+Use `defaultAsyncValidationFailedMessage` in `DefaultValidationTranslations` to provide a fallback message.

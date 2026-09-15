@@ -17,4 +17,5 @@ abstract final class GladeValidationsKeys {
   static const String dateTimeIsBetweenError = 'datetime-compare-isbetween-error';
   static const String dateTimeIsAfterError = 'datetime-compare-isafter-error';
   static const String dateTimeIsBeforeError = 'datetime-compare-isbefore-error';
+  static const String asyncValidationFailed = 'async-validation-failed';
 }

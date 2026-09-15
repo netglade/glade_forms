@@ -15,6 +15,10 @@ class GladeInputDescription {
   final bool isPure;
   final bool isUnchanged;
   final bool hasConversionError;
+  final bool isValidating;
+  final bool isAsyncValidationRunning;
+  final bool hasAsyncValidation;
+  final String asyncState;
   final List<String> errors;
   final List<String> warnings;
   final List<String> dependencies;
@@ -44,6 +48,9 @@ class GladeInputDescription {
 
   /// Color for conversion error state.
   Color get conversionColor => hasConversionError ? Constants.errorColor : Constants.successColor;
+
+  /// Label for async validation state.
+  String get asyncLabel => isValidating ? (isAsyncValidationRunning ? 'Running' : 'Debouncing') : asyncState;
 
   /// Returns true if the input has any errors.
   bool get hasErrors => errors.isNotEmpty || hasConversionError;
@@ -85,6 +92,10 @@ class GladeInputDescription {
     required this.isPure,
     required this.isUnchanged,
     required this.hasConversionError,
+    required this.isValidating,
+    required this.isAsyncValidationRunning,
+    required this.hasAsyncValidation,
+    required this.asyncState,
     required this.errors,
     required this.warnings,
     required this.dependencies,
@@ -102,6 +113,10 @@ class GladeInputDescription {
       isPure: json['isPure'] as bool,
       isUnchanged: json['isUnchanged'] as bool,
       hasConversionError: json['hasConversionError'] as bool,
+      isValidating: json['isValidating'] as bool? ?? false,
+      isAsyncValidationRunning: json['isAsyncValidationRunning'] as bool? ?? false,
+      hasAsyncValidation: json['hasAsyncValidation'] as bool? ?? false,
+      asyncState: json['asyncState'] as String? ?? 'notRun',
       dependencies: json['dependencies'] != null ? (json['dependencies'] as List<String>) : [],
       errors: json['errors'] as List<String>,
       warnings: json['warnings'] as List<String>,
@@ -110,13 +125,17 @@ class GladeInputDescription {
 
   Map<String, dynamic> toJson() {
     return {
+      'asyncState': asyncState,
       'dependencies': dependencies,
       'errors': errors,
+      'hasAsyncValidation': hasAsyncValidation,
       'hasConversionError': hasConversionError,
       'initialValue': initialValue,
+      'isAsyncValidationRunning': isAsyncValidationRunning,
       'isPure': isPure,
       'isUnchanged': isUnchanged,
       'isValid': isValid,
+      'isValidating': isValidating,
       'key': key,
       'type': type,
       'value': value,

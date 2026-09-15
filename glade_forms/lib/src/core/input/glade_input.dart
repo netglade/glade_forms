@@ -1,15 +1,16 @@
 import 'dart:math';
 
-import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart';
 import 'package:glade_forms/src/core/changes_info.dart';
 import 'package:glade_forms/src/core/error/error.dart';
+import 'package:glade_forms/src/core/input/async_validation_runner.dart';
 import 'package:glade_forms/src/core/input_dependencies.dart';
 import 'package:glade_forms/src/core/string_to_type_converter.dart';
+import 'package:glade_forms/src/model/async_validation_mode.dart';
 import 'package:glade_forms/src/model/glade_model.dart';
 import 'package:glade_forms/src/utils/type_helper.dart';
+import 'package:glade_forms/src/utils/value_equality.dart';
 import 'package:glade_forms/src/validator/validator.dart';
-import 'package:glade_forms/src/validator/validator_result.dart';
 import 'package:meta/meta.dart';
 
 typedef ValueComparator<T> = bool Function(T? initial, T? value);
@@ -90,6 +91,8 @@ class GladeInput<T> {
 
   GladeModel? _bindedModel;
 
+  AsyncValidationRunner<T>? _asyncRunner;
+
   InputDependencies get dependencies => dependenciesFactory();
 
   /// Initial value of input.
@@ -116,18 +119,51 @@ class GladeInput<T> {
   bool get isUnchanged => valueComparator?.call(initialValue, value) ?? _valueIsSameAsInitialValue;
 
   /// Input does not have conversion error nor validation errors but can include warnings.
-  bool get isValid => !hasConversionError && validatorInstance.validate(value).isValid;
+  ///
+  /// With [AsyncValidationMode.strict] (default) pending async validation makes the input invalid.
+  /// Never triggers async validation, see [validate].
+  bool get isValid {
+    if (hasConversionError) return false;
+
+    final result = validatorResult;
+
+    return _applyAsyncMode(result, result.isValid);
+  }
 
   /// Input does not have conversion error nor validation errors nor warnings.
-  bool get isValidAndWithoutWarnings => !hasConversionError && validatorInstance.validate(value).isValidWithoutWarnings;
+  ///
+  /// With [AsyncValidationMode.strict] (default) pending async validation makes the input invalid.
+  bool get isValidAndWithoutWarnings {
+    if (hasConversionError) return false;
+
+    final result = validatorResult;
+
+    return _applyAsyncMode(result, result.isValidWithoutWarnings);
+  }
 
   /// True when input is not valid - it has errors.
   bool get isNotValid => !isValid;
 
+  /// True when asynchronous validation for the current value waits for the debounce or is running.
+  bool get isValidating => _asyncRunner?.isValidating ?? false;
+
+  /// True when an asynchronous validation request is in flight.
+  ///
+  /// Unlike [isValidating] this is `false` while only the debounce is running, so a loading indicator
+  /// bound to it does not flicker on every keystroke.
+  bool get isAsyncValidationRunning => _asyncRunner?.isRunning ?? false;
+
+  /// True when the input declares at least one asynchronous validator.
+  bool get hasAsyncValidation => validatorInstance.hasAsyncParts;
+
   /// True when input has conversion error.
   bool get hasConversionError => __conversionError != null;
 
-  ValidatorResult<T> get validatorResult => validatorInstance.validate(value);
+  /// Freshly computed synchronous result merged with cached asynchronous results for the current value.
+  ///
+  /// Only asynchronous results are cached, so a change of a dependency is reflected immediately by the
+  /// synchronous half. Pure read, never triggers async validation. Use [validate] or [validateAsync] to trigger it.
+  ValidatorResult<T> get validatorResult => _validatorResultFor(validatorInstance.validate(value));
 
   List<GladeInputValidation<T>> get validationErrors => validatorResult.errors;
 
@@ -136,15 +172,9 @@ class GladeInput<T> {
   /// String representattion of [value].
   String get stringValue => stringToValueConverter?.convertBack(value) ?? value.toString();
 
-  bool get _valueIsSameAsInitialValue {
-    if (identical(value, initialValue)) return true;
+  bool get _valueIsSameAsInitialValue => ValueEquality.equals(value, initialValue);
 
-    if (value is List || value is Map || value is Set) {
-      return const DeepCollectionEquality().equals(value, initialValue);
-    }
-
-    return value == initialValue;
-  }
+  AsyncValidationMode get _asyncValidationMode => _bindedModel?.asyncValidationMode ?? .strict;
 
   set value(T value) {
     if (_useTextEditingController) {
@@ -209,6 +239,13 @@ class GladeInput<T> {
 
     if (_useTextEditingController) {
       _textEditingController?.addListener(_onTextControllerChange);
+    }
+
+    if (validatorInstance.hasAsyncParts) {
+      _asyncRunner = AsyncValidationRunner(
+        validatorInstance: validatorInstance,
+        onValidationStateChanged: _onAsyncValidationStateChanged,
+      );
     }
   }
 
@@ -334,7 +371,40 @@ class GladeInput<T> {
   // * Public methods
   // *
 
-  ValidatorResult<T> validate() => validatorInstance.validate(value);
+  /// Returns current validation result and triggers asynchronous validation when it did not run for the current value yet.
+  ValidatorResult<T> validate() {
+    final syncResult = validatorInstance.validate(value);
+
+    _scheduleAsyncValidation(syncResult: syncResult);
+
+    return _validatorResultFor(syncResult);
+  }
+
+  /// Runs asynchronous validation for the current value immediately, skipping the debounce, and awaits it.
+  ///
+  /// Returns the cached result when async validation already finished for the current value, unless [force] is `true`
+  /// or the cached result comes from a failed request - those are retried.
+  /// Joins a running validation instead of starting a new one. Without async validators returns the synchronous result.
+  ///
+  /// The returned result belongs to the value which was validated, not necessarily to the input's current value:
+  /// when the value changes while the request is in flight, the input discards the response but awaiting callers
+  /// still receive it. Compare [ValidatorResult.asyncValidatedValue] with [value] when that matters.
+  ///
+  /// Throws when synchronous validation or an async part's `shouldValidate` throws. Exceptions thrown by the async
+  /// part itself are turned into validation results instead.
+  Future<ValidatorResult<T>> validateAsync({bool force = false}) {
+    final runner = _asyncRunner;
+
+    if (runner == null || hasConversionError || _isDisposed) return Future.value(validatorResult);
+
+    if (force) runner.invalidate();
+
+    final syncResult = validatorInstance.validate(value);
+
+    if (!validatorInstance.shouldRunAsyncParts(syncResult)) return Future.value(_validatorResultFor(syncResult));
+
+    return runner.runNow(value);
+  }
 
   String? translate({String delimiter = '.'}) => _translate(delimiter: delimiter, customError: validatorResult);
 
@@ -356,6 +426,9 @@ class GladeInput<T> {
   ///
   /// Returns translated validation message.
   /// If there are multiple errors they are concenated into one string with [delimiter].
+  ///
+  /// Triggers asynchronous validation of the input's current value.
+  /// The [value] argument is only used for the synchronous message.
   String? textFormFieldInputValidatorCustom(
     String? value, {
     String delimiter = '.',
@@ -369,10 +442,15 @@ class GladeInput<T> {
 
     try {
       final convertedValue = converter.convert(value);
-      final convertedError = validatorInstance.validate(convertedValue);
+      final isCurrentValue = ValueEquality.equals(convertedValue, this.value);
+      final syncResult = validatorInstance.validate(isCurrentValue ? this.value : convertedValue);
 
-      return !convertedError.isValidWithSeverity(severity)
-          ? _translate(delimiter: delimiter, customError: convertedError, severity: severity)
+      if (isCurrentValue) _scheduleAsyncValidation(syncResult: syncResult);
+
+      final result = isCurrentValue ? _validatorResultFor(syncResult) : syncResult;
+
+      return !result.isValidWithSeverity(severity)
+          ? _translate(delimiter: delimiter, customError: result, severity: severity)
           : null;
     } on ConvertError<T> catch (e) {
       return _translate(delimiter: delimiter, customError: e, severity: severity);
@@ -382,6 +460,9 @@ class GladeInput<T> {
   /// Shorthand validator for TextFieldForm inputs.
   ///
   /// Returns translated validation message.
+  ///
+  /// Triggers asynchronous validation of the input's current value.
+  /// The [value] argument is only used for the synchronous message.
   String? textFormFieldInputValidator(
     String? value, {
     ValidationSeverity severity = .error,
@@ -390,17 +471,20 @@ class GladeInput<T> {
 
   /// Shorthand validator for Form field input.
   ///
-  /// Returns translated validation message.
+  /// Returns translated validation message. Triggers asynchronous validation of the input's current value.
   String? formFieldValidator(
     T value, {
     ValidationSeverity severity = .error,
     String delimiter = '.',
   }) {
-    final convertedError = validatorInstance.validate(value);
+    final isCurrentValue = ValueEquality.equals(value, this.value);
+    final syncResult = validatorInstance.validate(isCurrentValue ? this.value : value);
 
-    return convertedError.isNotValid
-        ? _translate(customError: convertedError, severity: severity, delimiter: delimiter)
-        : null;
+    if (isCurrentValue) _scheduleAsyncValidation(syncResult: syncResult);
+
+    final result = isCurrentValue ? _validatorResultFor(syncResult) : syncResult;
+
+    return result.isNotValid ? _translate(customError: result, severity: severity, delimiter: delimiter) : null;
   }
 
   void updateValueWithString(String? strValue, {bool shouldTriggerOnChange = true}) {
@@ -454,6 +538,8 @@ class GladeInput<T> {
     bool shouldResetToInitialValue = false,
     bool shouldTriggerOnChange = true,
   }) {
+    _asyncRunner?.invalidate();
+
     _initialValue = initialValue();
 
     if (shouldResetToInitialValue) {
@@ -476,6 +562,8 @@ class GladeInput<T> {
     } else {
       updateValue(_initialValue as T, shouldTriggerOnChange: shouldTriggerOnChange);
     }
+
+    _asyncRunner?.invalidate();
 
     _isPure = true;
     _bindedModel?.notifyInputUpdated(this);
@@ -543,6 +631,8 @@ class GladeInput<T> {
 
     _isDisposed = true;
 
+    _asyncRunner?.invalidate();
+
     _textEditingController?.removeListener(_onTextControllerChange);
 
     if (_ownsTextEditingController) _textEditingController?.dispose();
@@ -599,6 +689,11 @@ class GladeInput<T> {
     _isPure = false;
     __conversionError = null;
 
+    if (!ValueEquality.equals(_previousValue, _value)) {
+      _asyncRunner?.onValueChanged();
+      _scheduleAsyncValidation();
+    }
+
     // propagate input's changes
     if (shouldTriggerOnChange) {
       onChange?.call(
@@ -613,6 +708,40 @@ class GladeInput<T> {
     }
 
     _bindedModel?.notifyInputUpdated(this);
+    _asyncRunner?.markStateNotified();
+  }
+
+  ValidatorResult<T> _validatorResultFor(ValidatorResult<T> syncResult) {
+    final runner = _asyncRunner;
+
+    if (runner == null) return syncResult;
+
+    if (runner.cachedResults case final cached?) {
+      return validatorInstance.combineWithAsyncResults(syncResult, cached, asyncValidatedValue: value);
+    }
+
+    return syncResult.copyWith(asyncState: runner.state, clearAsyncValidatedValue: true);
+  }
+
+  void _scheduleAsyncValidation({ValidatorResult<T>? syncResult}) {
+    final runner = _asyncRunner;
+
+    if (runner == null || hasConversionError || _isDisposed) return;
+    if (!validatorInstance.shouldRunAsyncParts(syncResult ?? validatorInstance.validate(value))) return;
+
+    runner.schedule(value);
+  }
+
+  void _onAsyncValidationStateChanged() {
+    if (_isDisposed) return;
+
+    _bindedModel?.notifyInputValidationUpdated(this);
+  }
+
+  bool _applyAsyncMode(ValidatorResult<T> result, bool isValidByKnownResults) {
+    if (!isValidByKnownResults || !result.isValidating) return isValidByKnownResults;
+
+    return _asyncValidationMode == .lastKnown;
   }
 
   // *
@@ -684,6 +813,9 @@ class GladeInput<T> {
           if (defaultTranslationsTmp != null &&
               (e.isNullError || e.hasStringEmptyOrNullErrorKey || e.hasNullValueOrEmptyValueKey)) {
             return defaultTranslationsTmp.defaultValueIsNullOrEmptyMessage ?? e.toString();
+          } else if (defaultTranslationsTmp?.defaultAsyncValidationFailedMessage case final message?
+              when e.isAsyncValidationFailedError) {
+            return message;
           } else if (_bindedModel case final model?) {
             return model.defaultValidationTranslate(e, e.key, e.devValidationMessage, dependenciesFactory());
           }

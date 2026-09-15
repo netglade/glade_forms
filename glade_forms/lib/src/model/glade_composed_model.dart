@@ -1,5 +1,4 @@
 import 'package:glade_forms/src/src.dart';
-import 'package:glade_forms/src/validator/validator_result.dart';
 
 abstract class GladeComposedModel<M extends GladeModelBase> extends GladeModelBase {
   final List<M> _models = [];
@@ -23,6 +22,12 @@ abstract class GladeComposedModel<M extends GladeModelBase> extends GladeModelBa
   /// Input is unchanged if its value is same as initial value, even if value was updated into initial value.
   @override
   bool get isUnchanged => models.every((model) => model.isUnchanged);
+
+  @override
+  bool get isValidating => models.any((model) => model.isValidating);
+
+  @override
+  bool get isAsyncValidationRunning => models.any((model) => model.isAsyncValidationRunning);
 
   /// Models that this composed model is currently listening to.
   List<M> get models => _models;
@@ -67,6 +72,13 @@ abstract class GladeComposedModel<M extends GladeModelBase> extends GladeModelBa
       ..unbindFromComposedModel(this);
 
     if (shouldNotify) notifyListeners();
+  }
+
+  @override
+  Future<bool> validateAsync() async {
+    final _ = await Future.wait(models.map((model) => model.validateAsync()));
+
+    return isValid;
   }
 
   @override
