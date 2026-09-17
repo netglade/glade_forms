@@ -12,6 +12,14 @@ class ComposedModelStateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    // Own inputs are aggregated together with the contained models, so the label must describe
+    // whichever of the two the state actually covers.
+    final scope = switch ((model.inputs.isNotEmpty, model.childModels.isNotEmpty)) {
+      (true, true) => 'Own Inputs + All Models',
+      (true, false) => 'Own Inputs',
+      (false, true) => 'All Models',
+      (false, false) => 'Empty Model',
+    };
 
     return Card(
       child: Padding(
@@ -31,21 +39,21 @@ class ComposedModelStateCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             StateBadge(
-              label: 'All Models Valid',
+              label: '$scope Valid',
               value: model.isValid,
               icon: model.isValid ? Icons.check_circle : Icons.cancel,
               color: model.validityColor,
             ),
             const Divider(height: 16),
             StateBadge(
-              label: 'All Models Pure',
+              label: '$scope Pure',
               value: model.isPure,
               icon: model.isPure ? Icons.check_circle : Icons.cancel,
               color: model.purityColor,
             ),
             const Divider(height: 16),
             StateBadge(
-              label: 'All Models Unchanged',
+              label: '$scope Unchanged',
               value: model.isUnchanged,
               icon: model.isUnchanged ? Icons.check : Icons.edit,
               color: model.changeColor,
