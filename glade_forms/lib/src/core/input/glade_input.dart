@@ -332,7 +332,12 @@ class GladeInput<T> {
   @internal
   void bindToModel(GladeInputsOwner model) {
     assert(
-      _bindedModel == null || _bindedModel == model,
+      !_isDisposed,
+      "Input '$inputKey' was disposed and can not be binded to ${model.runtimeType}. Create a new input instead - a disposed input no longer has a usable TextEditingController.",
+    );
+
+    assert(
+      _bindedModel == null || _bindedModel == model || (_bindedModel?.isDisposed ?? false),
       '''
 Input '$inputKey' is already owned by ${_bindedModel.runtimeType} and can not be binded to ${model.runtimeType}.
 An input belongs to exactly one model - list it in `inputs`/`allInputs` of that model only.
@@ -558,10 +563,6 @@ A GladeComposedModel lists its own inputs, never inputs of its contained models.
     _textEditingController?.removeListener(_onTextControllerChange);
 
     if (_ownsTextEditingController) _textEditingController?.dispose();
-
-    // Let the input be re-binded when it outlives its model - the assert in `bindToModel` would
-    // otherwise refuse an input handed to a newly created model.
-    _bindedModel = null;
   }
 
   @override

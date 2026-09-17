@@ -12,9 +12,10 @@ import 'package:glade_forms/src/model/glade_model_base.dart';
 /// descendant is not supported, because nothing would call [initialize] and the inputs would
 /// never be binded to the model.
 mixin GladeInputsOwner on GladeModelBase {
-  bool _groupEdit = false;
+  int _groupEditDepth = 0;
 
-  ValidationTranslator<Object?> get defaultValidationTranslate => (error, key, devMessage, dependencies) => devMessage;
+  ValidationTranslator<Object?> get defaultValidationTranslate =>
+      (error, key, devMessage, dependencies) => devMessage;
 
   /// Currently tracked inputs by the model.
   ///
@@ -37,25 +38,27 @@ mixin GladeInputsOwner on GladeModelBase {
       inputs.map((e) => e.errorOrWarningFormatted()).where((element) => element.isNotEmpty).join('\n');
 
   /// Formats errors from `inputs` with debug information.
-  String get debugFormattedValidationErrors => inputs.map((e) {
-    if (e.hasConversionError) return '${e.inputKey} - CONVERSION ERROR';
+  String get debugFormattedValidationErrors => inputs
+      .map((e) {
+        if (e.hasConversionError) return '${e.inputKey} - CONVERSION ERROR';
 
-    if (e.validatorResult.isNotValid) {
-      return '${e.inputKey} - ${e.errorFormatted()}';
-    }
+        if (e.validatorResult.isNotValid) {
+          return '${e.inputKey} - ${e.errorFormatted()}';
+        }
 
-    return '${e.inputKey} - VALID';
-  }).join('\n');
+        return '${e.inputKey} - VALID';
+      })
+      .join('\n');
 
   /// Returns true if model has any debug metadata.
   bool get hasDebugMetadata => fillDebugMetadata().isNotEmpty;
 
-  /// True while [groupEdit]'s callback is being executed.
+  /// True while [groupEdit]'s callback is being executed, nested calls included.
   ///
   /// Notifications raised during a group edit are deferred into the single notification
-  /// which [groupEdit] emits at the end.
+  /// which the outermost [groupEdit] emits at the end.
   @protected
-  bool get isGroupEditing => _groupEdit;
+  bool get isGroupEditing => _groupEditDepth > 0;
 
   /// Initialize model's inputs.
   ///
@@ -102,7 +105,7 @@ Did you forget to override initialize() and create the model's inputs there?''',
 
   @internal
   void notifyInputUpdated(GladeInput<Object?> input) {
-    if (_groupEdit) {
+    if (isGroupEditing) {
       lastUpdates.add(input);
     } else {
       lastUpdates = [input];
@@ -116,22 +119,24 @@ Did you forget to override initialize() and create the model's inputs there?''',
 
   /// Use it to update multiple inputs at once before these changes are popragated through notifyListeners().
   void groupEdit(VoidCallback edit) {
-    // Keys of previous updates do not belong to this batch. A nested groupEdit is part of the batch
-    // already being accumulated, so it must not drop what the outer one collected.
-    if (!_groupEdit) lastUpdates = [];
+    // A nested groupEdit is part of the batch which is already running: it neither drops the keys
+    // the outer one collected nor flushes on its own, otherwise one batch would notify twice.
+    if (!isGroupEditing) lastUpdates = [];
 
-    _groupEdit = true;
+    _groupEditDepth++;
 
     try {
       edit();
     } finally {
+      _groupEditDepth--;
+
       // In `finally` so a throwing callback can not swallow updates which already happened - including
       // a notification of a contained model, which is deferred while the batch is open.
-      _groupEdit = false;
+      if (!isGroupEditing) {
+        notifyDependencies();
 
-      notifyDependencies();
-
-      notifyListeners();
+        notifyListeners();
+      }
     }
   }
 

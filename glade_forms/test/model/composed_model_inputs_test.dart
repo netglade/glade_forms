@@ -162,12 +162,39 @@ class _ReentrantTeamModel extends GladeComposedModel<_MemberModel> {
   }
 }
 
-/// Contained model whose disposal throws.
+/// Composed model with a flattened `inputs` getter - the misuse `addModel` must reject.
+class _FlattenedTeamModel extends GladeComposedModel<_MemberModel> {
+  @override
+  List<GladeInput<Object?>> get inputs => [for (final model in models) ...model.inputs];
+}
+
+/// Model which binds an input it does not list, so the input outlives the model.
+class _ExternalInputModel extends GladeModel {
+  final GladeStringInput external;
+
+  @override
+  List<GladeInput<Object?>> get inputs => const [];
+
+  _ExternalInputModel(this.external);
+
+  @override
+  void initialize() {
+    super.initialize();
+
+    bindToModel(external);
+  }
+}
+
+/// Contained model which can fail while being disposed.
 class _ThrowingMemberModel extends GladeModel {
+  final bool throwsOnDispose;
+
   late GladeStringInput firstName;
 
   @override
   List<GladeInput<Object?>> get inputs => [firstName];
+
+  _ThrowingMemberModel({this.throwsOnDispose = true});
 
   @override
   void initialize() {
@@ -180,7 +207,7 @@ class _ThrowingMemberModel extends GladeModel {
   void dispose() {
     super.dispose();
 
-    throw StateError('disposal failed');
+    if (throwsOnDispose) throw StateError('disposal failed');
   }
 }
 
@@ -449,9 +476,11 @@ void main() {
       expect(team.mottoDependencyKeys, equals(['teamName']));
     });
 
-    test('Nested groupEdit keeps keys accumulated by the outer batch', () {
+    test('Nested groupEdit notifies once and keeps keys accumulated by the outer batch', () {
       // arrange
       final team = _TeamModel();
+      final counter = _Counter();
+      team.addListener(counter.increment);
 
       // act
       team.groupEdit(() {
@@ -460,6 +489,7 @@ void main() {
       });
 
       // assert
+      expect(counter.count, equals(1), reason: 'a nested batch must not flush on its own');
       expect(team.lastUpdatedInputKeys, containsAll(['teamName', 'motto']));
     });
 
@@ -559,6 +589,53 @@ void main() {
       expect(act, throwsA(isA<AssertionError>()));
     });
 
+    test('A rejected model is not left attached to the composed model', () {
+      // arrange
+      final team = _FlattenedTeamModel();
+      final member = _MemberModel();
+      final counter = _Counter();
+      team.addListener(counter.increment);
+
+      // act
+      void act() => team.addModel(member);
+
+      // assert
+      expect(act, throwsA(isA<AssertionError>()));
+      expect(team.models, isEmpty, reason: 'the attach must be rolled back');
+
+      member.firstName.value = 'John';
+      expect(counter.count, isZero, reason: 'the rejected model must not drive the composed model');
+    });
+
+    test('A disposed input can not be binded to another model', () {
+      // arrange
+      final member = _MemberModel();
+      final input = member.firstName;
+      member.dispose();
+
+      // act
+      void act() => _TeamModel().bindToModel(input);
+
+      // assert
+      expect(input.isDisposed, isTrue);
+      expect(act, throwsA(isA<AssertionError>()));
+    });
+
+    test('An input which outlived its disposed model can be binded again', () {
+      // arrange
+      final external = GladeStringInput(value: '', inputKey: 'external');
+      final first = _ExternalInputModel(external);
+      first.dispose();
+
+      // act
+      void act() => _ExternalInputModel(external);
+
+      // assert
+      expect(external.isDisposed, isFalse, reason: 'the model does not own what it does not list');
+      expect(first.isDisposed, isTrue);
+      expect(act, returnsNormally);
+    });
+
     test('Duplicated own input keys assert', () {
       // arrange
       _DuplicatedKeysTeamModel? model;
@@ -638,6 +715,21 @@ void main() {
       // assert
       expect(observer.ownInputDisposedStates, isNotEmpty, reason: 'dispose must notify at least once');
       expect(observer.ownInputDisposedStates, everyElement(isFalse));
+      expect(team.teamName.isDisposed, isTrue);
+    });
+
+    test('A contained model throwing while disposing does not stop the others', () {
+      // arrange
+      final healthy = _ThrowingMemberModel(throwsOnDispose: false);
+      final team = _ThrowingChildTeamModel([_ThrowingMemberModel(), healthy]);
+
+      // act
+      void act() => team.dispose();
+
+      // assert
+      expect(act, throwsA(isA<StateError>()), reason: 'the failure is rethrown once teardown finished');
+      expect(healthy.firstName.isDisposed, isTrue, reason: 'disposal must not stop at the failing model');
+      expect(team.models, isEmpty);
       expect(team.teamName.isDisposed, isTrue);
     });
 

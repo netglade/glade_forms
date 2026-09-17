@@ -87,17 +87,15 @@ abstract class GladeComposedModel<M extends GladeModelBase> extends GladeModelBa
   /// Use it when model is attached during widget's build phase where notifying listeners is not allowed.
   void addModel(M model, {bool shouldNotify = true}) {
     _models.add(model);
+
+    assert(_acceptsAddedModel(model), '''
+Model ${model.runtimeType} shares an input with composed model $runtimeType.
+A composed model must list only its own inputs in `inputs`/`allInputs`.
+Inputs of a contained model are aggregated through that model itself.''');
+
     model
       ..addListener(_onModelsChanged)
       ..bindToComposedModel(this);
-
-    assert(
-      model is! GladeInputsOwner || !model.allInputs.any(allInputs.contains),
-      '''
-Model ${model.runtimeType} shares an input with composed model $runtimeType.
-A composed model must list only its own inputs in `inputs`/`allInputs`.
-Inputs of a contained model are aggregated through that model itself.''',
-    );
 
     if (shouldNotify) _onModelsChanged();
   }
@@ -145,27 +143,49 @@ Inputs of a contained model are aggregated through that model itself.''',
 
   @override
   void dispose() {
-    try {
-      // Iterate over a copy to avoid concurrent modification
-      for (final model in _models.toList()) {
-        model
-          ..removeListener(_onModelsChanged)
-          ..dispose();
-      }
-      _models.clear();
-    } finally {
-      // Both nested in `finally` so that a throw while disposing a contained model can neither leave
-      // this model undisposed nor leak its own inputs (and their controllers).
+    (Object, StackTrace)? failure;
+
+    // Iterate over a copy to avoid concurrent modification
+    for (final model in _models.toList()) {
+      model.removeListener(_onModelsChanged);
+
       try {
-        // Detaching from parent composed models (in super.dispose()) notifies them synchronously.
-        // Own inputs must outlive those notifications, therefore they are disposed as the very last step.
-        super.dispose();
-      } finally {
-        for (final input in allInputs) {
-          input.dispose();
-        }
+        model.dispose();
+      } on Object catch (e, stackTrace) {
+        // Disposal of the remaining models must not be skipped, so the first failure is kept
+        // and rethrown once everything is torn down.
+        failure ??= (e, stackTrace);
       }
     }
+    _models.clear();
+
+    try {
+      // Detaching from parent composed models (in super.dispose()) notifies them synchronously.
+      // Own inputs must outlive those notifications, therefore they are disposed as the very last step.
+      super.dispose();
+    } finally {
+      // In `finally` so own inputs (and their controllers) can not be leaked.
+      for (final input in allInputs) {
+        input.dispose();
+      }
+    }
+
+    if (failure case (final error, final stackTrace)?) Error.throwWithStackTrace(error, stackTrace);
+  }
+
+  /// Whether a model which was just added may stay attached.
+  ///
+  /// Called from an assert, so it runs in debug mode only. The model is already in [models] so that
+  /// a flattened `inputs` getter is caught too, and a rejected model is detached again before the
+  /// assert fails - it must never be left half attached.
+  bool _acceptsAddedModel(M model) {
+    if (model is GladeInputsOwner && model.allInputs.any(allInputs.contains)) {
+      final _ = _models.remove(model);
+
+      return false;
+    }
+
+    return true;
   }
 
   /// Propagates a change which was not caused by composed model's own inputs - a contained model
