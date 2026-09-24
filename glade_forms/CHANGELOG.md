@@ -17,6 +17,10 @@
   - A notification raised by a contained model during a composed model's `groupEdit()` is folded into the single notification the batch emits at its end. Previously it broke the batch in two and dropped the accumulated keys.
   - A nested `groupEdit()` is part of the batch which is already running: it no longer flushes on its own, so one batch notifies exactly once instead of once per nesting level.
   - Group edit mode is always left and the batch is always flushed, even when the callback throws.
+- **[Fix]**: `updateInput()` and `stringFieldUpdateInput()` no longer announce an update which the input announces itself.
+  - Called within `groupEdit()` they used to overwrite everything the batch had accumulated and notify in the middle of it, so keys were lost and dependencies of the lost inputs were never notified.
+  - Outside a batch they now emit one notification per update instead of two.
+- **[Fix]**: `resetToInitialValue()` and `setInputValuesAsNewInitialValues()` on a composed model are batched, so listeners are notified once instead of once per contained model - and never with a form which is half reset.
 - **[Fix]**: DevTools serializer produced the key `depedencies`, so an input's dependencies were never displayed in the extension.
 - **[Fix]**: DevTools serializer wrote `initialValue` unencoded, so a single input whose value is not a JSON primitive (e.g. `GladeDateTimeInput`) made the whole response fail to encode and **every** model disappeared from the inspector.
 - **[Fix]**: `GladeFormDebugInfoModal.show()` did not pass its type argument to the `GladeFormDebugInfo` it builds, so the widget looked up its own bound instead of the model given to it and always threw `ProviderNotFoundException`.

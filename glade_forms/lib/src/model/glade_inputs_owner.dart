@@ -88,7 +88,8 @@ Did you forget to override initialize() and create the model's inputs there?''',
     if (input.value == value) return;
 
     input.updateValueWithString(value);
-    notifyListeners();
+
+    _announceUpdateOfUnbindedInput(input);
   }
 
   /// Updates model's input value.
@@ -97,10 +98,9 @@ Did you forget to override initialize() and create the model's inputs there?''',
 
     if (input.value == value) return;
 
-    lastUpdates = [input];
-
     input.value = value;
-    notifyListeners();
+
+    _announceUpdateOfUnbindedInput(input);
   }
 
   @internal
@@ -159,7 +159,8 @@ Did you forget to override initialize() and create the model's inputs there?''',
       input.setNewInitialValueAsCurrentValue(shouldTriggerOnChange: shouldTriggerOnChange);
     }
 
-    notifyListeners();
+    // Within a group edit the batch notifies once at its end.
+    if (!isGroupEditing) notifyListeners();
   }
 
   /// Resets all inputs in the model to their initial values.
@@ -169,7 +170,9 @@ Did you forget to override initialize() and create the model's inputs there?''',
     for (final input in inputs) {
       input.resetToInitialValue(shouldTriggerOnChange: shouldTriggerOnChange);
     }
-    notifyListeners();
+
+    // Within a group edit the batch notifies once at its end.
+    if (!isGroupEditing) notifyListeners();
   }
 
   /// Fills debug metadata for the model.
@@ -178,6 +181,19 @@ Did you forget to override initialize() and create the model's inputs there?''',
   /// By default returns empty map.
   Map<String, Object> fillDebugMetadata() {
     return {};
+  }
+
+  /// An input binded to this model announces its own update through [notifyInputUpdated], which keeps
+  /// [lastUpdates] describing that update and folds it into a running [groupEdit]. Announcing it here
+  /// as well would overwrite what the batch accumulated and notify in the middle of it.
+  ///
+  /// An input which is not binded can not announce itself, so this model does it for it.
+  void _announceUpdateOfUnbindedInput(GladeInput<Object?> input) {
+    if (input.bindedModel == this) return;
+
+    lastUpdates = isGroupEditing ? [...lastUpdates, input] : [input];
+
+    if (!isGroupEditing) notifyListeners();
   }
 
   bool _ownsInput(GladeInput<Object?> input) => input.bindedModel == null || input.bindedModel == this;

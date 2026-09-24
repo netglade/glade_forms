@@ -243,6 +243,18 @@ class _Counter {
   void increment() => count++;
 }
 
+/// Records the whole form's state on every notification, so an intermediate state - part of the
+/// form already reset, the rest still holding old values - can be detected.
+class _FormStateObserver {
+  final _TeamModel model;
+
+  final List<String> snapshots = [];
+
+  _FormStateObserver(this.model);
+
+  void onNotified() => snapshots.add('${model.teamName.value}|${model.models.map((e) => e.firstName.value).join(',')}');
+}
+
 /// Records whether composed model's own input was already disposed on every notification received.
 ///
 /// Reading `controller.text` would not do - a disposed TextEditingController keeps returning its
@@ -665,6 +677,45 @@ void main() {
       expect(member.firstName.value, isEmpty);
       expect(team.isUnchanged, isTrue);
       expect(team.isPure, isTrue);
+    });
+
+    test('resetToInitialValue notifies once and never exposes a half reset form', () {
+      // arrange
+      final members = [_MemberModel(), _MemberModel(), _MemberModel()];
+      final team = _TeamModel(members);
+      team.teamName.value = 'A-team';
+      for (final member in members) {
+        member.firstName.value = 'John';
+      }
+
+      final observer = _FormStateObserver(team);
+      team.addListener(observer.onNotified);
+
+      // act
+      team.resetToInitialValue();
+
+      // assert
+      expect(observer.snapshots, equals(['|,,']), reason: 'one notification, everything already reset');
+    });
+
+    test('setInputValuesAsNewInitialValues notifies once', () {
+      // arrange
+      final members = [_MemberModel(), _MemberModel()];
+      final team = _TeamModel(members);
+      team.teamName.value = 'A-team';
+      for (final member in members) {
+        member.firstName.value = 'John';
+      }
+
+      final counter = _Counter();
+      team.addListener(counter.increment);
+
+      // act
+      team.setInputValuesAsNewInitialValues();
+
+      // assert
+      expect(counter.count, equals(1));
+      expect(team.isUnchanged, isTrue);
     });
 
     test('setInputValuesAsNewInitialValues applies to own inputs and all contained models', () {

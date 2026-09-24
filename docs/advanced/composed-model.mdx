@@ -46,6 +46,26 @@ The newly attached model is fully registered — its own changes are propagated 
 A composed model can have inputs of its own, standing next to the models it contains — a team's name next to the forms of its members. Declare them exactly as on a `GladeModel`: create the inputs in `initialize()` and list them in `inputs`.
 
 ```dart
+/// One member of the team. An ordinary GladeModel - it owns its own inputs and knows nothing
+/// about the team it belongs to.
+class MemberModel extends GladeModel {
+  late GladeStringInput firstName;
+  late GladeStringInput lastName;
+
+  @override
+  List<GladeInput<Object?>> get inputs => [firstName, lastName];
+
+  @override
+  void initialize() {
+    firstName = GladeStringInput(initialValue: '', inputKey: 'firstName');
+    lastName = GladeStringInput(initialValue: '', inputKey: 'lastName');
+
+    super.initialize();
+  }
+}
+
+/// The team. `teamName` is the composed model's OWN input - it belongs to the team itself,
+/// not to any member. The members are contained models, aggregated as whole models.
 class TeamModel extends GladeComposedModel<MemberModel> {
   late GladeStringInput teamName;
 
@@ -61,9 +81,26 @@ class TeamModel extends GladeComposedModel<MemberModel> {
     super.initialize();
   }
 }
+
+final team = TeamModel([MemberModel(), MemberModel()]);
+
+team.inputs;        // [teamName]                 - the team's own inputs only
+team.models;        // [MemberModel, MemberModel] - the contained models
+team.models.first.inputs; // [firstName, lastName] - each member keeps its own
 ```
 
-Own inputs are aggregated *together with* the contained models, so `isValid`, `isValidWithoutWarnings`, `isPure`, `isUnchanged` and `validatorResults` describe the whole form — the composed model is invalid when its own `teamName` is empty, and equally invalid when one of its members is. `resetToInitialValue()` and `setInputValuesAsNewInitialValues()` reach the own inputs and every contained model as well.
+Own inputs are aggregated *together with* the contained models, so `isValid`, `isValidWithoutWarnings`, `isPure`, `isUnchanged` and `validatorResults` describe the whole form:
+
+```dart
+team.isValid;                  // false - teamName is empty and so are the members
+team.teamName.value = 'A-team';
+team.isValid;                  // still false - the members are not filled in
+team.models.first.isValid;     // false - and this one says why
+
+team.validatorResults.length;  // 5 - teamName + 2 inputs per member
+```
+
+`resetToInitialValue()` and `setInputValuesAsNewInitialValues()` reach the own inputs and every contained model as well, in a single batch — listeners are notified once, never with a half-reset form.
 
 Unlike on a `GladeModel`, overriding `initialize()` is optional — a composed model without own inputs does not need it. Beware that a composed model which already declares a method named `initialize()` for its own purposes now overrides this hook, and it is invoked from the constructor.
 

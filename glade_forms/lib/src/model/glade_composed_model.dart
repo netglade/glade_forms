@@ -118,13 +118,17 @@ Inputs of a contained model are aggregated through that model itself.''');
   /// [shouldTriggerOnChange] - if true, onChange callbacks will be triggered.
   @override
   void setInputValuesAsNewInitialValues({bool shouldTriggerOnChange = true}) {
-    for (final model in models) {
-      if (model is GladeInputsOwner) {
-        model.setInputValuesAsNewInitialValues(shouldTriggerOnChange: shouldTriggerOnChange);
+    // Batched, otherwise every contained model notifies on its own and listeners are handed
+    // intermediate states where a part of the form is already updated and the rest is not.
+    groupEdit(() {
+      for (final model in models) {
+        if (model is GladeInputsOwner) {
+          model.setInputValuesAsNewInitialValues(shouldTriggerOnChange: shouldTriggerOnChange);
+        }
       }
-    }
 
-    super.setInputValuesAsNewInitialValues(shouldTriggerOnChange: shouldTriggerOnChange);
+      super.setInputValuesAsNewInitialValues(shouldTriggerOnChange: shouldTriggerOnChange);
+    });
   }
 
   /// Resets own inputs and all [models] to their initial values.
@@ -132,13 +136,17 @@ Inputs of a contained model are aggregated through that model itself.''');
   /// [shouldTriggerOnChange] - if true, onChange callbacks will be triggered.
   @override
   void resetToInitialValue({bool shouldTriggerOnChange = true}) {
-    for (final model in models) {
-      if (model is GladeInputsOwner) {
-        model.resetToInitialValue(shouldTriggerOnChange: shouldTriggerOnChange);
+    // Batched, otherwise every contained model notifies on its own and listeners are handed
+    // intermediate states - a form half reset and half still holding its old values.
+    groupEdit(() {
+      for (final model in models) {
+        if (model is GladeInputsOwner) {
+          model.resetToInitialValue(shouldTriggerOnChange: shouldTriggerOnChange);
+        }
       }
-    }
 
-    super.resetToInitialValue(shouldTriggerOnChange: shouldTriggerOnChange);
+      super.resetToInitialValue(shouldTriggerOnChange: shouldTriggerOnChange);
+    });
   }
 
   @override
