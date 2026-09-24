@@ -4,4 +4,5 @@ export 'regex_patterns.dart';
 export 'specialized/int_validator.dart';
 export 'specialized/string_validator.dart';
 export 'validator_instance.dart';
+export 'validator_result.dart';
 export 'validator_result/validator_error.dart';

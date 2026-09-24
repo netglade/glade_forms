@@ -1,17 +1,20 @@
 import 'package:flutter/foundation.dart';
 import 'package:glade_forms/src/devtools/devtools_registry.dart';
 import 'package:glade_forms/src/src.dart';
-import 'package:glade_forms/src/validator/validator_result.dart';
 
 abstract class GladeModelBase extends ChangeNotifier {
   List<GladeInput<Object?>> lastUpdates = [];
   final List<GladeComposedModel> _bindedComposeModels = [];
   String? _devtoolsId;
+  bool _isDisposed = false;
 
   /// Unique identifier for the model instance.
   ///
   /// Used for DevTools inspection.
   String get debugKey => runtimeType.toString();
+
+  /// Model was already disposed and must not be used anymore.
+  bool get isDisposed => _isDisposed;
 
   bool get isValid;
 
@@ -50,6 +53,8 @@ abstract class GladeModelBase extends ChangeNotifier {
 
   @override
   void dispose() {
+    _isDisposed = true;
+
     if (_devtoolsId != null) {
       GladeFormsDevToolsRegistry().unregisterModel(_devtoolsId!);
     }
