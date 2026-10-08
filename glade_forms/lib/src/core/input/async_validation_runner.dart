@@ -28,6 +28,9 @@ class AsyncValidationRunner<T> {
 
   List<GladeValidatorResult<T>>? _cachedResults;
 
+  /// Value the cached results were produced for. Meaningful only while [_cachedResults] is not null.
+  T? _cachedValue;
+
   /// Cached results describe a failed request, so an explicit [runNow] retries instead of reusing them.
   bool _cacheIsRetryable = false;
 
@@ -55,6 +58,25 @@ class AsyncValidationRunner<T> {
   }) : _validatorInstance = validatorInstance,
        _onValidationStateChanged = onValidationStateChanged;
 
+  /// Merges [syncResult] with the cached asynchronous results, or returns `null` when there are none.
+  ///
+  /// The result is tagged with the value the asynchronous parts actually ran against, and with the runner's
+  /// live state whenever a validation is scheduled or running - a cached result must not report `done`
+  /// while a retry is in flight.
+  ValidatorResult<T>? combineCachedWith(ValidatorResult<T> syncResult) {
+    final cached = _cachedResults;
+
+    if (cached == null) return null;
+
+    final combined = _validatorInstance.combineWithAsyncResults(
+      syncResult,
+      cached,
+      asyncValidatedValue: _cachedValue as T,
+    );
+
+    return isValidating ? combined.copyWith(asyncState: _state) : combined;
+  }
+
   /// Value changed: cached results and any scheduled or running validation no longer apply.
   void onValueChanged() {
     _sequence++;
@@ -62,6 +84,7 @@ class AsyncValidationRunner<T> {
     _debounceTimer = null;
     _inFlight = null;
     _cachedResults = null;
+    _cachedValue = null;
     _cacheIsRetryable = false;
     _setState(.notRun);
   }
@@ -99,14 +122,9 @@ class AsyncValidationRunner<T> {
 
     if (_inFlight case final inFlight?) return inFlight.future;
 
-    if (_cachedResults case final cached? when !_cacheIsRetryable) {
-      return Future.value(
-        _validatorInstance.combineWithAsyncResults(
-          _validatorInstance.validate(value),
-          cached,
-          asyncValidatedValue: value,
-        ),
-      );
+    if (_cachedResults != null && !_cacheIsRetryable) {
+      // ignore: avoid-non-null-assertion, the cache was just checked
+      return Future.value(combineCachedWith(_validatorInstance.validate(value))!);
     }
 
     return _run(value);
@@ -135,6 +153,7 @@ class AsyncValidationRunner<T> {
 
       if (sequence == _sequence) {
         _cachedResults = outcome.results;
+        _cachedValue = value;
         _cacheIsRetryable = outcome.hasFailure;
       }
 

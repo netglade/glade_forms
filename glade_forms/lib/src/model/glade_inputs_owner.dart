@@ -97,9 +97,22 @@ Did you forget to override initialize() and create the model's inputs there?''',
 
   @override
   Future<bool> validateAsync() async {
-    final _ = await Future.wait(inputs.map((input) => input.validateAsync()));
+    final _ = await Future.wait(inputs.map(validateInputSettling));
 
     return isValid;
+  }
+
+  /// Awaits asynchronous validation of [input] and never propagates its failure.
+  ///
+  /// A validator which throws must not stop the remaining inputs from settling. The failing input stays
+  /// invalid through its own result; a throwing *synchronous* validator surfaces when [isValid] is read.
+  @protected
+  Future<void> validateInputSettling(GladeInput<Object?> input) async {
+    try {
+      final _ = await input.validateAsync();
+    } on Object {
+      // Intentionally swallowed - see the doc comment.
+    }
   }
 
   /// Updates model's input with String? value using its converter.
@@ -126,10 +139,14 @@ Did you forget to override initialize() and create the model's inputs there?''',
 
   /// Called by an owned input when its asynchronous validation state changed.
   ///
-  /// Only notifies listeners. Unlike [notifyInputUpdated] it does not touch [lastUpdates] nor dependencies,
-  /// because no value changed.
+  /// Dependencies are not notified and [lastUpdates] is cleared, because no value changed - a listener
+  /// reading `lastUpdatedInputKeys` must not see the previous edit replayed once per async state change.
   @internal
-  void notifyInputValidationUpdated() => notifyListeners();
+  void notifyInputValidationUpdated() {
+    lastUpdates = [];
+
+    notifyListeners();
+  }
 
   @internal
   void notifyInputUpdated(GladeInput<Object?> input) {

@@ -102,7 +102,9 @@ class MyModel extends GladeModel {
 | Async threw (default `onError`) | `false` | `false` |
 
 The modes differ in one situation only: the current value has not been verified yet and synchronous validation passed.
-`strict` blocks a submit button bound to `model.isValid`. `lastKnown` keeps it enabled, so await the server before saving:
+`strict` blocks a submit button bound to `model.isValid` for validation which was actually **triggered**. It cannot block what was never run: a value whose async validation never started (`AsyncValidationState.notRun`) counts as valid in both modes. That happens when synchronous validation failed and later became valid through a dependency without the value changing, or on a form which never triggers validation at all (`autovalidateMode: .disabled`).
+
+Awaiting the server before saving is therefore the robust pattern in **both** modes, not only in `lastKnown`:
 
 ```dart
 onPressed: () async {
@@ -115,6 +117,8 @@ onPressed: () async {
 
 A response that arrives for a value the user already changed is discarded. Every finished result exposes `validatorResult.asyncValidatedValue`, the value it was produced for.
 A caller already awaiting `input.validateAsync()` still receives that discarded result, so compare `asyncValidatedValue` with `input.value` when you use the returned result directly.
+
+Cache invalidation uses the input's `valueComparator` when one is provided, and structural equality otherwise - the same notion of equality as `isUnchanged`. A value mutated **in place** and assigned back is the same instance, so no equality can see the change; call `validateAsync(force: true)` after such a mutation.
 
 `validateAsync()` throws when synchronous validation or an async part's `shouldValidate` throws. Exceptions from the async part itself are turned into validation results instead.
 
@@ -163,6 +167,7 @@ Failures produced by the default `onError` use `GladeValidationsKeys.asyncValida
 
 ## Lifecycle notes
 
-- `resetToInitialValue()` and `setNewInitialValue()` drop the cached results and discard requests in flight. The input is back to "async never ran".
+- `resetToInitialValue()` goes through the normal value change: a request in flight for the discarded value is dropped and the initial value is validated again. Resetting a value which is already the initial one changes nothing, so its cached result is kept.
+- `setNewInitialValue()` does not touch asynchronous state on its own - async results describe the value, not the initial value.
 - `dispose()` discards requests in flight; late responses are ignored.
 - `GladeComposedModel.isValidating` is `true` when any of its own inputs or any contained model is validating; `validateAsync()` awaits both.

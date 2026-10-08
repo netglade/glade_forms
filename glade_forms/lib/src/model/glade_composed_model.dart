@@ -127,8 +127,8 @@ Inputs of a contained model are aggregated through that model itself.''');
   @override
   Future<bool> validateAsync() async {
     final _ = await Future.wait([
-      ...inputs.map((input) => input.validateAsync()),
-      ...models.map((model) => model.validateAsync()),
+      ...inputs.map(validateInputSettling),
+      ...models.map(_validateModelSettling),
     ]);
 
     return isValid;
@@ -207,6 +207,15 @@ Inputs of a contained model are aggregated through that model itself.''');
   /// Called from an assert, so it runs in debug mode only. The model is already in [models] so that
   /// a flattened `inputs` getter is caught too, and a rejected model is detached again before the
   /// assert fails - it must never be left half attached.
+  /// Awaits asynchronous validation of [model] and never propagates its failure - see [validateInputSettling].
+  Future<void> _validateModelSettling(M model) async {
+    try {
+      final _ = await model.validateAsync();
+    } on Object {
+      // Intentionally swallowed - one failing model must not stop the others from settling.
+    }
+  }
+
   bool _acceptsAddedModel(M model) {
     if (model is GladeInputsOwner && model.allInputs.any(allInputs.contains)) {
       final _ = _models.remove(model);

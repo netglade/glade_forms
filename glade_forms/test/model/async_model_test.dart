@@ -3,6 +3,7 @@
 
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:glade_forms/glade_forms.dart';
 import 'package:test/test.dart';
@@ -490,6 +491,34 @@ void main() {
         expect(ownInput.isDisposed, isTrue);
         expect(ownInput.isValidating, isFalse);
       });
+    });
+  });
+  test('an async state change does not replay the keys of the last edited input', () {
+    FakeAsync().run((async) {
+      // arrange
+      final server = _Server();
+      final model = _Model(server);
+      final seenKeys = <List<String>>[];
+
+      void onModelChanged() => seenKeys.add(model.lastUpdatedInputKeys);
+
+      model.addListener(onModelChanged);
+
+      // act
+      final username = model.username;
+
+      model.updateInput(username, 'pending');
+      async.flushMicrotasks();
+      server.completeAll(result: true);
+      async.flushMicrotasks();
+
+      // assert
+      expect(seenKeys.firstOrNull, equals(['username']), reason: 'the value update carries its key');
+      expect(seenKeys.lastOrNull, isEmpty, reason: 'the async completion changed no value');
+
+      model
+        ..removeListener(onModelChanged)
+        ..dispose();
     });
   });
 }

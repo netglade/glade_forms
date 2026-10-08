@@ -354,7 +354,7 @@ void main() {
     });
   });
 
-  test('resetToInitialValue and dispose invalidate', () {
+  test('resetToInitialValue revalidates the initial value and discards the stale response', () {
     FakeAsync().run((async) {
       // arrange
       final server = _Server(manual: true);
@@ -364,21 +364,66 @@ void main() {
       input.updateValue('free');
       async.flushMicrotasks();
       input.resetToInitialValue();
+      async.flushMicrotasks();
 
       // assert
-      expect(input.isValidating, isFalse);
-      expect(input.validatorResult.asyncState, equals(AsyncValidationState.notRun));
+      expect(server.calls, equals(2), reason: 'the value changed back, so the initial value is validated');
+      expect(input.isValidating, isTrue);
 
-      server.pending.firstOrNull?.complete(true);
+      server.pending.firstOrNull?.complete(false);
       async.flushMicrotasks();
-      expect(input.validatorResult.asyncState, equals(AsyncValidationState.notRun), reason: 'stale response ignored');
 
+      expect(input.validationErrors, isEmpty, reason: 'the response for the pre-reset value is discarded');
+      expect(input.validatorResult.asyncState, equals(AsyncValidationState.running), reason: 'still awaiting the reset value');
+
+      server.pending.lastOrNull?.complete(true);
+      async.flushMicrotasks();
+
+      expect(input.isValidating, isFalse);
+      expect(input.validatorResult.asyncValidatedValue, equals(''), reason: 'the initial value was validated');
+    });
+  });
+
+  test('resetting to an unchanged value keeps the cached result', () {
+    FakeAsync().run((async) {
+      // arrange
+      final server = _Server();
+      final input = _usernameInput(server, debounce: .zero);
+      input.updateValue('free');
+      async.flushMicrotasks();
+
+      // act
+      input.resetToInitialValue();
+      input.updateValue('free');
+      async.flushMicrotasks();
+      input.resetToInitialValue();
+      async.flushMicrotasks();
+
+      final callsBeforeNoopReset = server.calls;
+
+      input.resetToInitialValue();
+      async.flushMicrotasks();
+
+      // assert
+      expect(server.calls - callsBeforeNoopReset, isZero, reason: 'the value did not change, so no new request');
+      expect(input.validatorResult.asyncState, equals(AsyncValidationState.done));
+    });
+  });
+
+  test('dispose invalidates a running validation', () {
+    FakeAsync().run((async) {
+      // arrange
+      final server = _Server(manual: true);
+      final input = _usernameInput(server, debounce: .zero);
+
+      // act
       input.updateValue('other');
       async.flushMicrotasks();
       input.dispose();
       server.pending.lastOrNull?.complete(true);
       async.flushMicrotasks();
 
+      // assert
       expect(input.isValidating, isFalse, reason: 'disposed input does not validate');
     });
   });
@@ -538,6 +583,108 @@ void main() {
 
       expect(calls, equals(2));
       expect(input.validationErrors, isEmpty);
+    });
+  });
+  test('a retry of a failed request is not reported as done', () {
+    FakeAsync().run((async) {
+      // arrange
+      var shouldFail = true;
+      final input = GladeStringInput(
+        value: 'a',
+        useTextEditingController: false,
+        validator: (v) =>
+            (v..customAsync((value, key) async {
+                  if (shouldFail) throw Exception('network down');
+
+                  return null;
+                }))
+                .build(asyncDebounce: .zero),
+      );
+
+      input.updateValue('b');
+      async.flushMicrotasks();
+
+      expect(input.validatorResult.asyncState, equals(AsyncValidationState.done));
+
+      // act
+      shouldFail = false;
+
+      expect(shouldFail, isFalse, reason: 'the retried request succeeds');
+
+      unawaited(input.validateAsync());
+
+      // assert
+      expect(input.isValidating, isTrue);
+      expect(input.validatorResult.asyncState, equals(AsyncValidationState.running), reason: 'the retry wins over the cache');
+      expect(input.validatorResult.isValidating, isTrue);
+      expect(input.isValid, isFalse, reason: 'strict must still block while the retry is in flight');
+
+      async.flushMicrotasks();
+
+      expect(input.isValid, isTrue);
+    });
+  });
+
+  test('valueTransform does not stop the form field validator from triggering async', () {
+    FakeAsync().run((async) {
+      // arrange
+      final server = _Server();
+      final input = GladeStringInput(
+        inputKey: 'username',
+        value: 'free',
+        useTextEditingController: false,
+        valueTransform: (value) => value.trim().toLowerCase(),
+        validator: (v) =>
+            (v..satisfyAsync(server.isAvailable, key: 'taken', devMessage: (_) => 'Taken')).build(asyncDebounce: .zero),
+      );
+
+      input.updateValue('Taken ');
+      async.flushMicrotasks();
+
+      // act
+      final message = input.textFormFieldInputValidator('Taken ');
+
+      // assert
+      expect(input.value, equals('taken'));
+      expect(server.calls, equals(1), reason: 'the untransformed text must still count as the current value');
+      expect(message, equals('Taken'));
+    });
+  });
+
+  test('valueComparator decides whether the cached async result survives', () {
+    FakeAsync().run((async) {
+      // arrange
+      final server = _Server();
+      final input = GladeStringInput(
+        inputKey: 'username',
+        value: 'aa',
+        useTextEditingController: false,
+        valueComparator: (a, b) => a?.length == b?.length,
+        validator: (v) =>
+            (v..satisfyAsync(server.isAvailable, key: 'taken', devMessage: (_) => 'Taken')).build(asyncDebounce: .zero),
+      );
+
+      input.updateValue('bb');
+      async.flushMicrotasks();
+
+      expect(server.calls, equals(1));
+
+      // act
+      input.updateValue('cc');
+      async.flushMicrotasks();
+
+      // assert
+      expect(server.calls, equals(1), reason: 'the comparator treats the values as equal, so the cache survives');
+      expect(
+        input.validatorResult.asyncValidatedValue,
+        equals('bb'),
+        reason: 'the result belongs to the value it was produced for, not to the current one',
+      );
+
+      input.updateValue('ddd');
+      async.flushMicrotasks();
+
+      expect(server.calls, equals(2), reason: 'a different length is a different value for this comparator');
     });
   });
 }

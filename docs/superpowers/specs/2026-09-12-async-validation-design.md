@@ -73,7 +73,8 @@ Rows where `strict` and `lastKnown` differ are marked with an asterisk.
 | 8 | Response for an outdated value | discarded | discarded | unchanged |
 | 9 | Submit during pending | button bound to `isValid` disabled | passes unless `await model.validateAsync()` | true |
 | 10 | Dependency changed, value same | caller runs `validateAsync(force: true)` | same | true after call |
-| 11 | `resetToInitialValue` / `setNewInitialValue` | cache cleared, in-flight invalidated | same | false |
+| 11 | `resetToInitialValue` to a different value | in-flight dropped, initial value revalidated | same | true until it finishes |
+| 11b | `resetToInitialValue` to the same value / `setNewInitialValue` | cached result kept | same | false |
 | 12 | Async part with severity `warning` | does not affect `isValid`, affects `isValidWithoutWarnings`; pending affects both | same | as above |
 | 13 | Composed model | aggregates children `isValid` | same | any child |
 | 14 | Dispose during flight | response discarded | same | false |

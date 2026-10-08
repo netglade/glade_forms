@@ -178,6 +178,7 @@ class GladeInput<T> {
 
   bool get _valueIsSameAsInitialValue => ValueEquality.equals(value, initialValue);
 
+
   AsyncValidationMode get _asyncValidationMode => _bindedModel?.asyncValidationMode ?? .strict;
 
   set value(T value) {
@@ -459,8 +460,8 @@ A GladeComposedModel lists its own inputs, never inputs of its contained models.
     final converter = stringToValueConverter ?? _defaultConverter;
 
     try {
-      final convertedValue = converter.convert(value);
-      final isCurrentValue = ValueEquality.equals(convertedValue, this.value);
+      final convertedValue = applyValueTransform(converter.convert(value));
+      final isCurrentValue = _valuesEqual(convertedValue, this.value);
       final syncResult = validatorInstance.validate(isCurrentValue ? this.value : convertedValue);
 
       if (isCurrentValue) _scheduleAsyncValidation(syncResult: syncResult);
@@ -495,8 +496,9 @@ A GladeComposedModel lists its own inputs, never inputs of its contained models.
     ValidationSeverity severity = .error,
     String delimiter = '.',
   }) {
-    final isCurrentValue = ValueEquality.equals(value, this.value);
-    final syncResult = validatorInstance.validate(isCurrentValue ? this.value : value);
+    final transformedValue = applyValueTransform(value);
+    final isCurrentValue = _valuesEqual(transformedValue, this.value);
+    final syncResult = validatorInstance.validate(isCurrentValue ? this.value : transformedValue);
 
     if (isCurrentValue) _scheduleAsyncValidation(syncResult: syncResult);
 
@@ -556,8 +558,6 @@ A GladeComposedModel lists its own inputs, never inputs of its contained models.
     bool shouldResetToInitialValue = false,
     bool shouldTriggerOnChange = true,
   }) {
-    _asyncRunner?.invalidate();
-
     _initialValue = initialValue();
 
     if (shouldResetToInitialValue) {
@@ -581,8 +581,6 @@ A GladeComposedModel lists its own inputs, never inputs of its contained models.
       updateValue(_initialValue as T, shouldTriggerOnChange: shouldTriggerOnChange);
     }
 
-    _asyncRunner?.invalidate();
-
     _isPure = true;
     _bindedModel?.notifyInputUpdated(this);
   }
@@ -596,6 +594,16 @@ A GladeComposedModel lists its own inputs, never inputs of its contained models.
       shouldResetToInitialValue: true,
       shouldTriggerOnChange: shouldTriggerOnChange,
     );
+  }
+
+  /// Applies [ValueTransform] of this input, if there is any.
+  @protected
+  T applyValueTransform(T value) {
+    final transform = _valueTransform;
+
+    if (transform == null) return value;
+
+    return TypeHelper.typeIsNullable<T>() ? transform(value) : (transform(value) ?? value);
   }
 
   @protected
@@ -697,48 +705,47 @@ A GladeComposedModel lists its own inputs, never inputs of its contained models.
   void _setValue(T value, {required bool shouldTriggerOnChange}) {
     _previousValue = _value;
 
-    // ignore: prefer-conditional-expressions, keep explicit if-else
-    if (_valueTransform != null) {
-      _value = TypeHelper.typeIsNullable<T>() ? _valueTransform(value) : (_valueTransform(value) ?? value);
-    } else {
-      _value = value;
-    }
+    _value = applyValueTransform(value);
 
     _isPure = false;
     __conversionError = null;
 
-    if (!ValueEquality.equals(_previousValue, _value)) {
-      _asyncRunner?.onValueChanged();
-      _scheduleAsyncValidation();
-    }
+    if (!_valuesEqual(_previousValue, _value)) _asyncRunner?.onValueChanged();
 
-    // propagate input's changes
-    if (shouldTriggerOnChange) {
-      onChange?.call(
-        ChangesInfo(
-          inputKey: inputKey,
-          previousValue: _previousValue,
-          value: value,
-          initialValue: initialValue,
-          validatorResult: validate(),
-        ),
-      );
+    // The synchronous pass is shared by the async trigger and by ChangesInfo instead of being run twice.
+    if (shouldTriggerOnChange || _asyncRunner != null) {
+      final syncResult = validatorInstance.validate(_value);
+
+      _scheduleAsyncValidation(syncResult: syncResult);
+
+      // propagate input's changes
+      if (shouldTriggerOnChange) {
+        onChange?.call(
+          ChangesInfo(
+            inputKey: inputKey,
+            previousValue: _previousValue,
+            value: value,
+            initialValue: initialValue,
+            validatorResult: _validatorResultFor(syncResult),
+          ),
+        );
+      }
     }
 
     _bindedModel?.notifyInputUpdated(this);
     _asyncRunner?.markStateNotified();
   }
 
+  /// Equality of two values of this input - [valueComparator] when provided, structural equality otherwise.
+  bool _valuesEqual(T? a, T? b) => valueComparator?.call(a, b) ?? ValueEquality.equals(a, b);
+
   ValidatorResult<T> _validatorResultFor(ValidatorResult<T> syncResult) {
     final runner = _asyncRunner;
 
     if (runner == null) return syncResult;
 
-    if (runner.cachedResults case final cached?) {
-      return validatorInstance.combineWithAsyncResults(syncResult, cached, asyncValidatedValue: value);
-    }
-
-    return syncResult.copyWith(asyncState: runner.state, clearAsyncValidatedValue: true);
+    return runner.combineCachedWith(syncResult) ??
+        syncResult.copyWith(asyncState: runner.state, clearAsyncValidatedValue: true);
   }
 
   void _scheduleAsyncValidation({ValidatorResult<T>? syncResult}) {
