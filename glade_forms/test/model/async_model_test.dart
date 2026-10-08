@@ -71,6 +71,37 @@ class _Composed extends GladeComposedModel<_Model> {
   _Composed(super.initialModels);
 }
 
+
+class _TeamComposed extends GladeComposedModel<_Model> {
+  final _Server server;
+  final AsyncValidationMode mode;
+
+  late GladeStringInput teamName;
+
+  @override
+  AsyncValidationMode get asyncValidationMode => mode;
+
+  @override
+  List<GladeInput<Object?>> get inputs => [teamName];
+
+  _TeamComposed(this.server, {this.mode = .strict, List<_Model>? initialModels}) : super(initialModels);
+
+  @override
+  void initialize() {
+    teamName = GladeStringInput(
+      inputKey: 'team-name',
+      value: 'team',
+      useTextEditingController: false,
+      validator: (v) =>
+          (v..satisfyAsync(server.check, key: 'team-taken', devMessage: (_) => 'Team taken')).build(
+            asyncDebounce: .zero,
+          ),
+    );
+
+    super.initialize();
+  }
+}
+
 void main() {
   setUp(GladeForms.initialize);
 
@@ -267,6 +298,198 @@ void main() {
       expect(composed.isValidating, isFalse);
       expect(composed.isValid, isTrue);
       expect(result, isTrue);
+    });
+  });
+  group("composed model's own inputs", () {
+    test('strict mode: a pending own input makes the composed model invalid', () {
+      FakeAsync().run((async) {
+        // arrange
+        final server = _Server();
+        final composed = _TeamComposed(server, initialModels: [_Model(server)]);
+
+        // act
+        composed.updateInput(composed.teamName, 'renamed');
+        async.flushMicrotasks();
+
+        // assert
+        expect(composed.isValidating, isTrue);
+        expect(composed.isAsyncValidationRunning, isTrue);
+        expect(composed.isValid, isFalse, reason: 'own input is pending even though every model is valid');
+
+        server.completeAll(result: true);
+        async.flushMicrotasks();
+
+        expect(composed.isValidating, isFalse);
+        expect(composed.isValid, isTrue);
+
+        composed.dispose();
+      });
+    });
+
+    test('own inputs read asyncValidationMode from the composed model', () {
+      FakeAsync().run((async) {
+        // arrange
+        final server = _Server();
+        final composed = _TeamComposed(server, mode: .lastKnown);
+
+        // act
+        composed.updateInput(composed.teamName, 'renamed');
+        async.flushMicrotasks();
+
+        // assert
+        expect(composed.isValidating, isTrue);
+        expect(composed.teamName.isValid, isTrue, reason: 'lastKnown is taken from the owning composed model');
+        expect(composed.isValid, isTrue);
+
+        server.completeAll(result: false);
+        async.flushMicrotasks();
+
+        expect(composed.isValid, isFalse);
+        expect(composed.formattedValidationErrors, equals('Team taken'));
+
+        composed.dispose();
+      });
+    });
+
+    test('the mode is per owner, it is not inherited by contained models', () {
+      FakeAsync().run((async) {
+        // arrange
+        final server = _Server();
+        final child = _Model(server);
+        final composed = _TeamComposed(server, mode: .lastKnown, initialModels: [child]);
+
+        // act
+        composed.updateInput(composed.teamName, 'renamed');
+        async.flushMicrotasks();
+
+        // assert
+        expect(composed.isValid, isTrue, reason: "own input follows the composed model's lastKnown");
+
+        child.updateInput(child.username, 'pending');
+        async.flushMicrotasks();
+
+        expect(composed.isValid, isFalse, reason: 'the child keeps its own strict mode and blocks the aggregate');
+
+        composed.dispose();
+      });
+    });
+
+    test('completion of an own input notifies the composed model', () {
+      FakeAsync().run((async) {
+        // arrange
+        final server = _Server();
+        final composed = _TeamComposed(server);
+        var notifications = 0;
+
+        void onComposedChanged() => notifications++;
+
+        composed.addListener(onComposedChanged);
+
+        // act
+        final teamName = composed.teamName;
+
+        composed.updateInput(teamName, 'renamed');
+        async.flushMicrotasks();
+
+        final beforeCompletion = notifications;
+
+        server.completeAll(result: true);
+        async.flushMicrotasks();
+
+        // assert
+        expect(notifications, greaterThan(beforeCompletion));
+
+        composed
+          ..removeListener(onComposedChanged)
+          ..dispose();
+      });
+    });
+
+    test('validateAsync awaits own inputs and contained models', () {
+      FakeAsync().run((async) {
+        // arrange
+        final server = _Server();
+        final child = _Model(server);
+        final composed = _TeamComposed(server, initialModels: [child]);
+        bool? result;
+
+        // act
+        composed.updateInput(composed.teamName, 'renamed');
+        child.updateInput(child.username, 'pending');
+        async.flushMicrotasks();
+
+        expect(server.pending, hasLength(2), reason: 'one request per level');
+
+        unawaited(composed.validateAsync().then((r) => result = r));
+        async.flushMicrotasks();
+
+        expect(result, isNull, reason: 'still waiting for both levels');
+
+        server.completeAll(result: true);
+        async.flushMicrotasks();
+
+        // assert
+        expect(result, isTrue);
+        expect(composed.isValidating, isFalse);
+
+        composed.dispose();
+      });
+    });
+
+    test('an async completion does not break an open groupEdit batch', () {
+      FakeAsync().run((async) {
+        // arrange
+        final server = _Server();
+        final child = _Model(server);
+        final composed = _TeamComposed(server, initialModels: [child]);
+        var notifications = 0;
+
+        void onComposedChanged() => notifications++;
+
+        composed.addListener(onComposedChanged);
+
+        // act
+        final teamName = composed.teamName;
+
+        composed.groupEdit(() {
+          composed.updateInput(teamName, 'renamed');
+          child.updateInput(child.username, 'pending');
+        });
+
+        // assert
+        expect(notifications, equals(1), reason: 'the batch notifies once, microtasks can not interleave with it');
+
+        async.flushMicrotasks();
+        server.completeAll(result: true);
+        async.flushMicrotasks();
+
+        expect(notifications, greaterThan(1), reason: 'completions notify after the batch closed');
+        expect(composed.isValid, isTrue);
+
+        composed
+          ..removeListener(onComposedChanged)
+          ..dispose();
+      });
+    });
+
+    test('disposing the composed model while an own request is in flight is safe', () {
+      FakeAsync().run((async) {
+        // arrange
+        final server = _Server();
+        final composed = _TeamComposed(server, initialModels: [_Model(server)]);
+        final ownInput = composed.teamName;
+
+        // act
+        composed.updateInput(ownInput, 'renamed');
+        async.flushMicrotasks();
+        composed.dispose();
+        server.completeAll(result: false);
+        async.flushMicrotasks();
+
+        // assert
+        expect(ownInput.isDisposed, isTrue);
+        expect(ownInput.isValidating, isFalse);
+      });
     });
   });
 }
