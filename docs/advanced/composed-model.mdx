@@ -41,6 +41,102 @@ composedModel.addModel(model, shouldNotify: false);
 
 The newly attached model is fully registered — its own changes are propagated as usual, only the notification about the attachment itself is skipped. `removeModel()` accepts the same parameter.
 
+**Composed model's own inputs**
+
+A composed model can have inputs of its own, standing next to the models it contains — a team's name next to the forms of its members. Declare them exactly as on a `GladeModel`: create the inputs in `initialize()` and list them in `inputs`.
+
+```dart
+/// One member of the team. An ordinary GladeModel - it owns its own inputs and knows nothing
+/// about the team it belongs to.
+class MemberModel extends GladeModel {
+  late GladeStringInput firstName;
+  late GladeStringInput lastName;
+
+  @override
+  List<GladeInput<Object?>> get inputs => [firstName, lastName];
+
+  @override
+  void initialize() {
+    firstName = GladeStringInput(initialValue: '', inputKey: 'firstName');
+    lastName = GladeStringInput(initialValue: '', inputKey: 'lastName');
+
+    super.initialize();
+  }
+}
+
+/// The team. `teamName` is the composed model's OWN input - it belongs to the team itself,
+/// not to any member. The members are contained models, aggregated as whole models.
+class TeamModel extends GladeComposedModel<MemberModel> {
+  late GladeStringInput teamName;
+
+  @override
+  List<GladeInput<Object?>> get inputs => [teamName];
+
+  TeamModel([super.initialModels]);
+
+  @override
+  void initialize() {
+    teamName = GladeStringInput(initialValue: '', inputKey: 'teamName');
+
+    super.initialize();
+  }
+}
+
+final team = TeamModel([MemberModel(), MemberModel()]);
+
+team.inputs;        // [teamName]                 - the team's own inputs only
+team.models;        // [MemberModel, MemberModel] - the contained models
+team.models.first.inputs; // [firstName, lastName] - each member keeps its own
+```
+
+Own inputs are aggregated *together with* the contained models, so `isValid`, `isValidWithoutWarnings`, `isPure`, `isUnchanged` and `validatorResults` describe the whole form:
+
+```dart
+team.isValid;                  // false - teamName is empty and so are the members
+team.teamName.value = 'A-team';
+team.isValid;                  // still false - the members are not filled in
+team.models.first.isValid;     // false - and this one says why
+
+team.validatorResults.length;  // 5 - teamName + 2 inputs per member
+```
+
+`resetToInitialValue()` and `setInputValuesAsNewInitialValues()` reach the own inputs and every contained model as well, in a single batch — listeners are notified once, never with a half-reset form.
+
+Unlike on a `GladeModel`, overriding `initialize()` is optional — a composed model without own inputs does not need it. Beware that a composed model which already declares a method named `initialize()` for its own purposes now overrides this hook, and it is invoked from the constructor.
+
+`initialize()` runs *before* the models passed into the constructor are attached, so `models` is still empty there.
+
+An input belongs to exactly one model. List only the composed model's own inputs in its `inputs` — inputs of a contained model are already aggregated through that model, and listing them on both levels would silently re-parent them. It is asserted against.
+
+**What own inputs do not do**
+
+Composed-level inputs and inputs of contained models do not observe each other. Neither direction of a cross-level dependency is notified:
+
+```dart
+// in a contained model - onDependencyChange is NEVER called
+address = GladeStringInput(
+  dependencies: () => [teamModel.sameAddressForAll],
+  onDependencyChange: (keys) => ...,
+);
+
+// on the composed model - the same, in the other direction
+teamName = GladeStringInput(
+  dependencies: () => [someMember.firstName],
+  onDependencyChange: (keys) => ...,
+);
+```
+
+Dependencies are resolved within a single model, so declare them between inputs of the same model. Own inputs of a composed model do see each other.
+
+`lastUpdates` (and `lastUpdatedInputKeys`) follows the same rule: on a composed model it reports the composed model's **own** inputs which caused the notification, and is empty when the notification came from somewhere else — a contained model changed, or a model was attached or detached. To learn which input of a contained model changed, listen to that model:
+
+```dart
+GladeFormListener<MemberModel>(
+  listener: (context, model, updatedKeys) => print(updatedKeys),
+  child: ...,
+)
+```
+
 **Rendering multiple identical forms**
 
 Since all form models within a composed model share the same type, it's often helpful to automatically generate the same form widget for each model. This is where `GladeComposedListBuilder` comes in. It iterates through all models and builds the appropriate form widget for each one.

@@ -151,11 +151,14 @@ class _ModelCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    if (modelsCount > 0)
+                    if (modelsCount > 0 || model.inputs.isNotEmpty)
                       Padding(
                         padding: const .only(top: 4),
                         child: Text(
-                          '$modelsCount models',
+                          [
+                            if (modelsCount > 0) '$modelsCount models',
+                            if (model.inputs.isNotEmpty) '${model.inputs.length} inputs',
+                          ].join(', '),
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),

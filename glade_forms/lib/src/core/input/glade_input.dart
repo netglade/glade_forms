@@ -7,7 +7,7 @@ import 'package:glade_forms/src/core/input/async_validation_runner.dart';
 import 'package:glade_forms/src/core/input_dependencies.dart';
 import 'package:glade_forms/src/core/string_to_type_converter.dart';
 import 'package:glade_forms/src/model/async_validation_mode.dart';
-import 'package:glade_forms/src/model/glade_model.dart';
+import 'package:glade_forms/src/model/glade_inputs_owner.dart';
 import 'package:glade_forms/src/utils/type_helper.dart';
 import 'package:glade_forms/src/utils/value_equality.dart';
 import 'package:glade_forms/src/validator/validator.dart';
@@ -89,11 +89,15 @@ class GladeInput<T> {
   /// Input is in invalid state when there was conversion error.
   ConvertError<T>? __conversionError;
 
-  GladeModel? _bindedModel;
+  GladeInputsOwner? _bindedModel;
 
   AsyncValidationRunner<T>? _asyncRunner;
 
   InputDependencies get dependencies => dependenciesFactory();
+
+  /// Model which owns this input, or null when the input was not binded to any model yet.
+  @internal
+  GladeInputsOwner? get bindedModel => _bindedModel;
 
   /// Initial value of input.
   T? get initialValue => _initialValue;
@@ -364,8 +368,22 @@ class GladeInput<T> {
   );
 
   @internal
-  // ignore: use_setters_to_change_properties, as method.
-  void bindToModel(GladeModel model) => _bindedModel = model;
+  void bindToModel(GladeInputsOwner model) {
+    assert(
+      !_isDisposed,
+      "Input '$inputKey' was disposed and can not be binded to ${model.runtimeType}. Create a new input instead - a disposed input no longer has a usable TextEditingController.",
+    );
+
+    assert(
+      _bindedModel == null || _bindedModel == model || (_bindedModel?.isDisposed ?? false),
+      '''
+Input '$inputKey' is already owned by ${_bindedModel.runtimeType} and can not be binded to ${model.runtimeType}.
+An input belongs to exactly one model - list it in `inputs`/`allInputs` of that model only.
+A GladeComposedModel lists its own inputs, never inputs of its contained models.''',
+    );
+
+    _bindedModel = model;
+  }
 
   // *
   // * Public methods
@@ -735,7 +753,7 @@ class GladeInput<T> {
   void _onAsyncValidationStateChanged() {
     if (_isDisposed) return;
 
-    _bindedModel?.notifyInputValidationUpdated(this);
+    _bindedModel?.notifyInputValidationUpdated();
   }
 
   bool _applyAsyncMode(ValidatorResult<T> result, bool isValidByKnownResults) {

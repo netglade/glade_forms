@@ -67,6 +67,8 @@ Two flags describe the wait, so an indicator does not flicker on every keystroke
 
 `validatorResult.asyncState` carries the same information as `AsyncValidationState.debouncing`, `.running`, `.done` and `.notRun`.
 
+`isValidating`, `isAsyncValidationRunning` and `validateAsync()` are available on `GladeModel` and on `GladeComposedModel`, which aggregates its own inputs together with the models it contains.
+
 Getters such as `isValid`, `validatorResult` or `validationErrors` never start a request. Only validation requests do.
 That is why the form's `autovalidateMode` decides when the initial value is validated:
 
@@ -163,4 +165,4 @@ Failures produced by the default `onError` use `GladeValidationsKeys.asyncValida
 
 - `resetToInitialValue()` and `setNewInitialValue()` drop the cached results and discard requests in flight. The input is back to "async never ran".
 - `dispose()` discards requests in flight; late responses are ignored.
-- `GladeComposedModel.isValidating` is `true` when any child model is validating, `validateAsync()` awaits all children.
+- `GladeComposedModel.isValidating` is `true` when any of its own inputs or any contained model is validating; `validateAsync()` awaits both.

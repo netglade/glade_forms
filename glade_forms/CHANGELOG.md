@@ -1,4 +1,4 @@
-## 6.2.0
+## Unreleased
 - **[Add]**: Asynchronous validation ([#12](https://github.com/netglade/glade_forms/issues/12)).
   - New validator parts `satisfyAsync()` and `customAsync()` with `runOnlyWhenSyncValid` and `onError` options; `build(asyncDebounce:)` configures debounce (default 300 ms).
   - `GladeInput` gains `isValidating`, `hasAsyncValidation` and `validateAsync({force})`. Validation requests (`validate()`, `textFormFieldInputValidator`, `formFieldValidator`, value changes) trigger async validation; getters only read.
@@ -6,9 +6,43 @@
   - `isValidating` covers the debounce window and the request; `isAsyncValidationRunning` covers only a request in flight, so a loading indicator does not flicker while typing.
   - Only asynchronous results are cached - the synchronous half is recomputed on every read, so a synchronous validator reading a dependency is never masked by a cached result.
   - A failed request is reported but retried by an explicit `validateAsync()`; passive triggers do not retry it. `ValidatorResult` is now exported from the package.
-  - `GladeModel.asyncValidationMode` (`strict` default, `lastKnown`) decides how pending async validation affects `isValid`. Models expose `isValidating`, `isAsyncValidationRunning` and `validateAsync()`.
+  - `asyncValidationMode` (`strict` default, `lastKnown`) decides how pending async validation affects `isValid`. It lives on `GladeInputsOwner`, so `GladeModel` and `GladeComposedModel` both honour it, and both expose `isValidating`, `isAsyncValidationRunning` and `validateAsync()`.
   - `AsyncValidationFailedError` with key `GladeValidationsKeys.asyncValidationFailed` reports exceptions from async validators; `DefaultValidationTranslations.defaultAsyncValidationFailedMessage` provides a fallback message.
   - `GladeFormDebugInfo` and the DevTools extension show async validation state.
+- **[Add]**: `GladeComposedModel` can have inputs of its own, next to the models it contains ([#106](https://github.com/netglade/glade_forms/issues/106)).
+  - Declare them as on `GladeModel` - create the inputs in `initialize()` and list them in `inputs`. Overriding `initialize()` is optional for a composed model.
+  - Own inputs are aggregated **together with** the contained models into `isValid`, `isValidWithoutWarnings`, `isPure`, `isUnchanged` and `validatorResults`. A composed model without own inputs behaves exactly as before.
+  - `resetToInitialValue()` and `setInputValuesAsNewInitialValues()` on a composed model reach its own inputs and every contained model.
+  - Composed-level inputs and inputs of contained models do **not** observe each other - neither direction of a cross-level dependency is notified. See the docs.
+  - **Beware**: `GladeComposedModel` newly inherits these members, so a same-named member in your subclass is now an override: `inputs`, `allInputs`, `initialize`, `bindToModel`, `updateInput`, `stringFieldUpdateInput`, `groupEdit`, `isGroupEditing`, `notifyDependencies`, `resetToInitialValue`, `setInputValuesAsNewInitialValues`, `fillDebugMetadata`, `hasDebugMetadata`, `formattedValidationErrors`, `formattedValidationErrorsAndWarnings`, `debugFormattedValidationErrors`, `defaultValidationTranslate`.
+    - A member whose signature is not a valid override is a compile error, so you will see it. Two shapes are silent and deserve a check:
+    - A method named `initialize()` (including `Future<void> initialize()`, which is a valid override) now overrides the new hook and is invoked from the constructor - rename it, or call `super.initialize()` last.
+    - A getter named `inputs` returning a flattened list of contained models' inputs is now an override of the own-inputs contract, and `addModel()` will assert. List only the composed model's own inputs.
+- **[Add]**: New `GladeInputsOwner` mixin carries the input ownership shared by `GladeModel` and `GladeComposedModel`. Every member remains available on both classes with an unchanged signature; only `GladeInput.bindToModel` (`@internal`) accepts the mixin instead of `GladeModel`.
+  - `GladeFormDebugInfo` and `GladeFormDebugInfoModal.show` are bound to `GladeInputsOwner`, so they accept a composed model as well. `GladeFormDebugInfo` also shows how many models a composed model contains and how many of them are not valid.
+- **[Add]**: DevTools extension displays composed model's own inputs and counts them next to its child models.
+- **[Add]**: Export `ValidatorResult` - it is the element type of the public `validatorResults`, `GladeInput.validatorResult`, `GladeInput.validate()` and `ChangesInfo.validatorResult`, but could not be named by a consumer.
+- **[Fix]**: `lastUpdates` on a composed model no longer re-broadcasts keys of the previous own-input update when a contained model changes or a model is attached or detached - it is empty for those notifications.
+- **[Fix]**: `groupEdit()` no longer leaks keys of an update which preceded the batch, so dependencies of inputs which did not change within the batch are not notified anymore.
+  - A notification raised by a contained model during a composed model's `groupEdit()` is folded into the single notification the batch emits at its end. Previously it broke the batch in two and dropped the accumulated keys.
+  - A nested `groupEdit()` is part of the batch which is already running: it no longer flushes on its own, so one batch notifies exactly once instead of once per nesting level.
+  - Group edit mode is always left and the batch is always flushed, even when the callback throws.
+- **[Fix]**: `updateInput()` and `stringFieldUpdateInput()` no longer announce an update which the input announces itself.
+  - Called within `groupEdit()` they used to overwrite everything the batch had accumulated and notify in the middle of it, so keys were lost and dependencies of the lost inputs were never notified.
+  - Outside a batch they now emit one notification per update instead of two.
+- **[Fix]**: `resetToInitialValue()` and `setInputValuesAsNewInitialValues()` on a composed model are batched, so listeners are notified once instead of once per contained model - and never with a form which is half reset.
+- **[Fix]**: DevTools serializer produced the key `depedencies`, so an input's dependencies were never displayed in the extension.
+- **[Fix]**: DevTools serializer wrote `initialValue` unencoded, so a single input whose value is not a JSON primitive (e.g. `GladeDateTimeInput`) made the whole response fail to encode and **every** model disappeared from the inspector.
+- **[Fix]**: `GladeFormDebugInfoModal.show()` did not pass its type argument to the `GladeFormDebugInfo` it builds, so the widget looked up its own bound instead of the model given to it and always threw `ProviderNotFoundException`.
+- **[Fix]**: `lastUpdates` is no longer cleared by a nested notification raised while the model is delivering its own update - e.g. when an `onDependencyChange` callback updates a contained model.
+- **[Fix]**: DevTools extension failed to parse any model which has at least one input - decoded JSON lists were cast directly to `List<String>`, which throws even for an empty list.
+- **[Fix]**: Own inputs of a composed model are disposed after its contained models are detached and after it detaches from its parent composed models, because both notify synchronously and their listeners may still read those inputs. The disposal can no longer be skipped by a throw.
+  - A contained model which throws while being disposed no longer stops the disposal of the remaining models - every model is disposed and the collection is cleared, then the first failure is rethrown.
+- **[Fix]**: A model rejected by `addModel()` (it shares an input with the composed model) is detached again before the assert fails, so it is never left half attached and driving the composed model.
+- **[Add]**: `GladeModelBase.isDisposed` tells whether the model was already disposed.
+- Asserts were added for input ownership: an input can be binded to one model only, an input can not be updated through a model which does not own it, and a composed model can not share an input with a contained model.
+  - An input which outlived its model - one the model never listed, so it was not disposed with it - can be binded to a new model once the previous owner is disposed.
+  - A **disposed** input can not be binded at all: its `TextEditingController` is gone, so the new model would get a dead input.
 
 ## 6.1.0
 - **[Add]**: `GladeComposedModel.addModel()` and `removeModel()` accept `shouldNotify` parameter ([#104](https://github.com/netglade/glade_forms/issues/104)).

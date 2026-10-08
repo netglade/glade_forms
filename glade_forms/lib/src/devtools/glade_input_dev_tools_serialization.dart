@@ -9,11 +9,11 @@ extension GladeInputDevToolsSerialization<T> on GladeInput<T> {
 
     return {
       'asyncState': validatorResult.asyncState.name,
-      'depedencies': dependencies.map((d) => d.inputKey).toList(),
+      'dependencies': dependencies.map((d) => d.inputKey).toList(),
       'errors': validationErrors.map((e) => e.toString()).toList(),
       'hasAsyncValidation': hasAsyncValidation,
       'hasConversionError': hasConversionError,
-      'initialValue': initialValue,
+      'initialValue': _encodeValue(initialValue),
       'isAsyncValidationRunning': isAsyncValidationRunning,
       'isPure': isPure,
       'isUnchanged': isUnchanged,
@@ -29,7 +29,7 @@ extension GladeInputDevToolsSerialization<T> on GladeInput<T> {
   }
 
   /// Encode value for JSON - keep primitives as-is, convert complex objects to strings.
-  // ignore: no-object-declaration, keep object, avoid-unnecessary-nullable-parameters
+  // ignore: no-object-declaration, keep object
   Object? _encodeValue(T? val) {
     if (val == null) return null;
 

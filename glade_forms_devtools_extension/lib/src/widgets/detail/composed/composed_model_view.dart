@@ -3,6 +3,7 @@ import 'package:glade_forms_devtools_extension/src/constants.dart';
 import 'package:glade_forms_devtools_extension/src/models/glade_model_description.dart';
 import 'package:glade_forms_devtools_extension/src/widgets/detail/composed/composed_child_model_card.dart';
 import 'package:glade_forms_devtools_extension/src/widgets/detail/composed/composed_model_state_card.dart';
+import 'package:glade_forms_devtools_extension/src/widgets/detail/glade_input_card.dart';
 
 /// Widget to display a composed model with its child models.
 class ComposedModelView extends StatelessWidget {
@@ -58,6 +59,25 @@ class ComposedModelView extends StatelessWidget {
           // Composed Model state card
           ComposedModelStateCard(model: model),
           const SizedBox(height: 16),
+
+          // Composed model's own inputs section
+          if (model.inputs.isNotEmpty) ...[
+            Row(
+              spacing: Constants.spacing8,
+              children: [
+                const Icon(Icons.input, size: 20),
+                Text(
+                  'Own Inputs (${model.inputs.length})',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: .bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            for (final input in model.inputs) GladeInputCard(input: input),
+            const SizedBox(height: 16),
+          ],
 
           // Child Models section
           Row(

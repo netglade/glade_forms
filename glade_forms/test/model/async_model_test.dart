@@ -111,7 +111,7 @@ void main() {
 
         expect(model.isValidating, isFalse);
         expect(model.isValid, isTrue, reason: 'async finished valid');
-        expect(notifications, equals(3), reason: 'notifyInputUpdated + updateInput notifyListeners + async completion');
+        expect(notifications, equals(2), reason: 'the value update plus the async completion');
         expect(model.dependencyCalls, equals(1), reason: 'only the value change notifies dependencies');
       });
     });

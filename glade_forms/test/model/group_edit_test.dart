@@ -54,6 +54,12 @@ class _ModeWithDependencies extends GladeModel {
   }
 }
 
+class _Counter {
+  int count = 0;
+
+  void increment() => count++;
+}
+
 void main() {
   setUp(GladeForms.initialize);
 
@@ -218,6 +224,53 @@ void main() {
       expect(model.bUpdated, equals(1), reason: '[b] only once updated');
       expect(model.cUpdated, equals(0), reason: '[c] never updated');
       expect(model.onDepenencyCalledCount, equals(1), reason: 'groupEdit update');
+    });
+  });
+
+  group('updateInput', () {
+    test('When called within groupEdit it does not break the batch', () {
+      // arrange
+      final counter = _Counter();
+      final model = _ModeWithDependencies()..addListener(counter.increment);
+
+      // act
+      model.groupEdit(() {
+        model.a.value = 1;
+        model.updateInput(model.b, 2);
+      });
+
+      // assert
+      expect(counter.count, equals(1), reason: 'the batch notifies once');
+      expect(model.lastUpdatedInputKeys, equals(['a', 'b']), reason: 'neither key is lost nor duplicated');
+      expect(model.aUpdated, equals(1), reason: '[c] depends on [a], which changed within the batch');
+      expect(model.bUpdated, equals(1));
+    });
+
+    test('When called outside groupEdit it notifies once', () {
+      // arrange
+      final counter = _Counter();
+      final model = _Model()..addListener(counter.increment);
+
+      // act
+      model.updateInput(model.b, 5);
+
+      // assert
+      expect(counter.count, equals(1));
+      expect(model.lastUpdatedInputKeys, equals(['b']));
+    });
+
+    test('When the input is not binded to the model it is still announced', () {
+      // arrange
+      final counter = _Counter();
+      final model = _Model()..addListener(counter.increment);
+      final input = GladeIntInput(value: 0, inputKey: 'loose');
+
+      // act
+      model.updateInput(input, 7);
+
+      // assert
+      expect(counter.count, equals(1));
+      expect(model.lastUpdatedInputKeys, equals(['loose']));
     });
   });
 }
