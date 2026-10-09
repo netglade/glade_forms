@@ -142,3 +142,36 @@ GladeFormListener<MemberModel>(
 Since all form models within a composed model share the same type, it's often helpful to automatically generate the same form widget for each model. This is where `GladeComposedListBuilder` comes in. It iterates through all models and builds the appropriate form widget for each one.
 
 ![composed-example](/assets/composed-model.gif)
+
+## Async validation
+
+A composed model's own inputs support [async validation](/async-validation) exactly as a `GladeModel`'s inputs do, and the composed model aggregates both levels:
+
+- `isValidating` and `isAsyncValidationRunning` are `true` when any own input **or** any contained model is validating.
+- `validateAsync()` awaits own inputs and all contained models, then returns `isValid`.
+- `isValid` turns `false` while an own input is pending, under the default `strict` mode, even when every contained model is valid.
+
+`asyncValidationMode` is per owner, not inherited. Own inputs follow the mode declared on the composed model; each contained model keeps its own:
+
+```dart
+class TeamModel extends GladeComposedModel<MemberModel> {
+  late GladeStringInput teamName;
+
+  // Own inputs use lastKnown; contained MemberModels keep their own mode.
+  @override
+  AsyncValidationMode get asyncValidationMode => AsyncValidationMode.lastKnown;
+
+  @override
+  List<GladeInput<Object?>> get inputs => [teamName];
+
+  @override
+  void initialize() {
+    teamName = GladeStringInput(
+      inputKey: 'team-name',
+      validator: (v) => (v..satisfyAsync(api.isTeamNameAvailable)).build(),
+    );
+
+    super.initialize();
+  }
+}
+```

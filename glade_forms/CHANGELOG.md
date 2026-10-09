@@ -1,4 +1,23 @@
 ## Unreleased
+- **[Add]**: Asynchronous validation ([#12](https://github.com/netglade/glade_forms/issues/12)).
+  - New validator parts `satisfyAsync()` and `customAsync()` with `runOnlyWhenSyncValid` and `onError` options; `build(asyncDebounce:)` configures debounce (default 300 ms).
+  - `GladeInput` gains `isValidating`, `hasAsyncValidation` and `validateAsync({force})`. Validation requests (`validate()`, `textFormFieldInputValidator`, `formFieldValidator`, value changes) trigger async validation; getters only read.
+  - `ValidatorResult` gains `asyncState` (`notRun`, `debouncing`, `running`, `done`), `asyncValidatedValue`, `isValidating` and `isAsyncValidationRunning`.
+  - `isValidating` covers the debounce window and the request; `isAsyncValidationRunning` covers only a request in flight, so a loading indicator does not flicker while typing.
+  - Only asynchronous results are cached - the synchronous half is recomputed on every read, so a synchronous validator reading a dependency is never masked by a cached result.
+  - A failed request is reported but retried by an explicit `validateAsync()`; passive triggers do not retry it. `ValidatorResult` is now exported from the package.
+  - `asyncValidationMode` (`strict` default, `lastKnown`) decides how pending async validation affects `isValid`. It lives on `GladeInputsOwner`, so `GladeModel` and `GladeComposedModel` both honour it, and both expose `isValidating`, `isAsyncValidationRunning` and `validateAsync()`.
+  - `AsyncValidationFailedError` with key `GladeValidationsKeys.asyncValidationFailed` reports exceptions from async validators; `DefaultValidationTranslations.defaultAsyncValidationFailedMessage` provides a fallback message.
+  - `GladeComposedModel` supports async validation on its own inputs and aggregates both levels: `isValidating`, `isAsyncValidationRunning` and `validateAsync()` cover own inputs together with the contained models. `asyncValidationMode` is per owner - own inputs follow the composed model, contained models keep their own.
+  - A cached result never reports `done` while a retry is in flight, and it carries the value its asynchronous parts actually ran against.
+  - The form field validators respect `valueTransform` - without it a transformed value never matched the field's text and async validation was never triggered from a form field.
+  - An asynchronous state change clears `lastUpdates`, so a listener reading `lastUpdatedInputKeys` does not see the last edit replayed once per state change.
+  - `validateAsync()` on a model lets every input settle instead of failing fast on the first throwing validator.
+  - A cached asynchronous result is tied to the set of parts which produced it, so a result produced while synchronous validation was failing is not reused once it passes.
+  - Cached results are dropped on a structural value change. Where a text field is the source of the value, the text decides instead, so a cursor move does not restart validation and the field's own text counts as the current value.
+  - `GladeModelBase` gained `isValidating`, `isAsyncValidationRunning` and `validateAsync()`, all with defaults, so extending it directly keeps compiling.
+  - `ValidatorInstance.hasDeclaredValidator()` keeps reporting synchronous parts only; asynchronous ones are reported by the new `hasDeclaredAsyncValidator()`.
+  - `GladeFormDebugInfo` and the DevTools extension show async validation state.
 - **[Add]**: `GladeComposedModel` can have inputs of its own, next to the models it contains ([#106](https://github.com/netglade/glade_forms/issues/106)).
   - Declare them as on `GladeModel` - create the inputs in `initialize()` and list them in `inputs`. Overriding `initialize()` is optional for a composed model.
   - Own inputs are aggregated **together with** the contained models into `isValid`, `isValidWithoutWarnings`, `isPure`, `isUnchanged` and `validatorResults`. A composed model without own inputs behaves exactly as before.

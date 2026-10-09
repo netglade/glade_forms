@@ -23,8 +23,12 @@ class DefaultValidationTranslations {
   final String? defaultValueIsNullOrEmptyMessage;
   final String? defaultConversionMessage;
 
+  /// Used when an async validator threw and produced `AsyncValidationFailedError`.
+  final String? defaultAsyncValidationFailedMessage;
+
   const DefaultValidationTranslations({
     this.defaultValueIsNullOrEmptyMessage,
     this.defaultConversionMessage,
+    this.defaultAsyncValidationFailedMessage,
   });
 }
