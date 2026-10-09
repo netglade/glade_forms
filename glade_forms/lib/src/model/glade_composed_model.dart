@@ -207,15 +207,6 @@ Inputs of a contained model are aggregated through that model itself.''');
   /// Called from an assert, so it runs in debug mode only. The model is already in [models] so that
   /// a flattened `inputs` getter is caught too, and a rejected model is detached again before the
   /// assert fails - it must never be left half attached.
-  /// Awaits asynchronous validation of [model] and never propagates its failure - see [validateInputSettling].
-  Future<void> _validateModelSettling(M model) async {
-    try {
-      final _ = await model.validateAsync();
-    } on Object {
-      // Intentionally swallowed - one failing model must not stop the others from settling.
-    }
-  }
-
   bool _acceptsAddedModel(M model) {
     if (model is GladeInputsOwner && model.allInputs.any(allInputs.contains)) {
       final _ = _models.remove(model);
@@ -234,6 +225,15 @@ Inputs of a contained model are aggregated through that model itself.''');
   ///
   /// During [groupEdit] the notification is skipped - it is folded into the single notification
   /// which `groupEdit` emits at the end of the batch.
+  /// Awaits asynchronous validation of [model] and never propagates its failure - see [validateInputSettling].
+  Future<void> _validateModelSettling(M model) async {
+    try {
+      final _ = await model.validateAsync();
+    } on Object {
+      // Intentionally swallowed - one failing model must not stop the others from settling.
+    }
+  }
+
   void _onModelsChanged() {
     if (isGroupEditing) return;
 

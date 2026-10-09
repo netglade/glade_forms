@@ -125,8 +125,9 @@ void main() {
       expect(validator.parts, hasLength(1));
       expect(validator.asyncParts, hasLength(2));
       expect(instance.hasAsyncParts, isTrue);
-      expect(instance.hasDeclaredValidator('custom'), isTrue);
-      expect(instance.hasDeclaredValidator('satisfy'), isTrue);
+      expect(instance.hasDeclaredAsyncValidator('custom'), isTrue);
+      expect(instance.hasDeclaredAsyncValidator('satisfy'), isTrue);
+      expect(instance.hasDeclaredValidator('custom'), isFalse, reason: 'async keys stay out of the sync lookup');
       expect(instance.tryFindAsyncValidatorPart('satisfy'), isA<SatisfyAsyncPredicatePart<String>>());
       expect(instance.tryFindAsyncValidatorPart('missing'), isNull);
       expect(() => instance.findAsyncValidatorPart('missing'), throwsArgumentError);

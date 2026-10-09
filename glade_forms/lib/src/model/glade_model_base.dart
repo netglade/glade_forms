@@ -25,12 +25,16 @@ abstract class GladeModelBase extends ChangeNotifier {
   bool get isUnchanged;
 
   /// True when any input's asynchronous validation waits for the debounce or is running.
-  bool get isValidating;
+  ///
+  /// `false` unless the model owns inputs - see `GladeInputsOwner`.
+  bool get isValidating => false;
 
   /// True when any input has an asynchronous validation request in flight.
   ///
   /// Unlike [isValidating] this is `false` while only the debounce is running.
-  bool get isAsyncValidationRunning;
+  ///
+  /// `false` unless the model owns inputs - see `GladeInputsOwner`.
+  bool get isAsyncValidationRunning => false;
 
   List<ValidatorResult<Object?>> get validatorResults;
 
@@ -42,8 +46,9 @@ abstract class GladeModelBase extends ChangeNotifier {
 
   /// Runs asynchronous validation of all inputs immediately, awaits it and returns [isValid].
   ///
-  /// Use it before submitting when [AsyncValidationMode.lastKnown] is used, or to validate initial values.
-  Future<bool> validateAsync();
+  /// Use it before submitting, or to validate initial values. A model without inputs has nothing to run
+  /// and reports [isValid] right away - see `GladeInputsOwner`.
+  Future<bool> validateAsync() => .value(isValid);
 
   /// Binds current model to compose model.
   void bindToComposedModel(GladeComposedModel model) {

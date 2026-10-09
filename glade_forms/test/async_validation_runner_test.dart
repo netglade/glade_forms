@@ -14,6 +14,12 @@ typedef AsyncPredicate = Future<bool> Function(String value);
 void main() {
   setUp(GladeForms.initialize);
 
+  void schedule(AsyncValidationRunner<String> runner, String value) =>
+      runner.schedule(value, runner.validatorInstance.validate(value));
+
+  Future<ValidatorResult<String>> runNow(AsyncValidationRunner<String> runner, String value) =>
+      runner.runNow(value, runner.validatorInstance.validate(value));
+
   ValidatorInstance<String> instanceWith(
     AsyncPredicate predicate, {
     Duration debounce = const Duration(milliseconds: 300),
@@ -36,7 +42,7 @@ void main() {
       );
 
       // act
-      runner.schedule('taken');
+      schedule(runner, 'taken');
       async.flushMicrotasks();
 
       // assert
@@ -70,7 +76,7 @@ void main() {
       );
 
       // act
-      runner.schedule('a');
+      schedule(runner, 'a');
 
       // assert
       expect(runner.isValidating, isTrue);
@@ -92,7 +98,7 @@ void main() {
       );
 
       // act
-      runner.schedule('a');
+      schedule(runner, 'a');
       runner.markStateNotified();
       async.flushMicrotasks();
 
@@ -115,11 +121,11 @@ void main() {
       );
 
       // act
-      runner.schedule('a');
-      runner.schedule('a');
+      schedule(runner, 'a');
+      schedule(runner, 'a');
       async.elapse(const Duration(milliseconds: 300));
       async.flushMicrotasks();
-      runner.schedule('a');
+      schedule(runner, 'a');
       async.elapse(const Duration(milliseconds: 300));
       async.flushMicrotasks();
 
@@ -145,7 +151,7 @@ void main() {
       );
 
       // act
-      runner.schedule('a');
+      schedule(runner, 'a');
 
       // assert
       expect(runner.state, equals(AsyncValidationState.running));
@@ -172,7 +178,7 @@ void main() {
       );
 
       // act
-      runner.schedule('a');
+      schedule(runner, 'a');
       async.elapse(const Duration(milliseconds: 200));
       runner.onValueChanged();
       async.elapse(const Duration(milliseconds: 300));
@@ -204,10 +210,10 @@ void main() {
       );
 
       // act
-      runner.schedule('first');
+      schedule(runner, 'first');
       async.flushMicrotasks();
       runner.onValueChanged();
-      runner.schedule('second');
+      schedule(runner, 'second');
       async.flushMicrotasks();
 
       completers.elementAtOrNull(0)?.complete(false);
@@ -242,15 +248,15 @@ void main() {
       ValidatorResult<String>? second;
 
       Future<void> runFirst() async {
-        first = await runner.runNow('a');
+        first = await runNow(runner, 'a');
       }
 
       Future<void> runSecond() async {
-        second = await runner.runNow('a');
+        second = await runNow(runner, 'a');
       }
 
       // act
-      runner.schedule('a');
+      schedule(runner, 'a');
       unawaited(runFirst());
       unawaited(runSecond());
       async.flushMicrotasks();
@@ -284,14 +290,14 @@ void main() {
       );
       ValidatorResult<String>? result;
 
-      Future<void> runNow() async {
-        result = await runner.runNow('a');
+      Future<void> runExplicitly() async {
+        result = await runNow(runner, 'a');
       }
 
       // act
-      runner.schedule('a');
+      schedule(runner, 'a');
       async.flushMicrotasks();
-      unawaited(runNow());
+      unawaited(runExplicitly());
       async.flushMicrotasks();
 
       // assert
@@ -321,20 +327,20 @@ void main() {
       );
 
       // act
-      runner.schedule('a');
+      schedule(runner, 'a');
       async.flushMicrotasks();
 
       // assert
       expect(runner.cachedResults?.singleOrNull, isA<AsyncValidationFailedError<String>>());
 
-      runner.schedule('a');
+      schedule(runner, 'a');
       async.flushMicrotasks();
 
       expect(calls, equals(1), reason: 'a rebuild must not hammer a failing server');
 
       shouldFail = false;
       expect(shouldFail, isFalse, reason: 'the retried request must observe the server recovering');
-      runner.runNow('a');
+      runNow(runner, 'a');
       async.flushMicrotasks();
 
       expect(calls, equals(2), reason: 'an explicit run retries');
@@ -345,9 +351,20 @@ void main() {
   test('throwing synchronous validation does not leave the runner validating', () {
     FakeAsync().run((async) {
       // arrange
+      var syncCalls = 0;
       final instance =
           (GladeValidator<String>()
-                ..satisfy((value) => throw StateError('dependency missing'), key: 'sync')
+                ..satisfy(
+                  (value) {
+                    syncCalls++;
+
+                    // The caller computes the sync result first; the run itself recomputes it after the debounce.
+                    if (syncCalls > 1) throw StateError('dependency missing');
+
+                    return true;
+                  },
+                  key: 'sync',
+                )
                 ..satisfyAsync((value) async => true))
               .build(asyncDebounce: .zero);
       final runner = AsyncValidationRunner(
@@ -358,7 +375,7 @@ void main() {
 
       Future<void> runAndCatch() async {
         try {
-          final _ = await runner.runNow('a');
+          final _ = await runNow(runner, 'a');
         } on Object catch (e) {
           caughtError = e;
         }
@@ -379,9 +396,20 @@ void main() {
   test('scheduled run swallows the error instead of leaving it unhandled', () {
     FakeAsync().run((async) {
       // arrange
+      var syncCalls = 0;
       final instance =
           (GladeValidator<String>()
-                ..satisfy((value) => throw StateError('boom'), key: 'sync')
+                ..satisfy(
+                  (value) {
+                    syncCalls++;
+
+                    // The caller computes the sync result first; the run itself recomputes it after the debounce.
+                    if (syncCalls > 1) throw StateError('boom');
+
+                    return true;
+                  },
+                  key: 'sync',
+                )
                 ..satisfyAsync((value) async => true))
               .build(asyncDebounce: .zero);
       final runner = AsyncValidationRunner(
@@ -390,7 +418,7 @@ void main() {
       );
 
       // act
-      runner.schedule('a');
+      schedule(runner, 'a');
       async.flushMicrotasks();
 
       // assert
@@ -409,7 +437,7 @@ void main() {
       ValidatorResult<String>? result;
 
       Future<void> runOld() async {
-        result = await runner.runNow('old');
+        result = await runNow(runner, 'old');
       }
 
       // act

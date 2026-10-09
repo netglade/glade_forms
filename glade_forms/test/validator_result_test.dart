@@ -56,7 +56,8 @@ void main() {
     expect(error.key, equals(GladeValidationsKeys.asyncValidationFailed));
     expect(error.partKey, equals('username'));
     expect(error.error, same(exception));
-    expect(error.devValidationMessage, contains('boom'));
+    expect(error.devValidationMessage, equals('Async validation failed.'), reason: 'the exception text must not reach the UI');
+    expect(error.error.toString(), contains('boom'));
     expect(error.isAsyncValidationFailedError, isTrue);
     expect(error.severity, equals(ValidationSeverity.error));
   });

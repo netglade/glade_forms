@@ -143,6 +143,10 @@ Did you forget to override initialize() and create the model's inputs there?''',
   /// reading `lastUpdatedInputKeys` must not see the previous edit replayed once per async state change.
   @internal
   void notifyInputValidationUpdated() {
+    // An input which is not listed in `allInputs` is not disposed with the model, so its late response
+    // can reach a model which is already gone.
+    if (isDisposed) return;
+
     lastUpdates = [];
 
     notifyListeners();

@@ -99,11 +99,9 @@ class ValidatorInstance<T> {
   @internal
   Future<AsyncValidationOutcome<T>> runAsyncParts(T value, ValidatorResult<T> syncResult) async {
     final results = <GladeValidatorResult<T>>[];
-    final syncStopped = _syncStopped(syncResult);
     var hasFailure = false;
 
-    for (final part in _asyncParts) {
-      if (part.runOnlyWhenSyncValid && (syncStopped || syncResult.isNotValid)) continue;
+    for (final part in asyncPartsToRun(syncResult)) {
 
       final partOutcome = await _runAsyncPart(part, value);
 
@@ -120,6 +118,18 @@ class ValidatorInstance<T> {
     }
 
     return AsyncValidationOutcome(results: results, hasFailure: hasFailure);
+  }
+
+  /// Asynchronous parts which [runAsyncParts] would run for [syncResult].
+  ///
+  /// A part gated by `runOnlyWhenSyncValid` is left out when the synchronous half produced an error or
+  /// already stopped validation. The selection depends on the synchronous result, so a cached asynchronous
+  /// result is only reusable while this selection stays the same.
+  @internal
+  List<AsyncInputValidatorPart<T>> asyncPartsToRun(ValidatorResult<T> syncResult) {
+    final runsSyncDependentParts = !_syncStopped(syncResult) && syncResult.isValid;
+
+    return _asyncParts.where((part) => runsSyncDependentParts || !part.runOnlyWhenSyncValid).toList();
   }
 
   /// Merges [syncResult] with already computed [asyncResults].
@@ -159,13 +169,7 @@ class ValidatorInstance<T> {
   }
 
   /// Whether [validateAsync] would run at least one asynchronous part given [syncResult].
-  bool shouldRunAsyncParts(ValidatorResult<T> syncResult) {
-    if (!hasAsyncParts) return false;
-
-    final runsSyncDependentParts = !_syncStopped(syncResult) && syncResult.isValid;
-
-    return _asyncParts.any((part) => runsSyncDependentParts || !part.runOnlyWhenSyncValid);
-  }
+  bool shouldRunAsyncParts(ValidatorResult<T> syncResult) => asyncPartsToRun(syncResult).isNotEmpty;
 
   InputValidatorPart<T>? tryFindValidatorPart(Object key) {
     return _parts.firstWhereOrNull((part) => part.key == key);
@@ -191,9 +195,17 @@ class ValidatorInstance<T> {
     );
   }
 
-  /// Whether a synchronous or asynchronous part with [key] is declared.
+  /// Whether a synchronous part with [key] is declared.
+  ///
+  /// Asynchronous parts are reported by [hasDeclaredAsyncValidator], so that this getter keeps agreeing
+  /// with [findValidatorPart].
   bool hasDeclaredValidator(Object key) {
-    return _parts.any((part) => part.key == key) || _asyncParts.any((part) => part.key == key);
+    return _parts.any((part) => part.key == key);
+  }
+
+  /// Whether an asynchronous part with [key] is declared.
+  bool hasDeclaredAsyncValidator(Object key) {
+    return _asyncParts.any((part) => part.key == key);
   }
 
   bool _syncStopped(ValidatorResult<T> syncResult) =>
@@ -210,13 +222,31 @@ class ValidatorInstance<T> {
       return AsyncValidationOutcome(results: [?result], hasFailure: false);
       // ignore: avoid_catches_without_on_clauses, any exception must be turned into a validation result
     } catch (e, stackTrace) {
-      final onError = part.onError;
-      final result = onError != null
-          ? onError(value, e, stackTrace, part.key)
-          // Severity of an infrastructure failure never follows the part's own severity - see docs.
-          : AsyncValidationFailedError<T>(value: value, error: e, stackTrace: stackTrace, partKey: part.key);
-
-      return AsyncValidationOutcome(results: [?result], hasFailure: true);
+      return AsyncValidationOutcome(results: [?_handleFailure(part, value, e, stackTrace)], hasFailure: true);
     }
+  }
+
+  /// Turns a failure of [part] into a validation result, never into a thrown exception.
+  ///
+  /// A throwing `onError` falls back to the default handling - letting it escape would leave the input
+  /// without a cached result, and every rebuild would start the request again.
+  GladeValidatorResult<T>? _handleFailure(
+    AsyncInputValidatorPart<T> part,
+    T value,
+    Object error,
+    StackTrace stackTrace,
+  ) {
+    final onError = part.onError;
+
+    if (onError != null) {
+      try {
+        return onError(value, error, stackTrace, part.key);
+      } on Object {
+        // Falls through to the default handling below.
+      }
+    }
+
+    // Severity of an infrastructure failure never follows the part's own severity - see docs.
+    return AsyncValidationFailedError<T>(value: value, error: error, stackTrace: stackTrace, partKey: part.key);
   }
 }

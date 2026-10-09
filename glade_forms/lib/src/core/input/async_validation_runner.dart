@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:glade_forms/src/validator/part/async_input_validator_part.dart';
 import 'package:glade_forms/src/validator/validator_instance.dart';
 import 'package:glade_forms/src/validator/validator_result.dart';
 import 'package:glade_forms/src/validator/validator_result/async_validation_state.dart';
@@ -31,6 +32,12 @@ class AsyncValidationRunner<T> {
   /// Value the cached results were produced for. Meaningful only while [_cachedResults] is not null.
   T? _cachedValue;
 
+  /// Asynchronous parts the cached results came from.
+  ///
+  /// Which parts run depends on the synchronous result, so a cache produced while synchronous validation
+  /// was failing must not be reused once it passes - the parts gated by `runOnlyWhenSyncValid` never ran.
+  List<AsyncInputValidatorPart<T>>? _cachedParts;
+
   /// Cached results describe a failed request, so an explicit [runNow] retries instead of reusing them.
   bool _cacheIsRetryable = false;
 
@@ -39,6 +46,9 @@ class AsyncValidationRunner<T> {
   AsyncValidationState _lastNotifiedState = .notRun;
 
   bool _isNotificationScheduled = false;
+
+  /// Validator this runner drives.
+  ValidatorInstance<T> get validatorInstance => _validatorInstance;
 
   /// Current state of asynchronous validation.
   AsyncValidationState get state => _state;
@@ -66,7 +76,7 @@ class AsyncValidationRunner<T> {
   ValidatorResult<T>? combineCachedWith(ValidatorResult<T> syncResult) {
     final cached = _cachedResults;
 
-    if (cached == null) return null;
+    if (cached == null || !_cacheCovers(syncResult)) return null;
 
     final combined = _validatorInstance.combineWithAsyncResults(
       syncResult,
@@ -85,16 +95,17 @@ class AsyncValidationRunner<T> {
     _inFlight = null;
     _cachedResults = null;
     _cachedValue = null;
+    _cachedParts = null;
     _cacheIsRetryable = false;
     _setState(.notRun);
   }
 
   /// Requests validation of [value] after the configured debounce.
   ///
-  /// No-op when results are cached or a validation is already scheduled or running. Cached results of a failed
-  /// request are kept here on purpose - retrying on every rebuild would hammer a failing server.
-  void schedule(T value) {
-    if (_cachedResults != null || _inFlight != null || _debounceTimer != null) return;
+  /// No-op when usable results are cached or a validation is already scheduled or running. Cached results of
+  /// a failed request are kept here on purpose - retrying on every rebuild would hammer a failing server.
+  void schedule(T value, ValidatorResult<T> syncResult) {
+    if (_hasUsableCache(syncResult) || _inFlight != null || _debounceTimer != null) return;
 
     final debounce = _validatorInstance.asyncDebounce;
 
@@ -116,15 +127,15 @@ class AsyncValidationRunner<T> {
   ///
   /// Joins a running validation instead of starting a new one and reuses cached results, unless they come
   /// from a failed request - those are retried.
-  Future<ValidatorResult<T>> runNow(T value) {
+  Future<ValidatorResult<T>> runNow(T value, ValidatorResult<T> syncResult) {
     _debounceTimer?.cancel();
     _debounceTimer = null;
 
     if (_inFlight case final inFlight?) return inFlight.future;
 
-    if (_cachedResults != null && !_cacheIsRetryable) {
+    if (_hasUsableCache(syncResult) && !_cacheIsRetryable) {
       // ignore: avoid-non-null-assertion, the cache was just checked
-      return Future.value(combineCachedWith(_validatorInstance.validate(value))!);
+      return Future.value(combineCachedWith(syncResult)!);
     }
 
     return _run(value);
@@ -154,6 +165,7 @@ class AsyncValidationRunner<T> {
       if (sequence == _sequence) {
         _cachedResults = outcome.results;
         _cachedValue = value;
+        _cachedParts = _validatorInstance.asyncPartsToRun(syncResult);
         _cacheIsRetryable = outcome.hasFailure;
       }
 
@@ -178,6 +190,23 @@ class AsyncValidationRunner<T> {
       // Errors are reported to callers awaiting validateAsync(). A scheduled run has nobody to report to
       // and the input's state was already restored in _execute.
     }
+  }
+
+  /// Cached results exist and came from the same parts the current [syncResult] selects.
+  bool _hasUsableCache(ValidatorResult<T> syncResult) => _cachedResults != null && _cacheCovers(syncResult);
+
+  bool _cacheCovers(ValidatorResult<T> syncResult) {
+    final cachedParts = _cachedParts;
+
+    if (cachedParts == null) return false;
+
+    final cachedIterator = cachedParts.iterator;
+
+    for (final part in _validatorInstance.asyncPartsToRun(syncResult)) {
+      if (!cachedIterator.moveNext() || !identical(part, cachedIterator.current)) return false;
+    }
+
+    return !cachedIterator.moveNext();
   }
 
   void _setState(AsyncValidationState state) {

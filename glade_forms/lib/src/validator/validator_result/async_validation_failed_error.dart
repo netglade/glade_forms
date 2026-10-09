@@ -1,9 +1,12 @@
 import 'package:glade_forms/src/core/error/glade_validations_keys.dart';
 import 'package:glade_forms/src/validator/validator_result/glade_validator_result.dart';
 
-/// Produced when an async validator throws and no custom `onError` handler was provided.
+/// Produced when an async validator throws and no custom `onError` handler produced a result.
 ///
 /// Key is always [GladeValidationsKeys.asyncValidationFailed]; the failing part's own key is in [partKey].
+///
+/// The default message is deliberately generic - it reaches the UI whenever no translation is provided,
+/// and an exception's text can carry internal details. The exception itself stays in [error].
 class AsyncValidationFailedError<T> extends GladeValidatorResult<T> {
   /// Exception thrown by the async validator.
   // ignore: no-object-declaration, error can be any object
@@ -24,6 +27,6 @@ class AsyncValidationFailedError<T> extends GladeValidatorResult<T> {
     super.errorServerity,
   }) : super(
          key: GladeValidationsKeys.asyncValidationFailed,
-         devMessage: devMessage ?? ((_) => 'Async validation failed: $error'),
+         devMessage: devMessage ?? ((_) => 'Async validation failed.'),
        );
 }

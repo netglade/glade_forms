@@ -394,7 +394,7 @@ A GladeComposedModel lists its own inputs, never inputs of its contained models.
   ValidatorResult<T> validate() {
     final syncResult = validatorInstance.validate(value);
 
-    _scheduleAsyncValidation(syncResult: syncResult);
+    _scheduleAsyncValidation(syncResult);
 
     return _validatorResultFor(syncResult);
   }
@@ -409,8 +409,8 @@ A GladeComposedModel lists its own inputs, never inputs of its contained models.
   /// when the value changes while the request is in flight, the input discards the response but awaiting callers
   /// still receive it. Compare [ValidatorResult.asyncValidatedValue] with [value] when that matters.
   ///
-  /// Throws when synchronous validation or an async part's `shouldValidate` throws. Exceptions thrown by the async
-  /// part itself are turned into validation results instead.
+  /// Throws only when synchronous validation throws. Exceptions thrown by an async part or by its
+  /// `shouldValidate` are turned into validation results instead.
   Future<ValidatorResult<T>> validateAsync({bool force = false}) {
     final runner = _asyncRunner;
 
@@ -422,7 +422,7 @@ A GladeComposedModel lists its own inputs, never inputs of its contained models.
 
     if (!validatorInstance.shouldRunAsyncParts(syncResult)) return Future.value(_validatorResultFor(syncResult));
 
-    return runner.runNow(value);
+    return runner.runNow(value, syncResult);
   }
 
   String? translate({String delimiter = '.'}) => _translate(delimiter: delimiter, customError: validatorResult);
@@ -461,10 +461,10 @@ A GladeComposedModel lists its own inputs, never inputs of its contained models.
 
     try {
       final convertedValue = applyValueTransform(converter.convert(value));
-      final isCurrentValue = _valuesEqual(convertedValue, this.value);
+      final isCurrentValue = ValueEquality.equals(convertedValue, this.value);
       final syncResult = validatorInstance.validate(isCurrentValue ? this.value : convertedValue);
 
-      if (isCurrentValue) _scheduleAsyncValidation(syncResult: syncResult);
+      if (isCurrentValue) _scheduleAsyncValidation(syncResult);
 
       final result = isCurrentValue ? _validatorResultFor(syncResult) : syncResult;
 
@@ -497,10 +497,10 @@ A GladeComposedModel lists its own inputs, never inputs of its contained models.
     String delimiter = '.',
   }) {
     final transformedValue = applyValueTransform(value);
-    final isCurrentValue = _valuesEqual(transformedValue, this.value);
+    final isCurrentValue = ValueEquality.equals(transformedValue, this.value);
     final syncResult = validatorInstance.validate(isCurrentValue ? this.value : transformedValue);
 
-    if (isCurrentValue) _scheduleAsyncValidation(syncResult: syncResult);
+    if (isCurrentValue) _scheduleAsyncValidation(syncResult);
 
     final result = isCurrentValue ? _validatorResultFor(syncResult) : syncResult;
 
@@ -710,13 +710,13 @@ A GladeComposedModel lists its own inputs, never inputs of its contained models.
     _isPure = false;
     __conversionError = null;
 
-    if (!_valuesEqual(_previousValue, _value)) _asyncRunner?.onValueChanged();
+    if (!ValueEquality.equals(_previousValue, _value)) _asyncRunner?.onValueChanged();
 
     // The synchronous pass is shared by the async trigger and by ChangesInfo instead of being run twice.
-    if (shouldTriggerOnChange || _asyncRunner != null) {
+    if ((shouldTriggerOnChange && onChange != null) || _asyncRunner != null) {
       final syncResult = validatorInstance.validate(_value);
 
-      _scheduleAsyncValidation(syncResult: syncResult);
+      _scheduleAsyncValidation(syncResult);
 
       // propagate input's changes
       if (shouldTriggerOnChange) {
@@ -736,25 +736,27 @@ A GladeComposedModel lists its own inputs, never inputs of its contained models.
     _asyncRunner?.markStateNotified();
   }
 
-  /// Equality of two values of this input - [valueComparator] when provided, structural equality otherwise.
-  bool _valuesEqual(T? a, T? b) => valueComparator?.call(a, b) ?? ValueEquality.equals(a, b);
-
   ValidatorResult<T> _validatorResultFor(ValidatorResult<T> syncResult) {
     final runner = _asyncRunner;
 
     if (runner == null) return syncResult;
 
+    // Without a usable cache nothing ran for this value and this selection of parts, so the state is
+    // notRun unless a validation is currently scheduled or running.
     return runner.combineCachedWith(syncResult) ??
-        syncResult.copyWith(asyncState: runner.state, clearAsyncValidatedValue: true);
+        syncResult.copyWith(
+          asyncState: runner.isValidating ? runner.state : .notRun,
+          clearAsyncValidatedValue: true,
+        );
   }
 
-  void _scheduleAsyncValidation({ValidatorResult<T>? syncResult}) {
+  void _scheduleAsyncValidation(ValidatorResult<T> syncResult) {
     final runner = _asyncRunner;
 
     if (runner == null || hasConversionError || _isDisposed) return;
-    if (!validatorInstance.shouldRunAsyncParts(syncResult ?? validatorInstance.validate(value))) return;
+    if (!validatorInstance.shouldRunAsyncParts(syncResult)) return;
 
-    runner.schedule(value);
+    runner.schedule(value, syncResult);
   }
 
   void _onAsyncValidationStateChanged() {

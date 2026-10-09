@@ -13,6 +13,9 @@
   - Cache invalidation and the form field validators use the input's `valueComparator` when provided, and respect `valueTransform` - without it a transformed value never matched the field's text and async validation was never triggered from a form field.
   - An asynchronous state change clears `lastUpdates`, so a listener reading `lastUpdatedInputKeys` does not see the last edit replayed once per state change.
   - `validateAsync()` on a model lets every input settle instead of failing fast on the first throwing validator.
+  - A cached asynchronous result is tied to the set of parts which produced it, so a result produced while synchronous validation was failing is not reused once it passes.
+  - `GladeModelBase` gained `isValidating`, `isAsyncValidationRunning` and `validateAsync()`, all with defaults, so extending it directly keeps compiling.
+  - `ValidatorInstance.hasDeclaredValidator()` keeps reporting synchronous parts only; asynchronous ones are reported by the new `hasDeclaredAsyncValidator()`.
   - `GladeFormDebugInfo` and the DevTools extension show async validation state.
 - **[Add]**: `GladeComposedModel` can have inputs of its own, next to the models it contains ([#106](https://github.com/netglade/glade_forms/issues/106)).
   - Declare them as on `GladeModel` - create the inputs in `initialize()` and list them in `inputs`. Overriding `initialize()` is optional for a composed model.

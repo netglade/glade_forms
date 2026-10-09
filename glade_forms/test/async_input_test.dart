@@ -374,7 +374,11 @@ void main() {
       async.flushMicrotasks();
 
       expect(input.validationErrors, isEmpty, reason: 'the response for the pre-reset value is discarded');
-      expect(input.validatorResult.asyncState, equals(AsyncValidationState.running), reason: 'still awaiting the reset value');
+      expect(
+        input.validatorResult.asyncState,
+        equals(AsyncValidationState.running),
+        reason: 'still awaiting the reset value',
+      );
 
       server.pending.lastOrNull?.complete(true);
       async.flushMicrotasks();
@@ -615,7 +619,11 @@ void main() {
 
       // assert
       expect(input.isValidating, isTrue);
-      expect(input.validatorResult.asyncState, equals(AsyncValidationState.running), reason: 'the retry wins over the cache');
+      expect(
+        input.validatorResult.asyncState,
+        equals(AsyncValidationState.running),
+        reason: 'the retry wins over the cache',
+      );
       expect(input.validatorResult.isValidating, isTrue);
       expect(input.isValid, isFalse, reason: 'strict must still block while the retry is in flight');
 
@@ -651,40 +659,86 @@ void main() {
     });
   });
 
-  test('valueComparator decides whether the cached async result survives', () {
+  test('a cache produced while sync was failing is not reused once sync passes', () {
     FakeAsync().run((async) {
       // arrange
-      final server = _Server();
-      final input = GladeStringInput(
+      var gatedCalls = 0;
+      final minLength = GladeIntInput(value: 10, inputKey: 'min-length');
+      final username = GladeStringInput(
         inputKey: 'username',
-        value: 'aa',
+        value: 'short',
         useTextEditingController: false,
-        valueComparator: (a, b) => a?.length == b?.length,
+        isRequired: false,
+        dependencies: () => [minLength],
         validator: (v) =>
-            (v..satisfyAsync(server.isAvailable, key: 'taken', devMessage: (_) => 'Taken')).build(asyncDebounce: .zero),
+            (v
+                  ..satisfy((value) => value.length >= minLength.value, key: 'too-short')
+                  ..customAsync((value, key) async => null, key: 'ungated', runOnlyWhenSyncValid: false)
+                  ..customAsync(
+                    (value, key) async {
+                      gatedCalls++;
+
+                      return ValueError(value: value, key: key, devMessage: (_) => 'Taken');
+                    },
+                    key: 'gated',
+                  ))
+                .build(asyncDebounce: .zero, stopOnFirstError: false),
       );
 
-      input.updateValue('bb');
+      // act
+      username.updateValue('taken');
       async.flushMicrotasks();
 
-      expect(server.calls, equals(1));
+      expect(gatedCalls, isZero, reason: 'sync is failing, the gated part must not run');
+
+      minLength.updateValue(1);
+
+      // assert
+      expect(
+        username.validatorResult.asyncState,
+        equals(AsyncValidationState.notRun),
+        reason: 'the cache no longer covers the parts which now apply',
+      );
+
+      unawaited(username.validateAsync());
+      async.flushMicrotasks();
+
+      expect(gatedCalls, equals(1), reason: 'the gated part runs once sync passes');
+      expect(username.validationErrors.map((e) => e.key), equals(['gated']));
+    });
+  });
+
+  test('a throwing onError falls back instead of restarting the request forever', () {
+    FakeAsync().run((async) {
+      // arrange
+      var calls = 0;
+      final input = GladeStringInput(
+        value: 'a',
+        useTextEditingController: false,
+        validator: (v) =>
+            (v..customAsync(
+                  (value, key) async {
+                    calls++;
+
+                    throw Exception('network down');
+                  },
+                  onError: (value, error, stackTrace, key) => throw StateError('broken handler'),
+                ))
+                .build(asyncDebounce: .zero),
+      );
 
       // act
-      input.updateValue('cc');
+      input.updateValue('b');
       async.flushMicrotasks();
 
       // assert
-      expect(server.calls, equals(1), reason: 'the comparator treats the values as equal, so the cache survives');
-      expect(
-        input.validatorResult.asyncValidatedValue,
-        equals('bb'),
-        reason: 'the result belongs to the value it was produced for, not to the current one',
-      );
+      expect(calls, equals(1));
+      expect(input.validationErrors.singleOrNull?.isAsyncValidationFailedError, isTrue);
 
-      input.updateValue('ddd');
+      final _ = input.validate();
       async.flushMicrotasks();
 
-      expect(server.calls, equals(2), reason: 'a different length is a different value for this comparator');
+      expect(calls, equals(1), reason: 'the failure is cached, a rebuild must not restart the request');
     });
   });
 }
