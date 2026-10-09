@@ -118,7 +118,9 @@ onPressed: () async {
 A response that arrives for a value the user already changed is discarded. Every finished result exposes `validatorResult.asyncValidatedValue`, the value it was produced for.
 A caller already awaiting `input.validateAsync()` still receives that discarded result, so compare `asyncValidatedValue` with `input.value` when you use the returned result directly.
 
-Cached results are dropped whenever the value changes structurally. A value mutated **in place** and assigned back is the same instance, so the change cannot be detected; call `validateAsync(force: true)` after such a mutation.
+Cached results are dropped whenever the value changes structurally. A type without a meaningful `==` is matched through its `stringToValueConverter` instead, so a cursor move does not look like a new value and the field's own text is recognised as the current one. Without a converter such a type counts as changed on every assignment, which means a request per assignment.
+
+A value mutated **in place** and assigned back is the same instance, so the change cannot be detected; call `validateAsync(force: true)` after such a mutation.
 
 They are also dropped when the set of asynchronous parts which apply changes - a result produced while synchronous validation was failing only covers the parts declared with `runOnlyWhenSyncValid: false`, and is not reused once synchronous validation passes.
 

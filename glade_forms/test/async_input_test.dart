@@ -4,8 +4,16 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:fake_async/fake_async.dart';
+import 'package:flutter/widgets.dart';
 import 'package:glade_forms/glade_forms.dart';
 import 'package:test/test.dart';
+
+/// Deliberately without `==`, the case the docs send to `valueComparator`.
+class _Tag {
+  final String name;
+
+  const _Tag(this.name);
+}
 
 class _Server {
   static const Set<String> taken = {'taken'};
@@ -708,9 +716,14 @@ void main() {
     });
   });
 
-  test('a throwing onError falls back instead of restarting the request forever', () {
+  test('a throwing onError is reported and falls back instead of restarting the request forever', () {
     FakeAsync().run((async) {
       // arrange
+      final reported = <FlutterErrorDetails>[];
+      final previousOnError = FlutterError.onError;
+      FlutterError.onError = reported.add;
+      addTearDown(() => FlutterError.onError = previousOnError);
+
       var calls = 0;
       final input = GladeStringInput(
         value: 'a',
@@ -739,6 +752,68 @@ void main() {
       async.flushMicrotasks();
 
       expect(calls, equals(1), reason: 'the failure is cached, a rebuild must not restart the request');
+      expect(reported.singleOrNull?.library, equals('glade_forms'), reason: 'the broken handler is not swallowed');
+    });
+  });
+  group('value without ==', () {
+    GladeInput<_Tag> tagInput(_Server server) => .create(
+      inputKey: 'tag',
+      value: const _Tag('initial'),
+      useTextEditingController: true,
+      stringToValueConverter: StringToTypeConverter(
+        converter: (rawValue, _) => _Tag(rawValue ?? ''),
+        converterBack: (value) => value.name,
+      ),
+      validator: (v) =>
+          (v..satisfyAsync(
+                (value) => server.isAvailable(value.name),
+                key: 'taken',
+                devMessage: (_) => 'Taken',
+              ))
+              .build(asyncDebounce: .zero),
+    );
+
+    test('a controller notification which does not change the text keeps the cached result', () {
+      FakeAsync().run((async) {
+        // arrange
+        final server = _Server();
+        final input = tagInput(server);
+
+        input.updateValue(const _Tag('free'));
+        async.flushMicrotasks();
+
+        expect(server.calls, equals(1));
+
+        // act: a cursor move notifies the controller with unchanged text
+        input.controller?.selection = const TextSelection.collapsed(offset: 1);
+        async.flushMicrotasks();
+
+        // assert
+        expect(server.calls, equals(1), reason: 'the value did not change, so the cache survives');
+        expect(input.validatorResult.asyncState, equals(AsyncValidationState.done));
+
+        input.dispose();
+      });
+    });
+
+    test('the form field validator recognises the field text as the current value', () {
+      FakeAsync().run((async) {
+        // arrange
+        final server = _Server();
+        final input = tagInput(server);
+
+        input.updateValue(const _Tag('taken'));
+        async.flushMicrotasks();
+
+        // act
+        final message = input.textFormFieldInputValidator('taken');
+
+        // assert
+        expect(server.calls, equals(1), reason: 'no extra request, the text is the current value');
+        expect(message, equals('Taken'), reason: 'the cached async result reaches the field');
+
+        input.dispose();
+      });
     });
   });
 }

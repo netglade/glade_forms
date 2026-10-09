@@ -461,7 +461,7 @@ A GladeComposedModel lists its own inputs, never inputs of its contained models.
 
     try {
       final convertedValue = applyValueTransform(converter.convert(value));
-      final isCurrentValue = ValueEquality.equals(convertedValue, this.value);
+      final isCurrentValue = _sameValue(convertedValue, this.value);
       final syncResult = validatorInstance.validate(isCurrentValue ? this.value : convertedValue);
 
       if (isCurrentValue) _scheduleAsyncValidation(syncResult);
@@ -497,7 +497,7 @@ A GladeComposedModel lists its own inputs, never inputs of its contained models.
     String delimiter = '.',
   }) {
     final transformedValue = applyValueTransform(value);
-    final isCurrentValue = ValueEquality.equals(transformedValue, this.value);
+    final isCurrentValue = _sameValue(transformedValue, this.value);
     final syncResult = validatorInstance.validate(isCurrentValue ? this.value : transformedValue);
 
     if (isCurrentValue) _scheduleAsyncValidation(syncResult);
@@ -710,7 +710,7 @@ A GladeComposedModel lists its own inputs, never inputs of its contained models.
     _isPure = false;
     __conversionError = null;
 
-    if (!ValueEquality.equals(_previousValue, _value)) _asyncRunner?.onValueChanged();
+    if (!_sameValue(_previousValue, _value)) _asyncRunner?.onValueChanged();
 
     // The synchronous pass is shared by the async trigger and by ChangesInfo instead of being run twice.
     if ((shouldTriggerOnChange && onChange != null) || _asyncRunner != null) {
@@ -734,6 +734,23 @@ A GladeComposedModel lists its own inputs, never inputs of its contained models.
 
     _bindedModel?.notifyInputUpdated(this);
     _asyncRunner?.markStateNotified();
+  }
+
+  /// Whether [a] and [b] are the same value of this input.
+  ///
+  /// Structural equality first. A type without a meaningful `==` would otherwise report every converted
+  /// instance as a new value - dropping the cached asynchronous result on a mere cursor move and never
+  /// recognising the field's own text as the current value - so such types are matched through their
+  /// [stringToValueConverter]. Without a converter there is nothing left to compare and every assignment
+  /// counts as a change.
+  bool _sameValue(T? a, T? b) {
+    if (ValueEquality.equals(a, b)) return true;
+
+    final converter = stringToValueConverter;
+
+    if (converter == null || a == null || b == null) return false;
+
+    return converter.convertBack(a) == converter.convertBack(b);
   }
 
   ValidatorResult<T> _validatorResultFor(ValidatorResult<T> syncResult) {

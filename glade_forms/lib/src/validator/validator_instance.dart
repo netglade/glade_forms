@@ -1,11 +1,11 @@
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:glade_forms/src/core/core.dart';
 import 'package:glade_forms/src/validator/part/async_input_validator_part.dart';
 import 'package:glade_forms/src/validator/part/input_validator_part.dart';
 import 'package:glade_forms/src/validator/validator_result.dart';
 import 'package:glade_forms/src/validator/validator_result/async_validation_outcome.dart';
 import 'package:glade_forms/src/validator/validator_result/validator_error.dart';
-import 'package:meta/meta.dart';
 
 class ValidatorInstance<T> {
   /// Stops validation on first error.
@@ -127,10 +127,17 @@ class ValidatorInstance<T> {
   /// result is only reusable while this selection stays the same.
   @internal
   List<AsyncInputValidatorPart<T>> asyncPartsToRun(ValidatorResult<T> syncResult) {
-    final runsSyncDependentParts = !_syncStopped(syncResult) && syncResult.isValid;
+    final runsGatedParts = runsSyncDependentParts(syncResult);
 
-    return _asyncParts.where((part) => runsSyncDependentParts || !part.runOnlyWhenSyncValid).toList();
+    return _asyncParts.where((part) => runsGatedParts || !part.runOnlyWhenSyncValid).toList();
   }
+
+  /// Whether parts gated by `runOnlyWhenSyncValid` would run for [syncResult].
+  ///
+  /// Together with the fixed list of declared parts this single flag decides the selection made by
+  /// [asyncPartsToRun], which is what makes a cached asynchronous result reusable or stale.
+  @internal
+  bool runsSyncDependentParts(ValidatorResult<T> syncResult) => !_syncStopped(syncResult) && syncResult.isValid;
 
   /// Merges [syncResult] with already computed [asyncResults].
   ///
@@ -241,8 +248,17 @@ class ValidatorInstance<T> {
     if (onError != null) {
       try {
         return onError(value, error, stackTrace, part.key);
-      } on Object {
-        // Falls through to the default handling below.
+      } on Object catch (e, handlerStackTrace) {
+        // Reported rather than swallowed - otherwise a broken handler silently degrades into the
+        // generic failure message and nobody finds out why.
+        FlutterError.reportError(
+          FlutterErrorDetails(
+            exception: e,
+            stack: handlerStackTrace,
+            library: 'glade_forms',
+            context: ErrorDescription('while handling a failed async validation of part ${part.key ?? '<no key>'}'),
+          ),
+        );
       }
     }
 

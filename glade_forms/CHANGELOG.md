@@ -10,10 +10,11 @@
   - `AsyncValidationFailedError` with key `GladeValidationsKeys.asyncValidationFailed` reports exceptions from async validators; `DefaultValidationTranslations.defaultAsyncValidationFailedMessage` provides a fallback message.
   - `GladeComposedModel` supports async validation on its own inputs and aggregates both levels: `isValidating`, `isAsyncValidationRunning` and `validateAsync()` cover own inputs together with the contained models. `asyncValidationMode` is per owner - own inputs follow the composed model, contained models keep their own.
   - A cached result never reports `done` while a retry is in flight, and it carries the value its asynchronous parts actually ran against.
-  - Cache invalidation and the form field validators use the input's `valueComparator` when provided, and respect `valueTransform` - without it a transformed value never matched the field's text and async validation was never triggered from a form field.
+  - The form field validators respect `valueTransform` - without it a transformed value never matched the field's text and async validation was never triggered from a form field.
   - An asynchronous state change clears `lastUpdates`, so a listener reading `lastUpdatedInputKeys` does not see the last edit replayed once per state change.
   - `validateAsync()` on a model lets every input settle instead of failing fast on the first throwing validator.
   - A cached asynchronous result is tied to the set of parts which produced it, so a result produced while synchronous validation was failing is not reused once it passes.
+  - Cached results are dropped on a structural value change. A type without `==` is matched through its `stringToValueConverter`; without one, every assignment counts as a new value.
   - `GladeModelBase` gained `isValidating`, `isAsyncValidationRunning` and `validateAsync()`, all with defaults, so extending it directly keeps compiling.
   - `ValidatorInstance.hasDeclaredValidator()` keeps reporting synchronous parts only; asynchronous ones are reported by the new `hasDeclaredAsyncValidator()`.
   - `GladeFormDebugInfo` and the DevTools extension show async validation state.

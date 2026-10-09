@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:glade_forms/src/validator/part/async_input_validator_part.dart';
 import 'package:glade_forms/src/validator/validator_instance.dart';
 import 'package:glade_forms/src/validator/validator_result.dart';
 import 'package:glade_forms/src/validator/validator_result/async_validation_state.dart';
@@ -32,11 +31,11 @@ class AsyncValidationRunner<T> {
   /// Value the cached results were produced for. Meaningful only while [_cachedResults] is not null.
   T? _cachedValue;
 
-  /// Asynchronous parts the cached results came from.
+  /// Whether the parts gated by `runOnlyWhenSyncValid` ran for the cached results.
   ///
   /// Which parts run depends on the synchronous result, so a cache produced while synchronous validation
-  /// was failing must not be reused once it passes - the parts gated by `runOnlyWhenSyncValid` never ran.
-  List<AsyncInputValidatorPart<T>>? _cachedParts;
+  /// was failing must not be reused once it passes - the gated parts never ran.
+  bool? _cachedRunsSyncDependentParts;
 
   /// Cached results describe a failed request, so an explicit [runNow] retries instead of reusing them.
   bool _cacheIsRetryable = false;
@@ -95,7 +94,7 @@ class AsyncValidationRunner<T> {
     _inFlight = null;
     _cachedResults = null;
     _cachedValue = null;
-    _cachedParts = null;
+    _cachedRunsSyncDependentParts = null;
     _cacheIsRetryable = false;
     _setState(.notRun);
   }
@@ -165,7 +164,7 @@ class AsyncValidationRunner<T> {
       if (sequence == _sequence) {
         _cachedResults = outcome.results;
         _cachedValue = value;
-        _cachedParts = _validatorInstance.asyncPartsToRun(syncResult);
+        _cachedRunsSyncDependentParts = _validatorInstance.runsSyncDependentParts(syncResult);
         _cacheIsRetryable = outcome.hasFailure;
       }
 
@@ -195,19 +194,8 @@ class AsyncValidationRunner<T> {
   /// Cached results exist and came from the same parts the current [syncResult] selects.
   bool _hasUsableCache(ValidatorResult<T> syncResult) => _cachedResults != null && _cacheCovers(syncResult);
 
-  bool _cacheCovers(ValidatorResult<T> syncResult) {
-    final cachedParts = _cachedParts;
-
-    if (cachedParts == null) return false;
-
-    final cachedIterator = cachedParts.iterator;
-
-    for (final part in _validatorInstance.asyncPartsToRun(syncResult)) {
-      if (!cachedIterator.moveNext() || !identical(part, cachedIterator.current)) return false;
-    }
-
-    return !cachedIterator.moveNext();
-  }
+  bool _cacheCovers(ValidatorResult<T> syncResult) =>
+      _cachedRunsSyncDependentParts == _validatorInstance.runsSyncDependentParts(syncResult);
 
   void _setState(AsyncValidationState state) {
     if (_state == state) return;

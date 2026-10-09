@@ -217,14 +217,6 @@ Inputs of a contained model are aggregated through that model itself.''');
     return true;
   }
 
-  /// Propagates a change which was not caused by composed model's own inputs - a contained model
-  /// changed, or a model was attached or detached.
-  ///
-  /// Own [lastUpdates] are cleared, otherwise keys of the previous own-input update would be
-  /// re-broadcast as if they described this change.
-  ///
-  /// During [groupEdit] the notification is skipped - it is folded into the single notification
-  /// which `groupEdit` emits at the end of the batch.
   /// Awaits asynchronous validation of [model] and never propagates its failure - see [validateInputSettling].
   Future<void> _validateModelSettling(M model) async {
     try {
@@ -234,6 +226,14 @@ Inputs of a contained model are aggregated through that model itself.''');
     }
   }
 
+  /// Propagates a change which was not caused by composed model's own inputs - a contained model
+  /// changed, or a model was attached or detached.
+  ///
+  /// Own [lastUpdates] are cleared, otherwise keys of the previous own-input update would be
+  /// re-broadcast as if they described this change.
+  ///
+  /// During [groupEdit] the notification is skipped - it is folded into the single notification
+  /// which `groupEdit` emits at the end of the batch.
   void _onModelsChanged() {
     if (isGroupEditing) return;
 
