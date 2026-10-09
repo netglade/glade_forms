@@ -87,6 +87,10 @@ class GladeInput<T> {
   bool _isDisposed = false;
 
   /// Text of [controller] as it was when its last notification was processed.
+  ///
+  /// Starts as `null` on purpose. The constructor assigns the value directly, so with a lossy
+  /// `convertBack` the controller's initial text does not convert back into that value - the first
+  /// notification must therefore never be mistaken for an unchanged one.
   String? _lastControllerText;
 
   /// Input is in invalid state when there was conversion error.
@@ -242,8 +246,6 @@ class GladeInput<T> {
                 },
               )
             : null);
-
-    _lastControllerText = _textEditingController?.text;
 
     validatorInstance.bindInput(this);
 

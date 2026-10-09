@@ -889,6 +889,44 @@ void main() {
       expect(username.validatorResult.asyncState, equals(AsyncValidationState.done));
     });
   });
+  test('an initial value which does not round-trip through the text keeps no stale verdict', () {
+    FakeAsync().run((async) {
+      // arrange
+      final seen = <double>[];
+      final input = GladeInput<double>.create(
+        inputKey: 'amount',
+        value: 10.004,
+        useTextEditingController: true,
+        stringToValueConverter: StringToTypeConverter(
+          converter: (rawValue, _) => double.parse(rawValue ?? '0'),
+          // Lossy on purpose: the initial value does not come back out of the controller's text.
+          converterBack: (value) => value.toStringAsFixed(2),
+        ),
+        validator: (v) =>
+            (v..customAsync((value, key) async {
+                  seen.add(value);
+
+                  return value < 0 ? ValueError(value: value, key: key, devMessage: (_) => 'Negative') : null;
+                }))
+                .build(asyncDebounce: .zero),
+      );
+
+      final _ = input.validate();
+      async.flushMicrotasks();
+
+      expect(seen, equals([10.004]));
+
+      // act: a cursor move converts the text into a value which differs from the initial one
+      input.controller?.selection = const TextSelection.collapsed(offset: 1);
+      async.flushMicrotasks();
+
+      // assert
+      expect(input.value, equals(10.0));
+      expect(seen, equals([10.004, 10.0]), reason: 'the value changed, so the cached verdict must not stand');
+
+      input.dispose();
+    });
+  });
 }
 
 class _ModelWithAsyncInput extends GladeModel {
