@@ -14,7 +14,7 @@
   - An asynchronous state change clears `lastUpdates`, so a listener reading `lastUpdatedInputKeys` does not see the last edit replayed once per state change.
   - `validateAsync()` on a model lets every input settle instead of failing fast on the first throwing validator.
   - A cached asynchronous result is tied to the set of parts which produced it, so a result produced while synchronous validation was failing is not reused once it passes.
-  - Cached results are dropped on a structural value change. A type without `==` is matched through its `stringToValueConverter`; without one, every assignment counts as a new value.
+  - Cached results are dropped on a structural value change. Where a text field is the source of the value, the text decides instead, so a cursor move does not restart validation and the field's own text counts as the current value.
   - `GladeModelBase` gained `isValidating`, `isAsyncValidationRunning` and `validateAsync()`, all with defaults, so extending it directly keeps compiling.
   - `ValidatorInstance.hasDeclaredValidator()` keeps reporting synchronous parts only; asynchronous ones are reported by the new `hasDeclaredAsyncValidator()`.
   - `GladeFormDebugInfo` and the DevTools extension show async validation state.

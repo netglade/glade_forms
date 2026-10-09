@@ -816,6 +816,79 @@ void main() {
       });
     });
   });
+  test('a lossy convertBack does not make two different values look the same', () {
+    FakeAsync().run((async) {
+      // arrange
+      final seen = <double>[];
+      final input = GladeInput<double>.create(
+        inputKey: 'amount',
+        value: 0,
+        stringToValueConverter: StringToTypeConverter(
+          converter: (rawValue, _) => double.parse(rawValue ?? '0'),
+          // Lossy on purpose: both values below convert back to the same text.
+          converterBack: (value) => value.toStringAsFixed(2),
+        ),
+        validator: (v) =>
+            (v..customAsync((value, key) async {
+                  seen.add(value);
+
+                  return value < 0 ? ValueError(value: value, key: key, devMessage: (_) => 'Negative') : null;
+                }))
+                .build(asyncDebounce: .zero),
+      );
+
+      // act
+      input.updateValue(10.001);
+      async.flushMicrotasks();
+      input.updateValue(10.004);
+      async.flushMicrotasks();
+
+      // assert
+      expect(seen, equals([10.001, 10.004]), reason: 'the values differ, so both must be validated');
+    });
+  });
+
+  test('a sync flip does not drop the cache when no part is gated by it', () {
+    FakeAsync().run((async) {
+      // arrange
+      var calls = 0;
+      final minLength = GladeIntInput(value: 1, inputKey: 'min-length');
+      final username = GladeStringInput(
+        inputKey: 'username',
+        value: 'free',
+        useTextEditingController: false,
+        isRequired: false,
+        dependencies: () => [minLength],
+        validator: (v) =>
+            (v
+                  ..satisfy((value) => value.length >= minLength.value, key: 'too-short')
+                  ..customAsync(
+                    (value, key) async {
+                      calls++;
+
+                      return value.isEmpty ? ValueError(value: value, key: key, devMessage: (_) => 'Empty') : null;
+                    },
+                    key: 'ungated',
+                    runOnlyWhenSyncValid: false,
+                  ))
+                .build(asyncDebounce: .zero, stopOnFirstError: false),
+      );
+
+      username.updateValue('taken');
+      async.flushMicrotasks();
+
+      expect(calls, equals(1));
+
+      // act
+      minLength.updateValue(10);
+      final _ = username.validate();
+      async.flushMicrotasks();
+
+      // assert
+      expect(calls, equals(1), reason: 'the selection of parts cannot change, so the cache still applies');
+      expect(username.validatorResult.asyncState, equals(AsyncValidationState.done));
+    });
+  });
 }
 
 class _ModelWithAsyncInput extends GladeModel {

@@ -195,6 +195,7 @@ class AsyncValidationRunner<T> {
   bool _hasUsableCache(ValidatorResult<T> syncResult) => _cachedResults != null && _cacheCovers(syncResult);
 
   bool _cacheCovers(ValidatorResult<T> syncResult) =>
+      !_validatorInstance.hasSyncDependentParts ||
       _cachedRunsSyncDependentParts == _validatorInstance.runsSyncDependentParts(syncResult);
 
   void _setState(AsyncValidationState state) {

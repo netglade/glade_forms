@@ -28,6 +28,12 @@ class ValidatorInstance<T> {
   /// Whether any asynchronous part is declared.
   bool get hasAsyncParts => _asyncParts.isNotEmpty;
 
+  /// Whether any asynchronous part is gated by `runOnlyWhenSyncValid`.
+  ///
+  /// Without one the selection made by [asyncPartsToRun] does not depend on the synchronous result at all.
+  @internal
+  bool get hasSyncDependentParts => _asyncParts.any((part) => part.runOnlyWhenSyncValid);
+
   ValidatorInstance({
     required List<InputValidatorPart<T>> parts,
     required this.stopOnFirstError,

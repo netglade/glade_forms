@@ -86,6 +86,9 @@ class GladeInput<T> {
 
   bool _isDisposed = false;
 
+  /// Text of [controller] as it was when its last notification was processed.
+  String? _lastControllerText;
+
   /// Input is in invalid state when there was conversion error.
   ConvertError<T>? __conversionError;
 
@@ -239,6 +242,8 @@ class GladeInput<T> {
                 },
               )
             : null);
+
+    _lastControllerText = _textEditingController?.text;
 
     validatorInstance.bindInput(this);
 
@@ -461,7 +466,7 @@ A GladeComposedModel lists its own inputs, never inputs of its contained models.
 
     try {
       final convertedValue = applyValueTransform(converter.convert(value));
-      final isCurrentValue = _sameValue(convertedValue, this.value);
+      final isCurrentValue = _isCurrentControllerText(value) || ValueEquality.equals(convertedValue, this.value);
       final syncResult = validatorInstance.validate(isCurrentValue ? this.value : convertedValue);
 
       if (isCurrentValue) _scheduleAsyncValidation(syncResult);
@@ -497,7 +502,7 @@ A GladeComposedModel lists its own inputs, never inputs of its contained models.
     String delimiter = '.',
   }) {
     final transformedValue = applyValueTransform(value);
-    final isCurrentValue = _sameValue(transformedValue, this.value);
+    final isCurrentValue = ValueEquality.equals(transformedValue, this.value);
     final syncResult = validatorInstance.validate(isCurrentValue ? this.value : transformedValue);
 
     if (isCurrentValue) _scheduleAsyncValidation(syncResult);
@@ -693,16 +698,26 @@ A GladeComposedModel lists its own inputs, never inputs of its contained models.
     final shouldTriggerOnNextChange = _controllerTriggersOnChange;
     _controllerTriggersOnChange = true;
 
-    try {
-      final convertedValue = converter.convert(controller?.text);
+    final text = controller?.text;
+    // A controller notifies on selection changes too. The value did not change there, so the cached
+    // asynchronous result still applies - converting the same text may well produce a new instance.
+    final isUnchangedText = text == _lastControllerText;
+    _lastControllerText = text;
 
-      _setValue(convertedValue, shouldTriggerOnChange: shouldTriggerOnNextChange);
+    try {
+      final convertedValue = converter.convert(text);
+
+      _setValue(
+        convertedValue,
+        shouldTriggerOnChange: shouldTriggerOnNextChange,
+        keepAsyncResults: isUnchangedText,
+      );
     } on ConvertError<T> catch (e) {
       _conversionError = e;
     }
   }
 
-  void _setValue(T value, {required bool shouldTriggerOnChange}) {
+  void _setValue(T value, {required bool shouldTriggerOnChange, bool keepAsyncResults = false}) {
     _previousValue = _value;
 
     _value = applyValueTransform(value);
@@ -710,7 +725,7 @@ A GladeComposedModel lists its own inputs, never inputs of its contained models.
     _isPure = false;
     __conversionError = null;
 
-    if (!_sameValue(_previousValue, _value)) _asyncRunner?.onValueChanged();
+    if (!keepAsyncResults && !ValueEquality.equals(_previousValue, _value)) _asyncRunner?.onValueChanged();
 
     // The synchronous pass is shared by the async trigger and by ChangesInfo instead of being run twice.
     if ((shouldTriggerOnChange && onChange != null) || _asyncRunner != null) {
@@ -736,21 +751,14 @@ A GladeComposedModel lists its own inputs, never inputs of its contained models.
     _asyncRunner?.markStateNotified();
   }
 
-  /// Whether [a] and [b] are the same value of this input.
+  /// Whether [text] is what the input's own text field currently holds.
   ///
-  /// Structural equality first. A type without a meaningful `==` would otherwise report every converted
-  /// instance as a new value - dropping the cached asynchronous result on a mere cursor move and never
-  /// recognising the field's own text as the current value - so such types are matched through their
-  /// [stringToValueConverter]. Without a converter there is nothing left to compare and every assignment
-  /// counts as a change.
-  bool _sameValue(T? a, T? b) {
-    if (ValueEquality.equals(a, b)) return true;
+  /// Only meaningful with a [controller] - there the text is the source of the value, so it identifies the
+  /// current value even for a type whose instances never compare equal.
+  bool _isCurrentControllerText(String? text) {
+    final controllerText = _textEditingController?.text;
 
-    final converter = stringToValueConverter;
-
-    if (converter == null || a == null || b == null) return false;
-
-    return converter.convertBack(a) == converter.convertBack(b);
+    return controllerText != null && controllerText == (text ?? '');
   }
 
   ValidatorResult<T> _validatorResultFor(ValidatorResult<T> syncResult) {
