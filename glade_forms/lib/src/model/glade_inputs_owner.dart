@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:glade_forms/src/core/error/validation_translator.dart';
 import 'package:glade_forms/src/core/input/glade_input.dart';
+import 'package:glade_forms/src/model/async_validation_mode.dart';
 import 'package:glade_forms/src/model/glade_model_base.dart';
 
 /// Adds ownership of [GladeInput]s to a model.
@@ -16,6 +17,11 @@ mixin GladeInputsOwner on GladeModelBase {
 
   ValidationTranslator<Object?> get defaultValidationTranslate =>
       (error, key, devMessage, dependencies) => devMessage;
+
+  /// Determines how pending asynchronous validation affects `isValid` of owned inputs and of this model.
+  ///
+  /// Override to switch to [AsyncValidationMode.lastKnown]. Default is [AsyncValidationMode.strict].
+  AsyncValidationMode get asyncValidationMode => .strict;
 
   /// Currently tracked inputs by the model.
   ///
@@ -42,6 +48,8 @@ mixin GladeInputsOwner on GladeModelBase {
       .map((e) {
         if (e.hasConversionError) return '${e.inputKey} - CONVERSION ERROR';
 
+        if (e.isValidating) return '${e.inputKey} - VALIDATING';
+
         if (e.validatorResult.isNotValid) {
           return '${e.inputKey} - ${e.errorFormatted()}';
         }
@@ -52,6 +60,12 @@ mixin GladeInputsOwner on GladeModelBase {
 
   /// Returns true if model has any debug metadata.
   bool get hasDebugMetadata => fillDebugMetadata().isNotEmpty;
+
+  @override
+  bool get isValidating => inputs.any((input) => input.isValidating);
+
+  @override
+  bool get isAsyncValidationRunning => inputs.any((input) => input.isAsyncValidationRunning);
 
   /// True while [groupEdit]'s callback is being executed, nested calls included.
   ///
@@ -81,6 +95,26 @@ Did you forget to override initialize() and create the model's inputs there?''',
   /// Binds input to model.
   void bindToModel(GladeInput<Object?> input) => input.bindToModel(this);
 
+  @override
+  Future<bool> validateAsync() async {
+    final _ = await Future.wait(inputs.map(validateInputSettling));
+
+    return isValid;
+  }
+
+  /// Awaits asynchronous validation of [input] and never propagates its failure.
+  ///
+  /// A validator which throws must not stop the remaining inputs from settling. The failing input stays
+  /// invalid through its own result; a throwing *synchronous* validator surfaces when [isValid] is read.
+  @protected
+  Future<void> validateInputSettling(GladeInput<Object?> input) async {
+    try {
+      final _ = await input.validateAsync();
+    } on Object {
+      // Intentionally swallowed - see the doc comment.
+    }
+  }
+
   /// Updates model's input with String? value using its converter.
   void stringFieldUpdateInput<INPUT extends GladeInput<Object?>>(INPUT input, String? value) {
     assert(_ownsInput(input), _foreignInputMessage(input));
@@ -101,6 +135,21 @@ Did you forget to override initialize() and create the model's inputs there?''',
     input.value = value;
 
     _announceUpdateOfUnbindedInput(input);
+  }
+
+  /// Called by an owned input when its asynchronous validation state changed.
+  ///
+  /// Dependencies are not notified and [lastUpdates] is cleared, because no value changed - a listener
+  /// reading `lastUpdatedInputKeys` must not see the previous edit replayed once per async state change.
+  @internal
+  void notifyInputValidationUpdated() {
+    // An input which is not listed in `allInputs` is not disposed with the model, so its late response
+    // can reach a model which is already gone.
+    if (isDisposed) return;
+
+    lastUpdates = [];
+
+    notifyListeners();
   }
 
   @internal

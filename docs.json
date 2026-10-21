@@ -25,6 +25,11 @@
           "icon": "spell-check"
         },
         {
+          "title": "Async validation",
+          "href": "/async-validation",
+          "icon": "cloud-arrow-up"
+        },
+        {
           "title": "GladeModel",
           "href": "/glade-model",
           "icon": "boxes-stacked"
