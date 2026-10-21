@@ -29,6 +29,7 @@ flutter:
   assets:
     - assets/translations/
     - lib/usecases/
+    - lib/usecases/async/
     - lib/usecases/dependencies/
     - lib/usecases/onchange/
     - lib/usecases/regress/

@@ -17,6 +17,7 @@ extension GladeModelBaseDevToolsSerialization on GladeModelBase {
       'isPure': isPure,
       'isUnchanged': isUnchanged,
       'isValid': isValid,
+      'isValidating': isValidating,
       'type': runtimeType.toString(),
     };
   }

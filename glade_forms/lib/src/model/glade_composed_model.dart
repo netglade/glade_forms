@@ -45,6 +45,16 @@ abstract class GladeComposedModel<M extends GladeModelBase> extends GladeModelBa
       inputs.where((input) => input.trackUnchanged).every((input) => input.isUnchanged) &&
       models.every((model) => model.isUnchanged);
 
+  /// Returns true if any own input or any model has asynchronous validation scheduled or running.
+  @override
+  bool get isValidating => inputs.any((input) => input.isValidating) || models.any((model) => model.isValidating);
+
+  /// Returns true if any own input or any model has an asynchronous validation request in flight.
+  @override
+  bool get isAsyncValidationRunning =>
+      inputs.any((input) => input.isAsyncValidationRunning) ||
+      models.any((model) => model.isAsyncValidationRunning);
+
   /// Models that this composed model is currently listening to.
   List<M> get models => _models;
 
@@ -111,6 +121,17 @@ Inputs of a contained model are aggregated through that model itself.''');
       ..unbindFromComposedModel(this);
 
     if (shouldNotify) _onModelsChanged();
+  }
+
+  /// Runs asynchronous validation of own inputs and of all [models], awaits it and returns [isValid].
+  @override
+  Future<bool> validateAsync() async {
+    final _ = await Future.wait([
+      ...inputs.map(validateInputSettling),
+      ...models.map(_validateModelSettling),
+    ]);
+
+    return isValid;
   }
 
   /// Sets the initial values of own inputs and of all [models] to their current values.
@@ -194,6 +215,15 @@ Inputs of a contained model are aggregated through that model itself.''');
     }
 
     return true;
+  }
+
+  /// Awaits asynchronous validation of [model] and never propagates its failure - see [validateInputSettling].
+  Future<void> _validateModelSettling(M model) async {
+    try {
+      final _ = await model.validateAsync();
+    } on Object {
+      // Intentionally swallowed - one failing model must not stop the others from settling.
+    }
   }
 
   /// Propagates a change which was not caused by composed model's own inputs - a contained model

@@ -19,8 +19,8 @@ class GladeInputCard extends StatelessWidget {
       margin: const .only(bottom: 8),
       child: ExpansionTile(
         leading: Icon(
-          input.isValid ? Icons.check_circle : Icons.error,
-          color: input.isValid ? Colors.green : Colors.red,
+          input.isValidating ? Icons.hourglass_top : (input.isValid ? Icons.check_circle : Icons.error),
+          color: input.isValidating ? Colors.orange : (input.isValid ? Colors.green : Colors.red),
         ),
         title: Text(input.key, style: const TextStyle(fontWeight: .bold)),
         subtitle: Row(
@@ -88,6 +88,17 @@ class GladeInputCard extends StatelessWidget {
                     ),
                   ],
                 ),
+                if (input.hasAsyncValidation)
+                  Row(
+                    children: [
+                      Expanded(
+                        child: InfoRow(label: 'Validating', value: input.isValidating, hasInverseBoolColors: true),
+                      ),
+                      Expanded(
+                        child: InfoRow(label: 'Async state', value: input.asyncLabel),
+                      ),
+                    ],
+                  ),
                 if (hasErrors) ...[
                   const Divider(height: 16),
                   Text(

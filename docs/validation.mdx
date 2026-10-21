@@ -55,6 +55,8 @@ In this example, all validation parts are checked, and both errors and warnings 
 
 Fields connected with `textFormFieldInputValidator` will automatically call validator and validation error (if any) is passed down to fields. By default `devMessage` is used unless translation is specified. 
 
+Validators can also be asynchronous, for example a server lookup. See [Async validation](/async-validation).
+
 ## Validation severity
 
 Each validation rule can specify a **severity** using the `ValidationSeverity` enum. This allows you to distinguish between errors (which typically block form submission) and warnings (which inform the user but do not block submission).
