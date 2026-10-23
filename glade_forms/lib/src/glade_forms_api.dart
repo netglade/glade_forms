@@ -8,6 +8,7 @@ abstract final class GladeForms {
   ///
   /// This must be called in your app's main() method before creating any GladeModel instances.
   /// It sets up DevTools integration so the Glade Forms Inspector is available immediately.
+  /// DevTools integration is set up in debug and profile mode; in release mode this is a no-op.
   ///
   /// Example:
   /// ```dart
@@ -17,6 +18,6 @@ abstract final class GladeForms {
   /// }
   /// ```
   static void initialize() {
-    if (kDebugMode) GladeFormsDevToolsRegistry.initialize();
+    if (!kReleaseMode) GladeFormsDevToolsRegistry.initialize();
   }
 }

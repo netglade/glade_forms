@@ -51,7 +51,7 @@ class GladeFormsDevToolsRegistry {
 
   void _registerServiceExtension() {
     if (kReleaseMode) {
-      return; // DevTools integration only available in debug mode.
+      return; // DevTools integration is not available in release mode.
     }
 
     developer.registerExtension(

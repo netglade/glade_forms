@@ -52,6 +52,8 @@
 - Asserts were added for input ownership: an input can be binded to one model only, an input can not be updated through a model which does not own it, and a composed model can not share an input with a contained model.
   - An input which outlived its model - one the model never listed, so it was not disposed with it - can be binded to a new model once the previous owner is disposed.
   - A **disposed** input can not be binded at all: its `TextEditingController` is gone, so the new model would get a dead input.
+- **[Fix]**: Every `GladeModel` threw `Bad state: GladeForms.initialize() must be called before using GladeModel` in **profile** mode, although `GladeForms.initialize()` was called. `initialize()` set up the DevTools registry in debug mode only, while models register with it in every non-release mode.
+  - `GladeForms.initialize()` now sets up DevTools integration in debug and profile mode, so the inspector is available in profile builds too. Release mode is unchanged.
 
 ## 6.1.0
 - **[Add]**: `GladeComposedModel.addModel()` and `removeModel()` accept `shouldNotify` parameter ([#104](https://github.com/netglade/glade_forms/issues/104)).
