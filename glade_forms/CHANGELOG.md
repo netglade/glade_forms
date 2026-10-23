@@ -1,4 +1,5 @@
-## Unreleased
+## 7.0.0
+- **Breaking**: `GladeComposedModel` newly inherits members of `GladeInputsOwner` (`initialize`, `inputs`, `updateInput`, ...). A same-named member in your subclass is now an override - see the composed model's own inputs entry below.
 - **[Add]**: Asynchronous validation ([#12](https://github.com/netglade/glade_forms/issues/12)).
   - New validator parts `satisfyAsync()` and `customAsync()` with `runOnlyWhenSyncValid` and `onError` options; `build(asyncDebounce:)` configures debounce (default 300 ms).
   - `GladeInput` gains `isValidating`, `hasAsyncValidation` and `validateAsync({force})`. Validation requests (`validate()`, `textFormFieldInputValidator`, `formFieldValidator`, value changes) trigger async validation; getters only read.
