@@ -46,6 +46,7 @@
 - **[Fix]**: `GladeFormDebugInfoModal.show()` did not pass its type argument to the `GladeFormDebugInfo` it builds, so the widget looked up its own bound instead of the model given to it and always threw `ProviderNotFoundException`.
 - **[Fix]**: `lastUpdates` is no longer cleared by a nested notification raised while the model is delivering its own update - e.g. when an `onDependencyChange` callback updates a contained model.
 - **[Fix]**: DevTools extension failed to parse any model which has at least one input - decoded JSON lists were cast directly to `List<String>`, which throws even for an empty list.
+- **[Fix]**: The DevTools extension is now part of the published package. Versions 6.0.0 to 6.1.0 shipped without its build, so DevTools had no extension to load.
 - **[Fix]**: Own inputs of a composed model are disposed after its contained models are detached and after it detaches from its parent composed models, because both notify synchronously and their listeners may still read those inputs. The disposal can no longer be skipped by a throw.
   - A contained model which throws while being disposed no longer stops the disposal of the remaining models - every model is disposed and the collection is cleared, then the first failure is rethrown.
 - **[Fix]**: A model rejected by `addModel()` (it shares an input with the composed model) is detached again before the assert fails, so it is never left half attached and driving the composed model.
